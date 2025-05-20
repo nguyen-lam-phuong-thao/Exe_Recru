@@ -1,0 +1,73 @@
+@startuml
+title CV Analysis and Information Extraction using LangGraph Agent
+
+actor User
+
+participant "CVProcessingService" as Service
+box "LangGraph Agent Workflow" #LightBlue
+    participant "InputHandlerNode" as InputNode
+    participant "CVParserNode" as ParserNode
+    participant "SectionIdentifierNode" as SectionIdentifier
+    participant "InformationExtractorNode" as InfoExtractor
+    participant "CharacteristicInferenceNode" as InferenceNode
+    participant "OutputAggregatorNode" as OutputNode
+end box
+participant "LLMService" as LLM
+participant "DataExtractionTools" as Tools
+
+User -> Service: Submit CV Text/Markdown
+activate Service
+
+Service -> InputNode: Start CV Analysis with CV Content
+activate InputNode
+    InputNode -> ParserNode: Raw CV Content
+    activate ParserNode
+        ParserNode -> LLM: Clean and Structure CV (e.g., Markdown to Text, Normalize)
+        activate LLM
+        LLM --> ParserNode: Processed CV Text
+        deactivate LLM
+    ParserNode --> SectionIdentifier: Processed CV Text
+    deactivate ParserNode
+    activate SectionIdentifier
+        SectionIdentifier -> LLM: Identify CV Sections (e.g., Personal Info, Education, Work Experience, Skills, Projects)
+        activate LLM
+        LLM --> SectionIdentifier: List of Identified Sections
+        deactivate LLM
+    SectionIdentifier --> InfoExtractor: Processed CV Text and Sections
+    deactivate SectionIdentifier
+    activate InfoExtractor
+        loop for each Section
+            InfoExtractor -> LLM: "Extract [SectionType] details from text..."
+            activate LLM
+            LLM --> Tools: Request to use specific tool (e.g., EducationExtractorTool with schema)
+            activate Tools
+            Tools --> LLM: Tool schema / Function definition
+            LLM --> InfoExtractor: Call Tool with structured data for [SectionType] (e.g., EducationItem, WorkExperienceItem)
+            deactivate LLM
+            deactivate Tools
+            InfoExtractor -> InfoExtractor: Store Extracted [SectionType] Data
+        end
+        InfoExtractor -> LLM: Extract general keywords and summary
+        activate LLM
+        LLM --> InfoExtractor: Keywords, Summary
+        deactivate LLM
+    InfoExtractor --> InferenceNode: All Extracted Structured Data and Text
+    deactivate InfoExtractor
+    activate InferenceNode
+        InferenceNode -> LLM: "Based on the CV, infer user characteristics, potential roles, strengths, etc."
+        activate LLM
+        LLM --> InferenceNode: Inferred Characteristics and Insights
+        deactivate LLM
+    InferenceNode --> OutputNode: All Extracted Data and Inferences
+    deactivate InferenceNode
+    activate OutputNode
+        OutputNode -> OutputNode: Aggregate and Format Results (e.g., JSON including CVState fields)
+    OutputNode --> InputNode: Comprehensive CVAnalysisResult
+    deactivate OutputNode
+InputNode --> Service: CVAnalysisResult
+deactivate InputNode
+
+Service --> User: Display CV Analysis
+deactivate Service
+
+@enduml
