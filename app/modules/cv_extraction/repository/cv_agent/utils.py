@@ -108,3 +108,8 @@ class TokenTracker:
 
 	def add_context_tokens(self, tokens: int):
 		self.context_tokens += tokens
+
+	def reset(self):
+		self.input_tokens = 0
+		self.output_tokens = 0
+		self.context_tokens = 0

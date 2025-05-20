@@ -40,6 +40,10 @@ MINIO_SECURE = False  # Using boolean instead of string
 CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://redis:6379/0')
 CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://redis:6379/0')
 
+# API pricing per million tokens (in USD)
+INPUT_PRICE_PER_MILLION = float(os.getenv('INPUT_PRICE_PER_MILLION', '0.10'))
+OUTPUT_PRICE_PER_MILLION = float(os.getenv('OUTPUT_PRICE_PER_MILLION', '0.40'))
+CONTEXT_PRICE_PER_MILLION = float(os.getenv('CONTEXT_PRICE_PER_MILLION', '0.025'))
 
 class Settings(BaseModel):
 	PROJECT_NAME: str = PROJECT_NAME

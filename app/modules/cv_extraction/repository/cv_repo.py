@@ -4,6 +4,7 @@ import uuid
 import os
 from app.core.base_model import APIResponse
 from app.middleware.translation_manager import _
+from app.modules.cv_extraction.repository.cv_agent import CVAnalyzer
 from app.modules.cv_extraction.schemas.cv import ProcessCVRequest
 from app.utils.pdf import (
 	PDFToTextConverter,
@@ -29,7 +30,7 @@ class CVRepository:
 
 		print(f'[DEBUG] File downloaded successfully to: {file_path}')
 		extracted_text = None
-		file_extension = file_path.split('.')[-1].lower()
+		file_extension = "pdf"
 		print(f'[DEBUG] Detected file extension: {file_extension}')
 		converter = None
 
@@ -89,12 +90,27 @@ class CVRepository:
 				message=_('no_text_extracted'),
 				data=None,
 			)
+   
+		cv_analyzer = CVAnalyzer()
+		print('[DEBUG] Initialized CVAnalyzer')
+		try:
+			print('[DEBUG] Starting CV analysis')
+			result = await cv_analyzer.analyze_cv_content(extracted_text["markdown"])
+			print(f'[DEBUG] CV analysis result: {result}')
+		except Exception as e:
+			print(f'[DEBUG] Exception during CV analysis: {str(e)}')
+			return APIResponse(
+				error_code=1,
+				message=_('error_analyzing_cv'),
+				data=None,
+			)
 		return APIResponse(
 			error_code=0,
 			message=_('cv_processed_successfully'),
 			data={
 				'cv_file_url': request.cv_file_url,
 				'extracted_text': extracted_text,
+				'cv_analysis_result': result,
 			},
 		)
 
