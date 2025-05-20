@@ -213,42 +213,52 @@ class CVProcessorWorkflow:
             "extracted_keywords": [],
             "cv_summary": "",
         }
-
         section_to_schema_map = {
-            ("personal information", "contact", "about me"): (
-                PersonalInfoItem,
-                "personal_info_item",
-            ),
-            ("education", "academic background", "qualifications"): (
-                ListEducationItem,
-                "education_items",
-            ),
-            (
-                "work experience",
-                "experience",
-                "employment history",
-                "professional experience",
-            ): (
-                ListWorkExperienceItem,
-                "work_experience_items",
-            ),
-            ("skills", "technical skills", "languages"): (
-                ListSkillItem,
-                "skill_items",
-            ),
-            ("projects", "personal projects", "portfolio"): (
-                ListProjectItem,
-                "project_items",
-            ),
-            ("certifications", "courses", "licenses"): (
-                ListCertificateItem,
-                "certificate_items",
-            ),
-            ("interests", "hobbies"): (
-                ListInterestItem,
-                "interest_items",
-            ),
-        }
+			# Personal information keywords
+			("personal information", "contact", "about me", "personal details", "profile", "bio", "introduction", "summary", "overview"): (
+			PersonalInfoItem,
+			"personal_info_item",
+			),
+			# Education keywords
+			("education", "academic background", "qualifications", "academic history", "studies", "degrees", "academic achievements", "schools", "university", "colleges", "academic qualifications"): (
+			ListEducationItem,
+			"education_items",
+			),
+			# Work experience keywords
+			(
+			"work experience", "experience", "employment history", "professional experience", 
+			"career history", "professional background", "job history", "work history", 
+			"positions held", "career summary", "professional summary", "employment"
+			): (
+			ListWorkExperienceItem,
+			"work_experience_items",
+			),
+			# Skills keywords
+			("skills", "technical skills", "languages", "competencies", "abilities", "expertise", 
+			 "proficiencies", "capabilities", "core skills", "key skills", "professional skills", 
+			 "soft skills", "hard skills", "tech stack", "technologies"): (
+			ListSkillItem,
+			"skill_items",
+			),
+			# Projects keywords
+			("projects", "personal projects", "portfolio", "case studies", "works", "project experience", 
+			 "project history", "achievements", "key projects", "featured projects", "research projects"): (
+			ListProjectItem,
+			"project_items",
+			),
+			# Certifications keywords
+			("certifications", "courses", "licenses", "certificates", "accreditations", "qualifications", 
+			 "professional development", "training", "workshops", "professional certifications", "credentials"): (
+			ListCertificateItem,
+			"certificate_items",
+			),
+			# Interests keywords
+			("interests", "hobbies", "activities", "personal interests", "extracurricular activities", 
+			 "volunteering", "leisure activities", "passions", "recreational activities"): (
+			ListInterestItem,
+			"interest_items",
+			),
+		}
 
         current_messages = state.get("messages", [])
 

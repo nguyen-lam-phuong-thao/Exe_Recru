@@ -109,7 +109,7 @@ class CVRepository:
 			message=_('cv_processed_successfully'),
 			data={
 				'cv_file_url': request.cv_file_url,
-				'extracted_text': extracted_text,
+				'extracted_text': extracted_text['text'],
 				'cv_analysis_result': result,
 			},
 		)
