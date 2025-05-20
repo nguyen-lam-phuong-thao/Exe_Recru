@@ -53,10 +53,10 @@ class CVProcessorWorkflow:
 
     async def input_handler_node(self, state: CVState) -> Dict[str, Any]:
         """Handles initial input and starts the process."""
-        self.logger.info("InputHandlerNode: Starting CV analysis.")
+        print("InputHandlerNode: Starting CV analysis.")
         # raw_cv_content is expected to be in the initial state
         if not state.get("raw_cv_content"):
-            self.logger.error("InputHandlerNode: No raw_cv_content provided.")
+            print("InputHandlerNode: No raw_cv_content provided.")
             # Potentially raise an error or set a flag
             return {"raw_cv_content": ""}  # Ensure it's not None for next steps
         return {
@@ -66,7 +66,7 @@ class CVProcessorWorkflow:
 
     async def cv_parser_node(self, state: CVState) -> Dict[str, Any]:
         """Cleans and structures the raw CV content."""
-        self.logger.info("CVParserNode: Parsing and cleaning CV content.")
+        print("CVParserNode: Parsing and cleaning CV content.")
         raw_cv_content = state.get("raw_cv_content", "")
 
         prompt = CV_CLEANING_PROMPT.format(raw_cv_content=raw_cv_content)
@@ -79,7 +79,7 @@ class CVProcessorWorkflow:
         output_tokens = count_tokens(processed_cv_text, "gemini")
         self.token_tracker.add_output_tokens(output_tokens)
 
-        self.logger.info(
+        print(
             f"CVParserNode: CV content cleaned. Length: {len(processed_cv_text)}"
         )
         return {
@@ -94,7 +94,7 @@ class CVProcessorWorkflow:
 
     async def section_identifier_node(self, state: CVState) -> Dict[str, Any]:
         """Identifies sections within the processed CV text."""
-        self.logger.info("SectionIdentifierNode: Identifying CV sections.")
+        print("SectionIdentifierNode: Identifying CV sections.")
         processed_cv_text = state.get("processed_cv_text", "")
 
         prompt = SECTION_IDENTIFICATION_PROMPT.format(
@@ -119,12 +119,12 @@ class CVProcessorWorkflow:
                 else [s.strip() for s in identified_sections_str.split(",")]
             )
         except Exception as e:
-            self.logger.error(
+            print(
                 f"SectionIdentifierNode: Error parsing identified sections: {e}. Defaulting to empty list."
             )
             identified_sections = []
 
-        self.logger.info(
+        print(
             f"SectionIdentifierNode: Identified sections: {identified_sections}"
         )
         return {
@@ -139,9 +139,9 @@ class CVProcessorWorkflow:
 
     async def _extract_structured_data(
         self, cv_text_portion: str, schema: type, section_title: str
-    ) -> List[BaseModel]:
+    ) -> Optional[BaseModel]:  # Changed return type
         """Helper to extract data for a given schema using with_structured_output."""
-        self.logger.info(
+        print(
             f"InformationExtractorNode: Extracting data for section '{section_title}' with schema {schema.__name__}."
         )
 
@@ -158,44 +158,57 @@ class CVProcessorWorkflow:
         structured_llm = self.llm.with_structured_output(schema)
 
         try:
-            extracted_data = await structured_llm.ainvoke(
+            # Call the LLM to get structured data
+            result_from_llm = await structured_llm.ainvoke(
                 [
                     SystemMessage(content=system_prompt_with_schema),
                     HumanMessage(content=user_prompt),
                 ]
             )
 
-            if not isinstance(extracted_data, list) and extracted_data is not None:
-                extracted_data = [extracted_data]
-            elif extracted_data is None:
-                extracted_data = []
+            actual_instance: Optional[BaseModel] = None
+            if isinstance(result_from_llm, list) and len(result_from_llm) == 1 and isinstance(result_from_llm[0], schema):
+                # If LLM wraps the single instance in a list, unwrap it.
+                actual_instance = result_from_llm[0]
+                print(f"Unwrapped instance from list for {section_title}")
+            elif isinstance(result_from_llm, schema):
+                # LLM returned SchemaInstance directly.
+                actual_instance = result_from_llm
+            else:
+                print(
+                    f"Unexpected type from LLM for {section_title} (expected {schema.__name__}, got {type(result_from_llm)}). Value: {result_from_llm}"
+                )
+                return None # Return None if type is unexpected
 
-            output_tokens = count_tokens(str(extracted_data), "gemini")
-            self.token_tracker.add_output_tokens(output_tokens)
-            self.logger.info(
-                f"InformationExtractorNode: Successfully extracted {len(extracted_data)} items for '{section_title}'."
-            )
-            return extracted_data
+            if actual_instance is not None:
+                output_tokens = count_tokens(str(actual_instance), "gemini") # Calculate tokens based on the actual instance
+                self.token_tracker.add_output_tokens(output_tokens)
+                print(
+                    f"InformationExtractorNode: Successfully extracted data for '{section_title}' using schema {schema.__name__}."
+                )
+            return actual_instance # Return the direct instance or None
         except Exception as e:
-            self.logger.error(
-                f"InformationExtractorNode: Error extracting '{section_title}': {e}"
+            print(
+                f"InformationExtractorNode: Error extracting '{section_title}' with schema {schema.__name__}: {e}",
+                exc_info=True
             )
-            return []
+            return None  # Return None on error
 
     async def information_extractor_node(self, state: CVState) -> Dict[str, Any]:
         """Extracts detailed information from CV sections using Pydantic schemas."""
-        self.logger.info("InformationExtractorNode: Starting information extraction.")
+        print("InformationExtractorNode: Starting information extraction.")
         processed_cv_text = state.get("processed_cv_text", "")
         identified_sections = state.get("identified_sections", [])
 
+        # Initialize with default empty wrapper instances
         extracted_data_update = {
             "personal_info_item": None,
-            "education_items": [],
-            "work_experience_items": [],
-            "skill_items": [],
-            "project_items": [],
-            "certificate_items": [],
-            "interest_items": [],
+            "education_items": ListEducationItem(),
+            "work_experience_items": ListWorkExperienceItem(),
+            "skill_items": ListSkillItem(),
+            "project_items": ListProjectItem(),
+            "certificate_items": ListCertificateItem(),
+            "interest_items": ListInterestItem(),
             "other_extracted_data": {},
             "extracted_keywords": [],
             "cv_summary": "",
@@ -207,7 +220,7 @@ class CVProcessorWorkflow:
                 "personal_info_item",
             ),
             ("education", "academic background", "qualifications"): (
-                ListEducationItem,  # Changed to ListEducationItem
+                ListEducationItem,
                 "education_items",
             ),
             (
@@ -218,23 +231,23 @@ class CVProcessorWorkflow:
             ): (
                 ListWorkExperienceItem,
                 "work_experience_items",
-            ),  # Changed to ListWorkExperienceItem
+            ),
             ("skills", "technical skills", "languages"): (
-                ListSkillItem,  # Changed to ListSkillItem
+                ListSkillItem,
                 "skill_items",
             ),
             ("projects", "personal projects", "portfolio"): (
-                ListProjectItem,  # Changed to ListProjectItem
+                ListProjectItem,
                 "project_items",
             ),
             ("certifications", "courses", "licenses"): (
-                ListCertificateItem,  # Changed to ListCertificateItem
+                ListCertificateItem,
                 "certificate_items",
             ),
             ("interests", "hobbies"): (
                 ListInterestItem,
                 "interest_items",
-            ),  # Changed to ListInterestItem
+            ),
         }
 
         current_messages = state.get("messages", [])
@@ -242,7 +255,9 @@ class CVProcessorWorkflow:
         for section_title in identified_sections:
             matched = False
             for keywords, (schema, state_key) in section_to_schema_map.items():
-                print(f"Checking section '{section_title}' against keywords: {keywords}")
+                print(
+                    f"Checking section '{section_title}' against keywords: {keywords}"
+                )
                 if any(keyword in section_title.lower() for keyword in keywords):
                     extracted_items = await self._extract_structured_data(
                         processed_cv_text, schema, section_title
@@ -250,23 +265,26 @@ class CVProcessorWorkflow:
                     print(f"Extracted items: {extracted_items}")
 
                     if state_key == "personal_info_item":
-                        extracted_data_update[state_key] = (
-                            extracted_items[0] if extracted_items else None
-                        )
-                        print(f"Extracted personal info: {extracted_data_update[state_key]}")
-                    else:
                         extracted_data_update[state_key] = extracted_items
-                        print(f"Extracted {state_key}: {extracted_data_update[state_key]}")
+                        print(
+                            f"Extracted personal info: {extracted_data_update[state_key]}"
+                        )
+                    else:
+                        # For list types, assign the whole wrapper object
+                        extracted_data_update[state_key] = extracted_items
+                        print(
+                            f"Extracted {state_key}: {extracted_data_update[state_key]}"
+                        )
 
                     current_messages.append(
                         AIMessage(
-                            content=f"Extracted {len(extracted_items)} items for section: {section_title}"
+                            content=f"Extracted items for section: {section_title}"
                         )
                     )
                     matched = True
                     break
             if not matched:
-                self.logger.info(
+                print(
                     f"InformationExtractorNode: Section '{section_title}' not mapped to a specific schema. Storing as other data."
                 )
                 current_messages.append(
@@ -306,28 +324,40 @@ class CVProcessorWorkflow:
         current_messages.append(AIMessage(content=f"Generated CV summary."))
 
         extracted_data_update["messages"] = current_messages
-        self.logger.info(
+        print(
             "InformationExtractorNode: Information extraction phase complete."
         )
         return extracted_data_update
 
     async def characteristic_inference_node(self, state: CVState) -> Dict[str, Any]:
         """Infers candidate characteristics based on extracted CV data."""
-        self.logger.info("CharacteristicInferenceNode: Inferring characteristics.")
+        print("CharacteristicInferenceNode: Inferring characteristics.")
+
+        # Prepare data for the prompt, accessing .items from wrapper types if necessary
+        education_history_items = state.get("education_items")
+        work_experience_items = state.get("work_experience_items")
+        skill_items = state.get("skill_items")
+        project_items = state.get("project_items")
+        certificate_items = state.get("certificate_items")
+        interest_items = state.get("interest_items")
 
         inference_prompt_filled = INFERENCE_PROMPT.format(
             personal_info=state.get("personal_info_item"),
-            education_history=state.get("education_items"),
-            work_experience=state.get("work_experience_items"),
-            skills=state.get("skill_items"),
-            projects=state.get("project_items"),
-            certificates=state.get("certificate_items"),
-            interests=state.get("interest_items"),
+            education_history=(
+                education_history_items.items if education_history_items else []
+            ),
+            work_experience=(
+                work_experience_items.items if work_experience_items else []
+            ),
+            skills=skill_items.items if skill_items else [],
+            projects=project_items.items if project_items else [],
+            certificates=certificate_items.items if certificate_items else [],
+            interests=interest_items.items if interest_items else [],
             other_sections_data=state.get("other_extracted_data"),
             cv_summary=state.get("cv_summary"),
             extracted_keywords=state.get("extracted_keywords"),
         )
-
+        print(f"Filled inference prompt: {inference_prompt_filled}")
         system_prompt_with_schema = f"{INFERENCE_SYSTEM_PROMPT}\n\nThe output MUST be structured according to the following Pydantic schema"
 
         full_prompt_for_tokens = (
@@ -344,18 +374,17 @@ class CVProcessorWorkflow:
                     HumanMessage(content=inference_prompt_filled),
                 ]
             )
-            inferred_characteristics = (
-                inferred_characteristics_response.items
-            )  # Access items attribute
+            # The response is already ListInferredItem, no need to access .items here for assignment to state
+            inferred_characteristics = inferred_characteristics_response
             output_tokens = count_tokens(
                 str(inferred_characteristics_response), "gemini"
             )  # Count tokens from the response model
             self.token_tracker.add_output_tokens(output_tokens)
-            self.logger.info(
-                f"CharacteristicInferenceNode: Inferred {len(inferred_characteristics)} characteristics."
+            print(
+                f"CharacteristicInferenceNode: Inferred {len(inferred_characteristics.items) if inferred_characteristics else 0} characteristics."
             )
         except Exception as e:
-            self.logger.error(
+            print(
                 f"CharacteristicInferenceNode: Error inferring characteristics: {e}"
             )
             inferred_characteristics = []
@@ -365,44 +394,43 @@ class CVProcessorWorkflow:
             "messages": state.get("messages", [])
             + [
                 AIMessage(
-                    content=f"Inferred {len(inferred_characteristics)} characteristics."
+                    content=f"Inferred {len(inferred_characteristics.items) if inferred_characteristics else 0} characteristics."
                 )
             ],
         }
 
     async def output_aggregator_node(self, state: CVState) -> Dict[str, Any]:
         """Aggregates all data into the final CVAnalysisResult model."""
-        self.logger.info("OutputAggregatorNode: Aggregating final results.")
+        print("OutputAggregatorNode: Aggregating final results.")
 
+        # Ensure that the state fields are passed directly if they are already the correct wrapper types
         final_result = CVAnalysisResult(
             raw_cv_content=state.get("raw_cv_content"),
             processed_cv_text=state.get("processed_cv_text"),
             identified_sections=state.get("identified_sections", []),
             personal_information=state.get("personal_info_item"),
             education_history=state.get(
-                "education_items", ListEducationItem()
-            ),
+                "education_items"
+            ),  # Pass the wrapper object directly
             work_experience_history=state.get(
-                "work_experience_items", ListWorkExperienceItem()
-            ),
-            skills_summary=state.get(
-                "skill_items", ListSkillItem()
-            ),
+                "work_experience_items"
+            ),  # Pass the wrapper object directly
+            skills_summary=state.get("skill_items"),  # Pass the wrapper object directly
             projects_showcase=state.get(
-                "project_items", ListProjectItem()
-            ),
+                "project_items"
+            ),  # Pass the wrapper object directly
             certificates_and_courses=state.get(
-                "certificate_items", ListCertificateItem()
-            ),
+                "certificate_items"
+            ),  # Pass the wrapper object directly
             interests_and_hobbies=state.get(
-                "interest_items", ListInterestItem()
-            ),
+                "interest_items"
+            ),  # Pass the wrapper object directly
             other_sections_data=state.get("other_extracted_data", {}),
             cv_summary=state.get("cv_summary"),
             extracted_keywords=state.get("extracted_keywords", []),
             inferred_characteristics=state.get(
-                "inferred_characteristics", ListInferredItem()
-            ),
+                "inferred_characteristics"
+            ),  # Pass the wrapper object directly
             llm_token_usage={
                 "input_tokens": self.token_tracker.input_tokens,
                 "output_tokens": self.token_tracker.output_tokens,
@@ -416,7 +444,7 @@ class CVProcessorWorkflow:
                 ),
             },
         )
-        self.logger.info("OutputAggregatorNode: Final result aggregated.")
+        print("OutputAggregatorNode: Final result aggregated.")
         return {
             "final_analysis_result": final_result,
             "messages": state.get("messages", [])
@@ -425,7 +453,7 @@ class CVProcessorWorkflow:
 
     def _build_graph(self) -> StateGraph:
         """Constructs the LangGraph StateGraph for CV processing."""
-        self.logger.info("Building CV analysis workflow graph.")
+        print("Building CV analysis workflow graph.")
         workflow = StateGraph(CVState)
 
         # Add nodes based on the PlantUML diagram
@@ -449,7 +477,7 @@ class CVProcessorWorkflow:
 
     async def analyze_cv(self, cv_content: str) -> Optional[CVAnalysisResult]:
         """Public method to process a CV and return the analysis result."""
-        self.logger.info(
+        print(
             f"Starting CV analysis for content of length: {len(cv_content)}"
         )
         self.token_tracker.reset()
@@ -457,40 +485,42 @@ class CVProcessorWorkflow:
         thread_id = str(uuid.uuid4())
         config = {"configurable": {"thread_id": thread_id}}
 
-        initial_state = CVState(
-            messages=[],
-            raw_cv_content=cv_content,
-            processed_cv_text=None,
-            identified_sections=None,
-            personal_info_item=None,
-            education_items=None,
-            work_experience_items=None,
-            skill_items=None,
-            project_items=None,
-            certificate_items=None,
-            interest_items=None,
-            other_extracted_data=None,
-            extracted_keywords=None,
-            cv_summary=None,
-            inferred_characteristics=None,
-            token_usage=None,
-            final_analysis_result=None,
-        )
+        # Initialize state with wrapper types where appropriate
+        initial_state_data = {
+            "messages": [],
+            "raw_cv_content": cv_content,
+            "processed_cv_text": None,
+            "identified_sections": None,
+            "personal_info_item": None,
+            "education_items": ListEducationItem(),
+            "work_experience_items": ListWorkExperienceItem(),
+            "skill_items": ListSkillItem(),
+            "project_items": ListProjectItem(),
+            "certificate_items": ListCertificateItem(),
+            "interest_items": ListInterestItem(),
+            "other_extracted_data": None,
+            "extracted_keywords": None,
+            "cv_summary": None,
+            "inferred_characteristics": ListInferredItem(),
+            "token_usage": None,
+            "final_analysis_result": None,
+        }
+        initial_state = CVState(**initial_state_data)
 
         try:
             final_state_result = await self.workflow.ainvoke(
                 initial_state, config=config
             )
             if final_state_result and "final_analysis_result" in final_state_result:
-                self.logger.info("CV analysis completed successfully.")
+                print("CV analysis completed successfully.")
                 return final_state_result["final_analysis_result"]
             else:
-                self.logger.error(
+                print(
                     "CV analysis finished but no final_analysis_result found in state."
                 )
                 return None
         except Exception as e:
-            self.logger.exception(f"Error during CV analysis workflow: {e}")
+            print(f"Error during CV analysis workflow: {e}")
             error_result = CVAnalysisResult(
                 raw_cv_content=cv_content,
                 processed_cv_text=initial_state.get("processed_cv_text"),

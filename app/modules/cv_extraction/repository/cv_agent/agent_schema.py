@@ -291,17 +291,19 @@ class CVState(TypedDict):
         List[str]
     ]  # List of section names (Output of SectionIdentifierNode)
 
-    # Extracted structured data items (Populated by InformationExtractorNode through various tool calls)
-    # These are lists of Pydantic models defined above.
-    personal_info_item: Optional[
-        PersonalInfoItem
-    ]  # Changed to single item, assuming one person per CV
-    education_items: Optional[List[ListEducationItem]]
-    work_experience_items: Optional[List[ListWorkExperienceItem]]
-    skill_items: Optional[List[ListSkillItem]]
-    project_items: Optional[List[ListProjectItem]]
-    certificate_items: Optional[List[ListCertificateItem]]
-    interest_items: Optional[List[ListInterestItem]]
+    # Extracted structured data items (Populated by InformationExtractorNode)
+    # These fields will hold instances of the Pydantic wrapper models (e.g., ListEducationItem) or singular item models.
+    personal_info_item: Optional[PersonalInfoItem]
+    education_items: Optional[ListEducationItem]  # Changed from List[EducationItem]
+    work_experience_items: Optional[
+        ListWorkExperienceItem
+    ]  # Changed from List[WorkExperienceItem]
+    skill_items: Optional[ListSkillItem]  # Changed from List[SkillItem]
+    project_items: Optional[ListProjectItem]  # Changed from List[ProjectItem]
+    certificate_items: Optional[
+        ListCertificateItem
+    ]  # Changed from List[CertificateItem]
+    interest_items: Optional[ListInterestItem]  # Changed from List[InterestItem]
 
     # For dynamically identified sections not fitting the predefined models
     # Key: section title, Value: list of raw text blocks from that section
@@ -312,7 +314,10 @@ class CVState(TypedDict):
     cv_summary: Optional[str]  # LLM-generated summary of the CV
 
     # Inferences (Populated by CharacteristicInferenceNode)
-    inferred_characteristics: Optional[List[ListInferredItem]]
+    # This field will hold an instance of ListInferredItem.
+    inferred_characteristics: Optional[
+        ListInferredItem
+    ]  # Changed from List[InferredCharacteristicItem]
 
     # LLM usage tracking (Updated throughout the graph by various nodes)
     token_usage: Optional[Dict[str, int]]
