@@ -58,7 +58,7 @@ class CVRepository:
 					print(f'[DEBUG] Removing unsupported file: {file_path}')
 					os.remove(file_path)
 				return APIResponse(
-					error_code=3,
+					error_code=1,
 					message=_('unsupported_cv_file_type'),
 					data=None,
 				)
@@ -67,7 +67,7 @@ class CVRepository:
 			print(f'[DEBUG] Exception during text extraction: {str(e)}')
 			print(f'[DEBUG] Exception type: {type(e).__name__}')
 			return APIResponse(
-				error_code=2,
+				error_code=1,
 				message=_('error_extracting_cv_content'),
 				data=None,
 			)
@@ -82,6 +82,13 @@ class CVRepository:
 
 		print('[DEBUG] Process completed successfully')
 		print(f'[DEBUG] Extracted text length: {len(extracted_text) if extracted_text else 0}')
+		if not extracted_text:
+			print('[DEBUG] No text extracted, returning error response')
+			return APIResponse(
+				error_code=1,
+				message=_('no_text_extracted'),
+				data=None,
+			)
 		return APIResponse(
 			error_code=0,
 			message=_('cv_processed_successfully'),
