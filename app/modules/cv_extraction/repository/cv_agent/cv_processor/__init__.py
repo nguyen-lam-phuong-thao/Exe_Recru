@@ -14,6 +14,7 @@ from app.modules.cv_extraction.repository.cv_agent.agent_schema import (
     ListProjectItem,  # Added import
     ListCertificateItem,  # Added import
     ListInterestItem,  # Added import
+    ListKeywordItem,  # Added import
 )
 from app.modules.cv_extraction.repository.cv_agent.llm_setup import initialize_llm
 from app.modules.cv_extraction.repository.cv_agent.prompts import (
@@ -103,26 +104,44 @@ class CVProcessorWorkflow:
         input_tokens = count_tokens(prompt, "gemini")
         self.token_tracker.add_input_tokens(input_tokens)
 
-        # Assuming LLM returns a list-like string, e.g., "['Education', 'Experience']"
-        # or a more structured format if using with_structured_output for a simple list model
         response = await self.llm.ainvoke(prompt)
         identified_sections_str = response.content
         output_tokens = count_tokens(identified_sections_str, "gemini")
         self.token_tracker.add_output_tokens(output_tokens)
 
+        identified_sections = []
         try:
-            # Basic parsing for a string representation of a list
-            # For more robust parsing, consider a Pydantic model for the LLM to output
-            identified_sections = (
-                eval(identified_sections_str)
-                if identified_sections_str.startswith("[")
-                else [s.strip() for s in identified_sections_str.split(",")]
-            )
+            # Attempt to remove markdown code block fences if present
+            cleaned_str = identified_sections_str.strip()
+            if cleaned_str.startswith("```json"):
+                cleaned_str = cleaned_str[len("```json"):]
+            if cleaned_str.startswith("```"):  # General markdown fence
+                cleaned_str = cleaned_str[len("```"):]
+            if cleaned_str.endswith("```"):
+                cleaned_str = cleaned_str[:-len("```")]
+            cleaned_str = cleaned_str.strip()
+
+            # Parse the cleaned string as JSON
+            if cleaned_str.startswith("[") and cleaned_str.endswith("]"):
+                # Use json.loads for safety instead of eval
+                import json  # Make sure json is imported
+                identified_sections = json.loads(cleaned_str)
+                if not isinstance(identified_sections, list) or not all(isinstance(s, str) for s in identified_sections):
+                    print(f"SectionIdentifierNode: Parsed JSON is not a list of strings: {identified_sections}. Falling back.")
+                    identified_sections = []  # Reset if not a list of strings
+
+            # Fallback for simple comma-separated strings if JSON parsing fails or wasn't appropriate
+            if not identified_sections and not (cleaned_str.startswith("[") and cleaned_str.endswith("]")):
+                identified_sections = [s.strip() for s in cleaned_str.split(",") if s.strip()]
+
         except Exception as e:
             print(
-                f"SectionIdentifierNode: Error parsing identified sections: {e}. Defaulting to empty list."
+                f"SectionIdentifierNode: Error parsing identified sections string '{identified_sections_str}': {e}. Defaulting to empty list."
             )
-            identified_sections = []
+            identified_sections = []  # Ensure it's an empty list on any error
+
+        # Ensure all items are strings, just in case of mixed types from a lenient parse
+        identified_sections = [str(s) for s in identified_sections if isinstance(s, (str, int, float))]
 
         print(
             f"SectionIdentifierNode: Identified sections: {identified_sections}"
@@ -210,7 +229,7 @@ class CVProcessorWorkflow:
             "certificate_items": ListCertificateItem(),
             "interest_items": ListInterestItem(),
             "other_extracted_data": {},
-            "extracted_keywords": [],
+            "extracted_keywords": ListKeywordItem(),  # Initialize with ListKeywordItem
             "cv_summary": "",
         }
         section_to_schema_map = {
@@ -301,28 +320,29 @@ class CVProcessorWorkflow:
                     AIMessage(content=f"Section '{section_title}' noted as other data.")
                 )
 
+        # --- Keyword Extraction ---
+        print("InformationExtractorNode: Extracting keywords.")
         keyword_prompt = EXTRACT_KEYWORDS_PROMPT.format(
             processed_cv_text=processed_cv_text
         )
-        input_tokens_kw = count_tokens(keyword_prompt, "gemini")
-        self.token_tracker.add_input_tokens(input_tokens_kw)
-        keyword_response = await self.llm.ainvoke(keyword_prompt)
-        extracted_keywords_str = keyword_response.content
-        output_tokens_kw = count_tokens(extracted_keywords_str, "gemini")
-        self.token_tracker.add_output_tokens(output_tokens_kw)
+        input_tokens_keywords = count_tokens(keyword_prompt, "gemini")
+        self.token_tracker.add_input_tokens(input_tokens_keywords)
+
+        structured_llm_keywords = self.llm.with_structured_output(ListKeywordItem)
         try:
-            extracted_data_update["extracted_keywords"] = (
-                eval(extracted_keywords_str)
-                if extracted_keywords_str.startswith("[")
-                else [s.strip() for s in extracted_keywords_str.split(",")]
-            )
-        except:
-            extracted_data_update["extracted_keywords"] = []
-        current_messages.append(
-            AIMessage(
-                content=f'Extracted keywords: {extracted_data_update["extracted_keywords"]}'
-            )
-        )
+            extracted_keyword_items = await structured_llm_keywords.ainvoke(keyword_prompt)
+            if isinstance(extracted_keyword_items, ListKeywordItem):
+                extracted_data_update["extracted_keywords"] = extracted_keyword_items
+                output_tokens_keywords = count_tokens(str(extracted_keyword_items), "gemini")
+                self.token_tracker.add_output_tokens(output_tokens_keywords)
+                print(f"InformationExtractorNode: Extracted keywords: {extracted_keyword_items.items}")
+                current_messages.append(AIMessage(content=f"Extracted {len(extracted_keyword_items.items)} keywords."))
+            else:
+                print(f"InformationExtractorNode: Keyword extraction did not return ListKeywordItem. Got: {type(extracted_keyword_items)}")
+                current_messages.append(AIMessage(content="Keyword extraction failed to return expected type."))
+        except Exception as e:
+            print(f"InformationExtractorNode: Error extracting keywords: {e}", exc_info=True)
+            current_messages.append(AIMessage(content=f"Error during keyword extraction: {e}"))
 
         summary_prompt = CV_SUMMARY_PROMPT.format(processed_cv_text=processed_cv_text)
         input_tokens_sum = count_tokens(summary_prompt, "gemini")

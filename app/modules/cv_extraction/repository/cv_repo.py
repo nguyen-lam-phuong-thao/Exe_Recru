@@ -30,7 +30,7 @@ class CVRepository:
 
 		print(f'[DEBUG] File downloaded successfully to: {file_path}')
 		extracted_text = None
-		file_extension = "pdf"
+		file_extension = 'pdf'
 		print(f'[DEBUG] Detected file extension: {file_extension}')
 		converter = None
 
@@ -90,12 +90,12 @@ class CVRepository:
 				message=_('no_text_extracted'),
 				data=None,
 			)
-   
+
 		cv_analyzer = CVAnalyzer()
 		print('[DEBUG] Initialized CVAnalyzer')
 		try:
 			print('[DEBUG] Starting CV analysis')
-			result = await cv_analyzer.analyze_cv_content(extracted_text["markdown"])
+			result = await cv_analyzer.analyze_cv_content(extracted_text['markdown'])
 			print(f'[DEBUG] CV analysis result: {result}')
 		except Exception as e:
 			print(f'[DEBUG] Exception during CV analysis: {str(e)}')
