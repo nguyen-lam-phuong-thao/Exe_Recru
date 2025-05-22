@@ -21,6 +21,8 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-minioadmin}
       - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME:-enterviu-ai}
       - MINIO_SECURE=${MINIO_SECURE:-False}
+      - QDRANT_URL=http://qdrant:6333 # Changed from 6334 to 6333
+      - QDRANT_COLLECTION=agentic_rag_kb
       - PYTHONDONTWRITEBYTECODE=1
     env_file:
       - .env
@@ -31,7 +33,8 @@ services:
     networks:
       - enterviu-network
     depends_on:
-      - minio
+      minio:
+        condition: service_started
 
   minio:
     image: minio/minio
@@ -65,15 +68,20 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-minioadmin}
       - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME:-enterviu-ai}
       - MINIO_SECURE=false
+      - QDRANT_URL=http://qdrant:6333 # Changed from 6334 to 6333
+      - QDRANT_COLLECTION=agentic_rag_kb
       - CELERY_WORKER_CONCURRENCY=4  # Set concurrency for Celery workers
     env_file:
       - .env
     networks:
       - enterviu-network
     depends_on:
-      - redis-enterviu
-      - minio
-      - api
+      redis-enterviu:
+        condition: service_started
+      minio:
+        condition: service_started
+      api:
+        condition: service_started
     restart: always
 
   redis-enterviu:
@@ -91,4 +99,4 @@ networks:
 
 volumes:
   minio-data:
-  audio_data:  # Add new volume for audio files
+  audio_data:

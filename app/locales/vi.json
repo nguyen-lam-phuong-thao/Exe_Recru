@@ -18,5 +18,9 @@
   "checksum_invalid": "Checksum không hợp lệ. Tệp có thể đã bị hỏng hoặc bị thay đổi.",
   "error_analyzing_cv": "Đã xảy ra lỗi trong quá trình phân tích CV.",
   "no_text_extracted": "Không thể trích xuất văn bản từ CV được cung cấp.",
-  "unsupported_cv_file_type": "Loại tệp CV được cung cấp không được hỗ trợ. Vui lòng tải lên tệp PDF, DOCX hoặc TXT."
+  "unsupported_cv_file_type": "Loại tệp CV được cung cấp không được hỗ trợ. Vui lòng tải lên tệp PDF, DOCX hoặc TXT.",
+  "documents_added_successfully": "Thêm tài liệu thành công.",
+  "query_successful": "Truy vấn thành công.",
+  "response_generated_successfully": "Tạo phản hồi thành công.",
+  "error_initializing_qdrant_client": "Lỗi khởi tạo kết nối đến cơ sở dữ liệu vector Qdrant."
 }

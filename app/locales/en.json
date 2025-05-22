@@ -14,9 +14,13 @@
   "authentication": "Authentication",
   "failed_to_download_file": "Failed to download file from the provided URL.",
   "cv_processed_successfully": "CV processed successfully.",
+  "documents_added_successfully": "Documents added successfully.",
+  "query_successful": "Query executed successfully.",
+  "response_generated_successfully": "Response generated successfully.",
   "error_extracting_cv_content": "Error extracting content from CV.",
   "checksum_invalid": "Checksum is invalid. File may have been corrupted or tampered with.",
   "error_analyzing_cv": "An error occurred while analyzing the CV.",
   "no_text_extracted": "No text could be extracted from the provided CV.",
-  "unsupported_cv_file_type": "The provided CV file type is not supported. Please upload a PDF, DOCX, or TXT file."
+  "unsupported_cv_file_type": "The provided CV file type is not supported. Please upload a PDF, DOCX, or TXT file.",
+  "error_initializing_qdrant_client": "Error initializing Qdrant vector database client."
 }
