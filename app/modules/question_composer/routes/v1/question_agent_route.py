@@ -12,9 +12,9 @@ from app.modules.question_composer.schemas.question_agent_schema import (
     GeneratedQuestion
 )
 
-router = APIRouter()
+route = APIRouter()
 
-@router.post("/compose-questions", response_model=QuestionCompositionAPIResponse, status_code=status.HTTP_200_OK)
+@route.post("/compose-questions", response_model=QuestionCompositionAPIResponse, status_code=status.HTTP_200_OK)
 @handle_exceptions
 async def compose_questions_endpoint(
     request: Request,
@@ -48,7 +48,7 @@ async def compose_questions_endpoint(
 # This would likely live in your agentic_rag module or a shared utility
 # For now, this is just a placeholder to illustrate the concept based on the flowchart
 
-# @router.post("/query-knowledge-base", status_code=status.HTTP_200_OK)
+# @route.post("/query-knowledge-base", status_code=status.HTTP_200_OK)
 # @handle_exceptions
 # async def query_knowledge_base_endpoint(request: Request, query: str):
 #     """
