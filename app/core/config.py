@@ -23,8 +23,8 @@ MODEL_NAME = 'model/gemini-2.0-flash-exp'
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 
 SECRET_KEY = os.getenv('SECRET_KEY', '-extremely-secret-and-very-long-key')
-TOKEN_ISSUER = os.getenv('TOKEN_ISSUER', 'frecord-api')
-TOKEN_AUDIENCE = os.getenv('TOKEN_AUDIENCE', 'frecord-client')
+TOKEN_ISSUER = os.getenv('TOKEN_ISSUER', 'enterviu-api')
+TOKEN_AUDIENCE = os.getenv('TOKEN_AUDIENCE', 'enterviu-client')
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', '30'))
 REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv('REFRESH_TOKEN_EXPIRE_DAYS', '7'))
 

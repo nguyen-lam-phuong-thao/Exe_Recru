@@ -47,13 +47,11 @@ services:
     networks:
       - enterviu-network
     restart: always
-
   celery:
     build:  
       context: .
       dockerfile: Dockerfile
     image: enterviu-api:latest
-    command: ["/app/startup.sh"]  # Explicitly set command to use startup.sh
     volumes:
       - .:/app
       - audio_data:/data/audio  # Add shared volume for audio files

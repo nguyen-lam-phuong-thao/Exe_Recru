@@ -38,22 +38,23 @@ RUN python -m venv venv
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-# Copy the startup script and fix line endings and permissions
-COPY startup.sh /app/
-RUN dos2unix /app/startup.sh && \
-    chmod +x /app/startup.sh && \
-    chown appuser:appuser /app/startup.sh
-
 # Copy toàn bộ mã nguồn vào container
 COPY --chown=appuser:appuser . .
-
-# Make absolutely sure the startup script is executable
-RUN chmod 755 /app/startup.sh
 
 # Expose port
 EXPOSE 8000
 
-# Switch to non-root user and set entrypoint
+# Switch to non-root user
 USER appuser
-# ENTRYPOINT ["/bin/bash", "-c"]
-CMD ["/app/startup.sh"]
+
+# Default command that checks environment variables to decide what to run
+CMD if [ "$SERVICE_TYPE" = "celery_worker" ]; then \
+        echo "Starting Celery worker..." && \
+        python -m celery -A app.jobs.celery_worker worker --loglevel=debug --concurrency=${CELERY_WORKER_CONCURRENCY:-4}; \
+    elif [ "$ENV" = "development" ]; then \
+        echo "Starting API in local mode (with hot reload)" && \
+        uvicorn main:app --host 0.0.0.0 --port 8000 --reload --log-level debug; \
+    else \
+        echo "Starting API in production mode" && \
+        uvicorn main:app --host 0.0.0.0 --port 8000 --workers ${WORKER_CONCURRENCY:-4} --log-level debug; \
+    fi
