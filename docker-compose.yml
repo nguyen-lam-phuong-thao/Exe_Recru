@@ -21,6 +21,8 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-minioadmin}
       - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME:-enterviu-ai}
       - MINIO_SECURE=${MINIO_SECURE:-False}
+      - QDRANT_URL=http://qdrant:6334
+      - QDRANT_COLLECTION=agentic_rag_kb
       - PYTHONDONTWRITEBYTECODE=1
     env_file:
       - .env
@@ -31,7 +33,10 @@ services:
     networks:
       - enterviu-network
     depends_on:
-      - minio
+      minio:
+        condition: service_started
+      qdrant:
+        condition: service_healthy
 
   minio:
     image: minio/minio
@@ -65,15 +70,22 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY:-minioadmin}
       - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME:-enterviu-ai}
       - MINIO_SECURE=false
+      - QDRANT_URL=http://qdrant:6334
+      - QDRANT_COLLECTION=agentic_rag_kb
       - CELERY_WORKER_CONCURRENCY=4  # Set concurrency for Celery workers
     env_file:
       - .env
     networks:
       - enterviu-network
     depends_on:
-      - redis-enterviu
-      - minio
-      - api
+      redis-enterviu:
+        condition: service_started
+      minio:
+        condition: service_started
+      api:
+        condition: service_started
+      qdrant:
+        condition: service_healthy
     restart: always
 
   redis-enterviu:
@@ -84,6 +96,24 @@ services:
     networks:
       - enterviu-network
     restart: always
+    
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6333:6333"  # gRPC API
+      - "6334:6334"  # HTTP API
+    volumes:
+      - qdrant-data:/qdrant/storage
+    networks:
+      - enterviu-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/readiness"] # Corrected port to 6333
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
 
 networks:
   enterviu-network:
@@ -91,4 +121,5 @@ networks:
 
 volumes:
   minio-data:
-  audio_data:  # Add new volume for audio files
+  audio_data:  
+  qdrant-data:
