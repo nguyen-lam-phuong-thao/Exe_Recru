@@ -35,5 +35,14 @@
   "error_retrieving_document": "Error retrieving document from the knowledge base.",
   "error_uploading_file": "Error uploading file.",
   "file_uploaded_successfully": "File uploaded successfully.",
-  "unsupported_file_type": "Unsupported file type. Please upload PDF, TXT, or MD files."
+  "unsupported_file_type": "Unsupported file type. Please upload PDF, TXT, or MD files.",
+  "questions_composed_successfully": "Questions composed successfully.",
+  "error_generating_questions": "An error occurred while generating questions.",
+  "error_connecting_knowledge_base": "Could not connect to the knowledge base.",
+  "error_in_self_reflection": "An error occurred during the self-reflection process.",
+  "error_fetching_rag_knowledge": "Failed to fetch knowledge from RAG system.",
+  "error_generating_initial_questions": "Failed to generate initial set of questions.",
+  "error_in_self_reflection_resulted_empty": "Self-reflection process resulted in no questions.",
+  "error_no_questions_selected": "No critical questions were selected after processing.",
+  "error_unexpected_question_generation": "An unexpected error occurred during question generation."
 }

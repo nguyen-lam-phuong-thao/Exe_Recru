@@ -35,5 +35,14 @@
   "error_retrieving_document": "Lỗi truy xuất tài liệu từ cơ sở kiến thức.",
   "error_uploading_file": "Lỗi tải tệp lên.",
   "file_uploaded_successfully": "Tải tệp lên thành công.",
-  "unsupported_file_type": "Loại tệp không được hỗ trợ. Vui lòng tải lên tệp PDF, TXT hoặc MD."
+  "unsupported_file_type": "Loại tệp không được hỗ trợ. Vui lòng tải lên tệp PDF, TXT hoặc MD.",
+  "questions_composed_successfully": "Các câu hỏi đã được soạn thành công.",
+  "error_generating_questions": "Đã xảy ra lỗi trong quá trình tạo câu hỏi.",
+  "error_connecting_knowledge_base": "Không thể kết nối đến cơ sở kiến thức.",
+  "error_in_self_reflection": "Đã xảy ra lỗi trong quá trình tự đánh giá câu hỏi.",
+  "error_fetching_rag_knowledge": "Không thể truy xuất kiến thức từ hệ thống RAG.",
+  "error_generating_initial_questions": "Không thể tạo bộ câu hỏi ban đầu.",
+  "error_in_self_reflection_resulted_empty": "Quá trình tự đánh giá không tạo ra câu hỏi nào.",
+  "error_no_questions_selected": "Không có câu hỏi quan trọng nào được chọn sau khi xử lý.",
+  "error_unexpected_question_generation": "Đã xảy ra lỗi không mong muốn trong quá trình tạo câu hỏi."
 }
