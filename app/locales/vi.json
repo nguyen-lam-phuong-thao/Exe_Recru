@@ -22,5 +22,18 @@
   "documents_added_successfully": "Thêm tài liệu thành công.",
   "query_successful": "Truy vấn thành công.",
   "response_generated_successfully": "Tạo phản hồi thành công.",
-  "error_initializing_qdrant_client": "Lỗi khởi tạo kết nối đến cơ sở dữ liệu vector Qdrant."
+  "error_initializing_qdrant_client": "Lỗi khởi tạo kết nối đến cơ sở dữ liệu vector Qdrant.",
+  "document_deleted_successfully": "Xóa tài liệu thành công.",
+  "document_retrieved_successfully": "Truy xuất tài liệu thành công.",
+  "documents_listed_successfully": "Liệt kê tài liệu thành công.",
+  "empty_file_content": "Tệp được tải lên trống hoặc không chứa nội dung văn bản có thể trích xuất.",
+  "error_adding_document_to_vector_store": "Lỗi thêm tài liệu vào kho vector.",
+  "error_creating_or_checking_collection": "Lỗi tạo hoặc kiểm tra bộ sưu tập cơ sở kiến thức.",
+  "error_deleting_document": "Lỗi xóa tài liệu khỏi cơ sở kiến thức.",
+  "error_listing_documents": "Lỗi liệt kê tài liệu từ cơ sở kiến thức.",
+  "error_parsing_pdf": "Lỗi phân tích nội dung PDF.",
+  "error_retrieving_document": "Lỗi truy xuất tài liệu từ cơ sở kiến thức.",
+  "error_uploading_file": "Lỗi tải tệp lên.",
+  "file_uploaded_successfully": "Tải tệp lên thành công.",
+  "unsupported_file_type": "Loại tệp không được hỗ trợ. Vui lòng tải lên tệp PDF, TXT hoặc MD."
 }

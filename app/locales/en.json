@@ -22,5 +22,18 @@
   "error_analyzing_cv": "An error occurred while analyzing the CV.",
   "no_text_extracted": "No text could be extracted from the provided CV.",
   "unsupported_cv_file_type": "The provided CV file type is not supported. Please upload a PDF, DOCX, or TXT file.",
-  "error_initializing_qdrant_client": "Error initializing Qdrant vector database client."
+  "error_initializing_qdrant_client": "Error initializing Qdrant vector database client.",
+  "document_deleted_successfully": "Document deleted successfully.",
+  "document_retrieved_successfully": "Document retrieved successfully.",
+  "documents_listed_successfully": "Documents listed successfully.",
+  "empty_file_content": "The uploaded file is empty or contains no extractable text content.",
+  "error_adding_document_to_vector_store": "Error adding document to the vector store.",
+  "error_creating_or_checking_collection": "Error creating or checking the knowledge base collection.",
+  "error_deleting_document": "Error deleting document from the knowledge base.",
+  "error_listing_documents": "Error listing documents from the knowledge base.",
+  "error_parsing_pdf": "Error parsing PDF content.",
+  "error_retrieving_document": "Error retrieving document from the knowledge base.",
+  "error_uploading_file": "Error uploading file.",
+  "file_uploaded_successfully": "File uploaded successfully.",
+  "unsupported_file_type": "Unsupported file type. Please upload PDF, TXT, or MD files."
 }
