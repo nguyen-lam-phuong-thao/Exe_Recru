@@ -1,4 +1,3 @@
-
 // API Base URL - Change this if your API is hosted on a different domain or port
 const API_BASE_URL = 'http://localhost:8000/api/v1';
 
@@ -80,6 +79,8 @@ async function addDocuments() {
 
     try {
         // Parse the payload from the textarea
+        // IMPORTANT: Ensure document IDs in the payload are either unsigned integers or UUIDs.
+        // For example: "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479" or "id": 123
         const payloadStr = document.getElementById('add-documents-payload').value;
         const payload = JSON.parse(payloadStr);
 

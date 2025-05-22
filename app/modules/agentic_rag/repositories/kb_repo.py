@@ -2,6 +2,9 @@ import time
 from typing import List
 
 from qdrant_client import QdrantClient
+
+# Added imports for collection creation
+from qdrant_client.http.models import Distance, VectorParams, CollectionStatus
 from langchain_qdrant import QdrantVectorStore
 from langchain.schema import Document
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
@@ -26,6 +29,8 @@ class KBRepository:
         qdrant_url: str = settings.QdrantUrl
         qdrant_api_key: str = settings.QdrantApiKey
         self.collection_name: str = settings.QdrantCollection
+        self.embedding_model_name: str = "models/embedding-001"  # Store model name
+        self.vector_size: int = 768  # Dimension for models/embedding-001
 
         # Print connection details for debugging
         print(f"KBRepository: Connecting to Qdrant at {qdrant_url}")
@@ -60,12 +65,53 @@ class KBRepository:
         # Initialize embeddings using Google's GenerativeAI embeddings
         try:
             self.embedding = GoogleGenerativeAIEmbeddings(
-                model="models/embedding-001", google_api_key=GOOGLE_API_KEY
+                model=self.embedding_model_name, google_api_key=GOOGLE_API_KEY
             )
             print("KBRepository: Initialized Google GenerativeAI embeddings")
         except Exception as e:
             print(f"KBRepository: Error initializing embeddings: {e}")
             raise CustomHTTPException(status_code=500, message=_("error_occurred"))
+
+        # Ensure collection exists
+        try:
+            collection_exists = False
+            try:
+                collection_info = self.client.get_collection(
+                    collection_name=self.collection_name
+                )
+                if collection_info.status == CollectionStatus.GREEN:
+                    collection_exists = True
+                    print(
+                        f"KBRepository: Collection '{self.collection_name}' already exists and is ready."
+                    )
+            except (
+                Exception
+            ) as e:  # Catches specific "not found" or general connection errors
+                print(
+                    f"KBRepository: Collection '{self.collection_name}' not found or error checking: {e}. Attempting to create."
+                )
+
+            if not collection_exists:
+                print(
+                    f"KBRepository: Creating collection '{self.collection_name}' with vector size {self.vector_size}."
+                )
+                self.client.create_collection(
+                    collection_name=self.collection_name,
+                    vectors_config=VectorParams(
+                        size=self.vector_size, distance=Distance.COSINE
+                    ),
+                )
+                print(
+                    f"KBRepository: Collection '{self.collection_name}' created successfully."
+                )
+
+        except Exception as e:
+            print(
+                f"KBRepository: Error ensuring collection '{self.collection_name}' exists: {e}"
+            )
+            raise CustomHTTPException(
+                status_code=500, message=_("error_creating_or_checking_collection")
+            )
 
         try:
             # Create or load existing Qdrant collection via LangChain wrapper

@@ -3,7 +3,7 @@
 Pydantic models for Agentic RAG knowledge base operations.
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 from app.core.base_model import RequestSchema
 
@@ -32,10 +32,10 @@ class QueryRequest(RequestSchema):
 class QueryResponseItem(BaseModel):
 	"""Item representing a single query result."""
 
-	id: str = Field(..., description='Identifier of the matched document')
-	content: str = Field(..., description='Content of the matched document')
-	score: float = Field(..., description='Similarity score of the match')
-	metadata: Dict[str, Any] = Field(default_factory=dict, description='Metadata of the matched document')
+	id: Optional[str] = Field(None, description='Identifier of the matched document')
+	content: Optional[str] = Field(None, description='Content of the matched document')
+	score: Optional[float] = Field(None, description='Similarity score of the match')
+	metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description='Metadata of the matched document')
 
 
 class QueryResponse(BaseModel):
