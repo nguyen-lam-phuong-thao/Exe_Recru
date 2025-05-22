@@ -175,6 +175,21 @@ async function queryKnowledgeBase() {
     }
 }
 
+async function listAllDocuments() {
+    const responseElementId = 'list-all-documents-response';
+    resetResponseStyles(responseElementId);
+    showLoading(responseElementId);
+
+    try {
+        const response = await makeApiRequest('/kb/documents', 'GET');
+        displayResponse(responseElementId, response);
+    } catch (error) {
+        displayError(responseElementId, error);
+    } finally {
+        hideLoading(responseElementId);
+    }
+}
+
 // RAG API Functions
 async function ragGenerate() {
     const responseElementId = 'rag-generate-response';
