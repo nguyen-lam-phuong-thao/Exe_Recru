@@ -44,5 +44,22 @@
   "error_generating_initial_questions": "Failed to generate initial set of questions.",
   "error_in_self_reflection_resulted_empty": "Self-reflection process resulted in no questions.",
   "error_no_questions_selected": "No critical questions were selected after processing.",
-  "error_unexpected_question_generation": "An unexpected error occurred during question generation."
+  "error_unexpected_question_generation": "An unexpected error occurred during question generation.",
+  "error_missing_user_characteristics": "User characteristics are required to compose questions.",
+  "error_no_questions_composed": "Failed to compose any questions. The composition process did not yield results.",
+  "error_unexpected_question_composition": "An unexpected error occurred during question composition.",
+  "error_rag_connection": "Failed to connect to or retrieve data from the knowledge base (RAG system).",
+  "info_preparing_knowledge_query": "Preparing query for knowledge base...",
+  "info_querying_knowledge_base": "Querying knowledge base for relevant context...",
+  "info_generating_initial_questions": "Generating initial set of questions...",
+  "info_self_reflecting_questions": "Performing self-reflection on generated questions (Iteration {iteration_count}/{max_iterations})...",
+  "info_selecting_final_questions": "Selecting final questions...",
+  "info_question_composition_complete": "Question composition process completed.",
+  "error_knowledge_query_failed": "Failed to prepare a query for the knowledge base.",
+  "error_knowledge_base_query_failed": "Failed to retrieve context from the knowledge base.",
+  "error_initial_question_generation_failed": "Failed to generate initial questions.",
+  "error_self_reflection_failed_max_retries": "Self-reflection failed after maximum retries.",
+  "error_self_reflection_step_failed": "A step in the self-reflection process failed.",
+  "error_final_question_selection_failed": "Failed to select final questions.",
+  "error_composer_graph_execution": "An error occurred while executing the question composer graph."
 }

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Question Composer</title>
+    <link rel="stylesheet" href="test_question_composer.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Question Composer Test</h1>
+        <div class="input-section">
+            <label for="userInput">User Characteristics (JSON):</label>
+            <textarea id="userInput" rows="10" placeholder='''{
+  "job_description": "Software Engineer with 5 years of experience in Python and cloud technologies.",
+  "candidate_experience": "Led a team of 3 developers, proficient in AWS and Django.",
+  "interview_focus": "Problem-solving and system design."
+}'''></textarea>
+            <button id="composeButton">Compose Questions</button>
+        </div>
+        <div class="output-section">
+            <h2>Generated Questions:</h2>
+            <div id="questionsOutput">
+                <p>No questions generated yet.</p>
+            </div>
+        </div>
+        <div class="error-section" id="errorOutput" style="display:none;">
+            <h2>Error:</h2>
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+    <script src="test_question_composer.js"></script>
+</body>
+</html>

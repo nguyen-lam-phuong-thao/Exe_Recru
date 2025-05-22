@@ -1,1 +1,5 @@
-from question_agent_route import router as question_agent_router
+from .question_agent_route import route as question_agent_router
+
+__all__ = [
+    "question_agent_router",
+]

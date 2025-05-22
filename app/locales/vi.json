@@ -44,5 +44,22 @@
   "error_generating_initial_questions": "Không thể tạo bộ câu hỏi ban đầu.",
   "error_in_self_reflection_resulted_empty": "Quá trình tự đánh giá không tạo ra câu hỏi nào.",
   "error_no_questions_selected": "Không có câu hỏi quan trọng nào được chọn sau khi xử lý.",
-  "error_unexpected_question_generation": "Đã xảy ra lỗi không mong muốn trong quá trình tạo câu hỏi."
+  "error_unexpected_question_generation": "Đã xảy ra lỗi không mong muốn trong quá trình tạo câu hỏi.",
+  "error_missing_user_characteristics": "Cần có đặc điểm người dùng để soạn câu hỏi.",
+  "error_no_questions_composed": "Không thể soạn câu hỏi nào. Quá trình soạn thảo không mang lại kết quả.",
+  "error_unexpected_question_composition": "Đã xảy ra lỗi không mong muốn trong quá trình soạn câu hỏi.",
+  "error_rag_connection": "Không thể kết nối hoặc truy xuất dữ liệu từ cơ sở kiến thức (hệ thống RAG).",
+  "info_preparing_knowledge_query": "Đang chuẩn bị truy vấn cho cơ sở kiến thức...",
+  "info_querying_knowledge_base": "Đang truy vấn cơ sở kiến thức để tìm ngữ cảnh liên quan...",
+  "info_generating_initial_questions": "Đang tạo bộ câu hỏi ban đầu...",
+  "info_self_reflecting_questions": "Đang thực hiện tự phản ánh về các câu hỏi đã tạo (Lần lặp {iteration_count}/{max_iterations})...",
+  "info_selecting_final_questions": "Đang chọn câu hỏi cuối cùng...",
+  "info_question_composition_complete": "Quá trình soạn câu hỏi đã hoàn tất.",
+  "error_knowledge_query_failed": "Không thể chuẩn bị truy vấn cho cơ sở kiến thức.",
+  "error_knowledge_base_query_failed": "Không thể truy xuất ngữ cảnh từ cơ sở kiến thức.",
+  "error_initial_question_generation_failed": "Không thể tạo câu hỏi ban đầu.",
+  "error_self_reflection_failed_max_retries": "Tự phản ánh thất bại sau số lần thử tối đa.",
+  "error_self_reflection_step_failed": "Một bước trong quá trình tự phản ánh đã thất bại.",
+  "error_final_question_selection_failed": "Không thể chọn câu hỏi cuối cùng.",
+  "error_composer_graph_execution": "Đã xảy ra lỗi khi thực thi biểu đồ soạn câu hỏi."
 }

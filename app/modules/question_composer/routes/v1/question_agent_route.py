@@ -12,7 +12,7 @@ from app.modules.question_composer.schemas.question_agent_schema import (
     GeneratedQuestion
 )
 
-route = APIRouter()
+route = APIRouter(prefix='/question-composer', tags=['Question Agent'])
 
 @route.post("/compose-questions", response_model=QuestionCompositionAPIResponse, status_code=status.HTTP_200_OK)
 @handle_exceptions
