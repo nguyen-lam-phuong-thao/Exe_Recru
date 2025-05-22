@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 
 from app.core.base_model import APIResponse
 from app.middleware.translation_manager import _
-from app.exceptions.exception import CustomHTTPException
+from app.exceptions.handlers import handle_exceptions
 from app.modules.agentic_rag.schemas.rag_schema import RAGRequest
 from app.modules.agentic_rag.repositories.rag_repo import RAGRepository
 
@@ -18,18 +18,12 @@ def get_rag_repo():
 
 
 @route.post('/generate', response_model=APIResponse)
+@handle_exceptions
 async def generate_rag_response(
 	request: RAGRequest,
 	rag_repo: RAGRepository = Depends(get_rag_repo),
 ) -> APIResponse:
 	"""Generate an LLM response using RAG with document retrieval."""
-	try:
-		result = await rag_repo.generate(request)
-		print(f'[DEBUG] generate_rag_response: Generated response with {len(result.sources)} sources')
-		return APIResponse(error_code=0, message=_('response_generated_successfully'), data=result)
-	except CustomHTTPException as e:
-		print(f'[DEBUG] generate_rag_response error: {e.message}')
-		return APIResponse(error_code=e.status_code, message=e.message, data=None)
-	except Exception as e:
-		print(f'[DEBUG] generate_rag_response unexpected error: {e}')
-		raise CustomHTTPException(status_code=500, message=_('error_occurred'))
+	result = await rag_repo.generate(request)
+	print(f'[DEBUG] generate_rag_response: Generated response with {len(result.sources)} sources')
+	return APIResponse(error_code=0, message=_('response_generated_successfully'), data=result)

@@ -78,7 +78,7 @@ async function makeApiRequest(endpoint, method, payload, isFormData = false) {
     if (method !== 'GET' && method !== 'HEAD') {
         requestOptions.body = bodyToSend;
     }
-    
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, requestOptions);
 
     let data;
@@ -120,7 +120,7 @@ async function makeApiRequest(endpoint, method, payload, isFormData = false) {
             } else if (data.error && data.error.message && typeof data.error.message === 'string') {
                 errorMessage = data.error.message;
             } else if (typeof data === 'string') {
-                 errorMessage = data;
+                errorMessage = data;
             }
         }
         throw new Error(errorMessage);
