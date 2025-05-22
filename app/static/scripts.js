@@ -53,21 +53,78 @@ function resetResponseStyles(elementId) {
     element.style.color = '';
 }
 
-async function makeApiRequest(endpoint, method, payload) {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: method !== 'GET' ? JSON.stringify(payload) : undefined
-    });
+// Store the ID of the last successfully uploaded document in the Full API Flow
+let currentUploadedDocId = null;
 
-    const data = await response.json();
+async function makeApiRequest(endpoint, method, payload, isFormData = false) {
+    const headers = {};
+    let bodyToSend;
 
-    if (!response.ok) {
-        throw new Error(data.detail || 'An error occurred');
+    if (isFormData) {
+        bodyToSend = payload; // payload is already FormData
+        // Do not set Content-Type for FormData; the browser will do it with the correct boundary.
+    } else if (payload && (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE')) { // DELETE can also have a body
+        headers['Content-Type'] = 'application/json';
+        bodyToSend = JSON.stringify(payload);
+    } else {
+        bodyToSend = undefined;
     }
 
+    const requestOptions = {
+        method: method,
+        headers: headers,
+    };
+
+    if (method !== 'GET' && method !== 'HEAD') {
+        requestOptions.body = bodyToSend;
+    }
+    
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, requestOptions);
+
+    let data;
+    const responseContentType = response.headers.get("content-type");
+
+    if (response.status === 204) { // No Content
+        data = { success: true, status: response.status, message: "Operation successful (No Content)" };
+    } else if (responseContentType && responseContentType.includes("application/json")) {
+        data = await response.json();
+    } else {
+        const textResponse = await response.text();
+        if (response.ok) {
+            data = { success: true, status: response.status, message: textResponse || "Operation successful" };
+        } else {
+            // Attempt to parse as JSON if it's an error, FastAPI often returns JSON errors
+            try {
+                data = JSON.parse(textResponse);
+            } catch (e) {
+                data = { detail: textResponse || `HTTP error ${response.status}` };
+            }
+        }
+    }
+
+    if (!response.ok) {
+        let errorMessage = `An error occurred: ${response.statusText} (${response.status})`; // Default
+        if (data) {
+            if (data.detail) {
+                if (typeof data.detail === 'string') {
+                    errorMessage = data.detail;
+                } else if (Array.isArray(data.detail) && data.detail.length > 0 && data.detail[0].msg) {
+                    errorMessage = data.detail.map(err => `${err.loc.join('.')} - ${err.msg}`).join('; ');
+                } else {
+                    try {
+                        errorMessage = JSON.stringify(data.detail);
+                    } catch (e) { /* ignore if not stringifiable */ }
+                }
+            } else if (data.message && typeof data.message === 'string') {
+                errorMessage = data.message;
+            } else if (data.error && data.error.message && typeof data.error.message === 'string') {
+                errorMessage = data.error.message;
+            } else if (typeof data === 'string') {
+                 errorMessage = data;
+            }
+        }
+        throw new Error(errorMessage);
+    }
     return data;
 }
 
@@ -157,6 +214,150 @@ async function agentAnswer() {
 
         // Display the response
         displayResponse(responseElementId, response);
+    } catch (error) {
+        displayError(responseElementId, error);
+    } finally {
+        hideLoading(responseElementId);
+    }
+}
+
+// Full API Flow Functions
+async function uploadDocumentFlow() {
+    const fileInput = document.getElementById('upload-file-flow');
+    const responseElementId = 'upload-document-flow-response';
+    resetResponseStyles(responseElementId);
+    showLoading(responseElementId);
+    currentUploadedDocId = null; // Reset previous ID
+    document.getElementById('view-doc-id-flow').value = '';
+    document.getElementById('delete-doc-id-flow').value = '';
+
+
+    if (!fileInput.files || fileInput.files.length === 0) {
+        displayError(responseElementId, 'Please select a file to upload.');
+        hideLoading(responseElementId);
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await makeApiRequest('/kb/upload', 'POST', formData, true); // true for isFormData
+        if (response && response.data && response.data.document_id) {
+            currentUploadedDocId = response.data.document_id;
+            document.getElementById('view-doc-id-flow').value = currentUploadedDocId;
+            document.getElementById('delete-doc-id-flow').value = currentUploadedDocId;
+            const successData = {
+                message: `File uploaded successfully. Document ID: ${currentUploadedDocId}`,
+                originalResponse: response
+            };
+            displayResponse(responseElementId, successData);
+        } else {
+            displayResponse(responseElementId, response); // Fallback for different success structures
+        }
+    } catch (error) {
+        displayError(responseElementId, error);
+    } finally {
+        hideLoading(responseElementId);
+    }
+}
+
+async function viewDocumentFlow() {
+    const docId = document.getElementById('view-doc-id-flow').value;
+    const responseElementId = 'view-document-flow-response';
+    resetResponseStyles(responseElementId);
+    showLoading(responseElementId);
+
+    if (!docId) {
+        displayError(responseElementId, 'Please enter a Document ID or upload a document first.');
+        hideLoading(responseElementId);
+        return;
+    }
+
+    try {
+        const response = await makeApiRequest(`/kb/documents/${docId}`, 'GET');
+        displayResponse(responseElementId, response);
+    } catch (error) {
+        displayError(responseElementId, error);
+    } finally {
+        hideLoading(responseElementId);
+    }
+}
+
+async function queryKnowledgeBaseFlow() {
+    const responseElementId = 'query-kb-flow-response';
+    resetResponseStyles(responseElementId);
+    showLoading(responseElementId);
+
+    try {
+        const payloadStr = document.getElementById('query-kb-flow-payload').value;
+        const payload = JSON.parse(payloadStr);
+        const response = await makeApiRequest('/kb/query', 'POST', payload);
+        displayResponse(responseElementId, response);
+    } catch (error) {
+        displayError(responseElementId, error);
+    } finally {
+        hideLoading(responseElementId);
+    }
+}
+
+async function ragGenerateFlow() {
+    const responseElementId = 'rag-generate-flow-response';
+    resetResponseStyles(responseElementId);
+    showLoading(responseElementId);
+
+    try {
+        const payloadStr = document.getElementById('rag-generate-flow-payload').value;
+        const payload = JSON.parse(payloadStr);
+        const response = await makeApiRequest('/rag/generate', 'POST', payload);
+        displayResponse(responseElementId, response);
+    } catch (error) {
+        displayError(responseElementId, error);
+    } finally {
+        hideLoading(responseElementId);
+    }
+}
+
+async function agentAnswerFlow() {
+    const responseElementId = 'agent-answer-flow-response';
+    resetResponseStyles(responseElementId);
+    showLoading(responseElementId);
+
+    try {
+        const payloadStr = document.getElementById('agent-answer-flow-payload').value;
+        const payload = JSON.parse(payloadStr);
+        const response = await makeApiRequest('/agent/answer', 'POST', payload);
+        displayResponse(responseElementId, response);
+    } catch (error) {
+        displayError(responseElementId, error);
+    } finally {
+        hideLoading(responseElementId);
+    }
+}
+
+async function deleteDocumentFlow() {
+    const docId = document.getElementById('delete-doc-id-flow').value;
+    const responseElementId = 'delete-document-flow-response';
+    resetResponseStyles(responseElementId);
+    showLoading(responseElementId);
+
+    if (!docId) {
+        displayError(responseElementId, 'Please enter a Document ID or upload a document first.');
+        hideLoading(responseElementId);
+        return;
+    }
+
+    try {
+        const response = await makeApiRequest(`/kb/documents/${docId}`, 'DELETE', null);
+        displayResponse(responseElementId, response);
+        if (response && response.success) {
+            document.getElementById('delete-doc-id-flow').value = '';
+            if (currentUploadedDocId === docId) {
+                currentUploadedDocId = null;
+                document.getElementById('view-doc-id-flow').value = '';
+            }
+        }
     } catch (error) {
         displayError(responseElementId, error);
     } finally {

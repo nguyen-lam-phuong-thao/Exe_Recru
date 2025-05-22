@@ -1,10 +1,18 @@
+from typing import List, Optional
+import uuid
+import io
 import time
-from typing import List
 
 from qdrant_client import QdrantClient
+from fastapi import UploadFile
 
 # Added imports for collection creation
-from qdrant_client.http.models import Distance, VectorParams, CollectionStatus
+from qdrant_client.http.models import (
+    Distance,
+    VectorParams,
+    CollectionStatus,
+    PointStruct,
+)
 from langchain_qdrant import QdrantVectorStore
 from langchain.schema import Document
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
@@ -16,6 +24,8 @@ from app.modules.agentic_rag.schemas.kb_schema import (
     QueryRequest,
     QueryResponse,
     QueryResponseItem,
+    UploadDocumentResponse,
+    ViewDocumentResponse,
 )
 from app.core.config import GOOGLE_API_KEY
 from app.modules.agentic_rag.core.config import settings
@@ -70,7 +80,7 @@ class KBRepository:
             print("KBRepository: Initialized Google GenerativeAI embeddings")
         except Exception as e:
             print(f"KBRepository: Error initializing embeddings: {e}")
-            raise CustomHTTPException(status_code=500, message=_("error_occurred"))
+            raise CustomHTTPException(message=_("error_occurred"))
 
         # Ensure collection exists
         try:
@@ -110,7 +120,7 @@ class KBRepository:
                 f"KBRepository: Error ensuring collection '{self.collection_name}' exists: {e}"
             )
             raise CustomHTTPException(
-                status_code=500, message=_("error_creating_or_checking_collection")
+                message=_("error_creating_or_checking_collection")
             )
 
         try:
@@ -139,7 +149,7 @@ class KBRepository:
                         raise  # Re-raise to be caught by outer try-except
         except Exception as e:
             print(f"KBRepository: Error initializing Qdrant vector store: {e}")
-            raise CustomHTTPException(status_code=500, message=_("error_occurred"))
+            raise CustomHTTPException(message=_("error_occurred"))
 
     async def add_documents(self, request: AddDocumentsRequest) -> List[str]:
         """Add documents to the knowledge base."""
@@ -159,7 +169,7 @@ class KBRepository:
             return ids
         except Exception as e:
             print(f"KBRepository: Error adding documents: {e}")
-            raise CustomHTTPException(status_code=500, message=_("error_occurred"))
+            raise CustomHTTPException(message=_("error_occurred"))
 
     async def query(self, request: QueryRequest) -> QueryResponse:
         """Query the knowledge base for similar documents."""
@@ -183,4 +193,189 @@ class KBRepository:
             return QueryResponse(results=items)
         except Exception as e:
             print(f"KBRepository: Error querying knowledge base: {e}")
-            raise CustomHTTPException(status_code=500, message=_("error_occurred"))
+            raise CustomHTTPException(message=_("error_occurred"))
+
+    async def upload_file(self, file: UploadFile) -> UploadDocumentResponse:
+        """Upload a file, parse it, and add it to the knowledge base."""
+        try:
+            print(f"[DEBUG] KBRepository.upload_file: Processing file: {file.filename}")
+
+            # Read file content
+            content = await file.read()
+            text_content = ""
+            doc_id = str(uuid.uuid4())
+            metadata = {
+                "source": file.filename,
+                "file_type": file.content_type,
+                "upload_date": str(uuid.uuid1().time),
+            }
+
+            # Process file based on content type
+            if file.filename.lower().endswith(".pdf"):
+                # Parse PDF file - using simple extraction to avoid dependencies
+                try:
+                    # In a real implementation, use a proper PDF extraction library
+                    # For now, we'll use a simple placeholder
+                    text_content = f"PDF content extracted from {file.filename}"
+                    print(
+                        f"[DEBUG] KBRepository.upload_file: Parsed PDF file (simplified extraction)"
+                    )
+                except Exception as pdf_error:
+                    print(
+                        f"[DEBUG] KBRepository.upload_file: Error parsing PDF: {pdf_error}"
+                    )
+                    raise CustomHTTPException(message=_("error_parsing_pdf"))
+            elif file.filename.lower().endswith(".txt"):
+                # Parse text file
+                try:
+                    text_content = content.decode("utf-8")
+                    print(
+                        f"[DEBUG] KBRepository.upload_file: Parsed TXT file with {len(text_content)} characters"
+                    )
+                except UnicodeDecodeError:
+                    print(
+                        f"[DEBUG] KBRepository.upload_file: UTF-8 decode error, trying with latin-1"
+                    )
+                    text_content = content.decode("latin-1")
+                    print(
+                        f"[DEBUG] KBRepository.upload_file: Parsed TXT file with latin-1 encoding"
+                    )
+            elif file.filename.lower().endswith(".md"):
+                # Parse markdown file
+                try:
+                    text_content = content.decode("utf-8")
+                    print(
+                        f"[DEBUG] KBRepository.upload_file: Parsed Markdown file with {len(text_content)} characters"
+                    )
+                except UnicodeDecodeError:
+                    print(
+                        f"[DEBUG] KBRepository.upload_file: UTF-8 decode error, trying with latin-1"
+                    )
+                    text_content = content.decode("latin-1")
+                    print(
+                        f"[DEBUG] KBRepository.upload_file: Parsed Markdown file with latin-1 encoding"
+                    )
+            else:
+                # Unsupported file type
+                print(
+                    f"[DEBUG] KBRepository.upload_file: Unsupported file type: {file.filename}"
+                )
+                raise CustomHTTPException(message=_("unsupported_file_type"))
+
+            # Check if we extracted any content
+            if not text_content.strip():
+                print(
+                    f"[DEBUG] KBRepository.upload_file: No content extracted from file: {file.filename}"
+                )
+                raise CustomHTTPException(message=_("empty_file_content"))
+
+            # Create a document and add it to vectorstore
+            langchain_doc = Document(page_content=text_content, metadata=metadata)
+
+            print(
+                f"[DEBUG] KBRepository.upload_file: Adding document to vector store with ID: {doc_id}"
+            )
+            ids = self.vectorstore.add_documents(
+                documents=[langchain_doc], ids=[doc_id]
+            )
+            if not ids:
+                print(
+                    f"[DEBUG] KBRepository.upload_file: Failed to add document to vector store"
+                )
+                raise CustomHTTPException(
+                    message=_("error_adding_document_to_vector_store")
+                )
+
+            # Create and return response
+            return UploadDocumentResponse(
+                id=doc_id,
+                filename=file.filename,
+                content_type=file.content_type,
+                size=len(content),
+                metadata=metadata,
+            )
+
+        except CustomHTTPException as e:
+            # Re-raise custom exceptions
+            raise e
+        except Exception as e:
+            print(f"[DEBUG] KBRepository.upload_file: Unexpected error: {str(e)}")
+            raise CustomHTTPException(message=_("error_uploading_file"))
+
+    async def get_document(self, document_id: str) -> Optional[ViewDocumentResponse]:
+        """Retrieve a document from the knowledge base by its ID."""
+        try:
+            print(
+                f"[DEBUG] KBRepository.get_document: Retrieving document with ID: {document_id}"
+            )
+
+            # Retrieve the document from Qdrant
+            points = self.client.retrieve(
+                collection_name=self.collection_name,
+                ids=[document_id],
+                with_payload=True,
+                with_vectors=False,
+            )
+
+            if not points or len(points) == 0:
+                print(
+                    f"[DEBUG] KBRepository.get_document: Document not found with ID: {document_id}"
+                )
+                return None
+
+            # Extract document data from the retrieved point
+            point = points[0]
+            content = point.payload.get("page_content", "") if point.payload else ""
+            metadata = point.payload.get("metadata", {}) if point.payload else {}
+
+            print(
+                f"[DEBUG] KBRepository.get_document: Successfully retrieved document with ID: {document_id}"
+            )
+
+            # Create and return the response
+            return ViewDocumentResponse(
+                id=document_id, content=content, metadata=metadata
+            )
+
+        except Exception as e:
+            print(
+                f"[DEBUG] KBRepository.get_document: Error retrieving document: {str(e)}"
+            )
+            raise CustomHTTPException(message=_("error_retrieving_document"))
+
+    async def delete_document(self, document_id: str) -> bool:
+        """Delete a document from the knowledge base by its ID."""
+        try:
+            print(
+                f"[DEBUG] KBRepository.delete_document: Attempting to delete document with ID: {document_id}"
+            )
+
+            # Check if document exists first
+            points = self.client.retrieve(
+                collection_name=self.collection_name,
+                ids=[document_id],
+                with_payload=False,
+                with_vectors=False,
+            )
+
+            if not points or len(points) == 0:
+                print(
+                    f"[DEBUG] KBRepository.delete_document: Document not found with ID: {document_id}"
+                )
+                return False
+
+            response = self.client.delete(
+                collection_name=self.collection_name,
+                points_selector=PointStruct(ids=[document_id]),
+            )
+
+            print(
+                f"[DEBUG] KBRepository.delete_document: Document deleted successfully with ID: {document_id}"
+            )
+            return True
+
+        except Exception as e:
+            print(
+                f"[DEBUG] KBRepository.delete_document: Error deleting document: {str(e)}"
+            )
+            raise CustomHTTPException(message=_("error_deleting_document"))

@@ -14,6 +14,7 @@
       <button class="tab-btn active" onclick="openTab('kb-tab')">Knowledge Base</button>
       <button class="tab-btn" onclick="openTab('rag-tab')">RAG Generation</button>
       <button class="tab-btn" onclick="openTab('agent-tab')">Agent</button>
+      <button class="tab-btn" onclick="openTab('full-api-flow-tab')">Full API Flow</button>
     </div>
     
     <div id="kb-tab" class="tab-content active">
@@ -108,6 +109,109 @@
         </div>
       </div>
     </div>
+
+    <div id="full-api-flow-tab" class="tab-content">
+      <div class="panel">
+        <h2>1. Upload Document</h2>
+        <p>Upload a PDF, TXT, or MD file to the knowledge base.</p>
+        <div class="form-group">
+          <label for="upload-file-flow">Select file:</label>
+          <input type="file" id="upload-file-flow" accept=".pdf,.txt,.md">
+        </div>
+        <button class="btn" onclick="uploadDocumentFlow()">Upload Document</button>
+        <div class="response">
+          <h3>Response:</h3>
+          <pre id="upload-document-flow-response" class="response-area">Response will appear here</pre>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>2. View Document</h2>
+        <p>View a specific document by its ID (auto-filled after successful upload).</p>
+        <div class="form-group">
+          <label for="view-doc-id-flow">Document ID:</label>
+          <input type="text" id="view-doc-id-flow" placeholder="Enter document ID">
+        </div>
+        <button class="btn" onclick="viewDocumentFlow()">View Document</button>
+        <div class="response">
+          <h3>Response:</h3>
+          <pre id="view-document-flow-response" class="response-area">Response will appear here</pre>
+        </div>
+      </div>
+      
+      <div class="panel">
+        <h2>3. Query Knowledge Base</h2>
+        <p>Perform a semantic search on the knowledge base.</p>
+        <div class="form-group">
+          <label for="query-kb-flow-payload">Request Payload:</label>
+          <textarea id="query-kb-flow-payload" rows="5" class="code-editor">
+{
+  "query": "What is the main concept of the uploaded document?",
+  "top_k": 2
+}</textarea>
+        </div>
+        <button class="btn" onclick="queryKnowledgeBaseFlow()">Query KB</button>
+        <div class="response">
+          <h3>Response:</h3>
+          <pre id="query-kb-flow-response" class="response-area">Response will appear here</pre>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>4. RAG Generate</h2>
+        <p>Generate a response based on a query and retrieved context from the KB.</p>
+        <div class="form-group">
+          <label for="rag-generate-flow-payload">Request Payload:</label>
+          <textarea id="rag-generate-flow-payload" rows="7" class="code-editor">
+{
+  "query": "Summarize the uploaded document in one paragraph.",
+  "top_k": 3,
+  "temperature": 0.7,
+  "context_strategy": "merge"
+}</textarea>
+        </div>
+        <button class="btn" onclick="ragGenerateFlow()">RAG Generate</button>
+        <div class="response">
+          <h3>Response:</h3>
+          <pre id="rag-generate-flow-response" class="response-area">Response will appear here</pre>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>5. Agent Answer</h2>
+        <p>Get an answer from the agent, potentially using RAG and other tools.</p>
+        <div class="form-group">
+          <label for="agent-answer-flow-payload">Request Payload:</label>
+          <textarea id="agent-answer-flow-payload" rows="7" class="code-editor">
+{
+  "query": "Based on the uploaded document, what are the key takeaways?",
+  "top_k": 3,
+  "temperature": 0.7,
+  "context_strategy": "merge"
+}</textarea>
+        </div>
+        <button class="btn" onclick="agentAnswerFlow()">Agent Answer</button>
+        <div class="response">
+          <h3>Response:</h3>
+          <pre id="agent-answer-flow-response" class="response-area">Response will appear here</pre>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>6. Delete Document</h2>
+        <p>Delete a specific document by its ID (auto-filled after successful upload).</p>
+        <div class="form-group">
+          <label for="delete-doc-id-flow">Document ID:</label>
+          <input type="text" id="delete-doc-id-flow" placeholder="Enter document ID">
+        </div>
+        <button class="btn" onclick="deleteDocumentFlow()">Delete Document</button>
+        <div class="response">
+          <h3>Response:</h3>
+          <pre id="delete-document-flow-response" class="response-area">Response will appear here</pre>
+        </div>
+      </div>
+    </div>
+
   </div>
   <script src="scripts.js"></script>
 </body>
