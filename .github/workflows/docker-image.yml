@@ -19,7 +19,7 @@ jobs:
         run: |
           echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env
 
-      # Log in to Docker Hub (optional, required if pushing images)
+      # Log in to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -31,10 +31,15 @@ jobs:
         run: |
           docker compose build
 
-      # Push built images to registry (optional)
+      # Tag images for the specific Docker Hub repository
+      - name: Tag images
+        run: |
+          docker tag $(docker images --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1) luongnguyenminhan/enteviu:latest
+
+      # Push images to Docker Hub
       - name: Push images to Docker Hub
         run: |
-          docker compose push
+          docker push luongnguyenminhan/enteviu:latest
 
       # Test the services (optional)
       - name: Test services
@@ -43,30 +48,3 @@ jobs:
           sleep 30
           docker compose ps
           docker compose down
-
-  # deploy:
-  #   runs-on: self-hosted
-  #   needs: docker-build
-
-  #   steps:
-
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
-  #       with:
-  #         clean: false
-
-  #     - name: Clean up old Docker resources
-  #       run: |
-  #         docker stop money-ez-ai || true
-  #         docker rm money-ez-ai || true
-    
-  #     - name: Deploy to VPS
-  #       run: |
-  #         docker pull ducdang03/money-ez-ai:latest
-  #         docker run -d --name money-ez-ai -p 8888:8888 \
-  #           -e GOOGLE_API_KEY=${{ secrets.GOOGLE_API_KEY }} \
-  #           -e QDRANT_API_KEY=${{ secrets.QDRANT_API_KEY }} \
-  #           ducdang03/money-ez-ai:latest
-  
-  #     - name: Verify running containers
-  #       run: docker ps -a
