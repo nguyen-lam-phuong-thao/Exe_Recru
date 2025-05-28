@@ -29,20 +29,20 @@ jobs:
       # Build services with docker-compose
       - name: Build Docker Compose services
         run: |
-          docker-compose build
+          docker compose build
 
       # Push built images to registry (optional)
       - name: Push images to Docker Hub
         run: |
-          docker-compose push
+          docker compose push
 
       # Test the services (optional)
       - name: Test services
         run: |
-          docker-compose up -d
+          docker compose up -d
           sleep 30
-          docker-compose ps
-          docker-compose down
+          docker compose ps
+          docker compose down
 
   # deploy:
   #   runs-on: self-hosted
