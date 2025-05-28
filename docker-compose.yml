@@ -27,41 +27,41 @@ services:
     restart: always
     networks:
       - enterviu-network
-  celery:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: luongnguyenminhan/enteviu-celery:latest
-    volumes:
-      - .:/app
-      - audio_data:/data/audio  # Add shared volume for audio files
-    environment:
-      - ENV=development
-      - SERVICE_TYPE=celery_worker
-      - CELERY_BROKER_URL=redis://redis-enterviu:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis-enterviu:6379/0
-      - QDRANT_URL=http://qdrant:6333 # Changed from 6334 to 6333
-      - QDRANT_COLLECTION=agentic_rag_kb
-      - CELERY_WORKER_CONCURRENCY=4  # Set concurrency for Celery workers
-    env_file:
-      - .env
-    networks:
-      - enterviu-network
-    depends_on:
-      redis-enterviu:
-        condition: service_started
-      api:
-        condition: service_started
-    restart: always
+  # celery:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   image: luongnguyenminhan/enteviu-celery:latest
+  #   volumes:
+  #     - .:/app
+  #     - audio_data:/data/audio  # Add shared volume for audio files
+  #   environment:
+  #     - ENV=development
+  #     - SERVICE_TYPE=celery_worker
+  #     - CELERY_BROKER_URL=redis://redis-enterviu:6379/0
+  #     - CELERY_RESULT_BACKEND=redis://redis-enterviu:6379/0
+  #     - QDRANT_URL=http://qdrant:6333 # Changed from 6334 to 6333
+  #     - QDRANT_COLLECTION=agentic_rag_kb
+  #     - CELERY_WORKER_CONCURRENCY=4  # Set concurrency for Celery workers
+  #   env_file:
+  #     - .env
+  #   networks:
+  #     - enterviu-network
+  #   depends_on:
+  #     redis-enterviu:
+  #       condition: service_started
+  #     api:
+  #       condition: service_started
+  #   restart: always
 
-  redis-enterviu:
-    image: redis:latest
-    container_name: redis
-    ports:
-      - "6379:6379"
-    networks:
-      - enterviu-network
-    restart: always
+  # redis-enterviu:
+    # image: redis:latest
+    # container_name: redis
+    # ports:
+    #   - "6379:6379"
+    # networks:
+    #   - enterviu-network
+    # restart: always
 
 networks:
   enterviu-network:
