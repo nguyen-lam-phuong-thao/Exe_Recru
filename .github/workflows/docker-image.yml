@@ -34,7 +34,8 @@ jobs:
       # Push images to Docker Hub
       - name: Push images to Docker Hub
         run: |
-          docker push luongnguyenminhan/enteviu:latest
+          docker push luongnguyenminhan/enteviu-api:latest
+          docker push luongnguyenminhan/enteviu-celery:latest
 
       # Test the services (optional)
       - name: Test services
@@ -42,4 +43,19 @@ jobs:
           docker compose up -d
           sleep 30
           docker compose ps
+          docker compose logs --tail=50
           docker compose down
+
+  deploy:
+    needs: docker-compose-build
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      # Deploy to production server (if you have one)
+      - name: Deploy to server
+        run: |
+          echo "Deployment step - configure based on your deployment target"
+          echo "Images pushed successfully:"
+          echo "- luongnguyenminhan/enteviu-api:latest"
+          echo "- luongnguyenminhan/enteviu-celery:latest"
