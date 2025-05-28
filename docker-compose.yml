@@ -1,9 +1,9 @@
-services:
+services:  
   api:
     build:
       context: .
       dockerfile: Dockerfile
-    image: enterviu-api:latest
+    image: luongnguyenminhan/enteviu:latest
     ports:
       - "8000:8000"
     volumes:
@@ -51,10 +51,10 @@ services:
       - enterviu-network
     restart: always
   celery:
-    build:  
+    build:
       context: .
       dockerfile: Dockerfile
-    image: enterviu-api:latest
+    image: luongnguyenminhan/enteviu:latest
     volumes:
       - .:/app
       - audio_data:/data/audio  # Add shared volume for audio files
