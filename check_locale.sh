@@ -162,4 +162,4 @@ fi
 rm "$extracted_file" "$en_keys" "$vi_keys" "$en_json_new" "$en_json_new.tmp" "$vi_json_new" "$vi_json_new.tmp" 2>/dev/null
 
 echo -e "\n${GREEN}Check complete. Unused translations have been removed.${NC}"4
-echo -e "\n${YELLOW}Press any key to continue...${NC}" && read -n 1 -s
+echo -e "\n${YELLOW}Press any key to continue...${NC}" && read -n 1 -s 
