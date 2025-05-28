@@ -31,11 +31,6 @@ jobs:
         run: |
           docker compose build
 
-      # Tag images for the specific Docker Hub repository
-      - name: Tag images
-        run: |
-          docker tag $(docker images --format "table {{.Repository}}:{{.Tag}}" | grep -v REPOSITORY | head -1) luongnguyenminhan/enteviu:latest
-
       # Push images to Docker Hub
       - name: Push images to Docker Hub
         run: |
