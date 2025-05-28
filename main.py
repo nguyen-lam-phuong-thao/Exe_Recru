@@ -1,7 +1,3 @@
-"""
-Main function
-"""
-
 import os
 import sys
 
