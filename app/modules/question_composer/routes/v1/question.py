@@ -3,10 +3,10 @@ from typing import Dict, Any, List
 from app.modules.question_composer.schemas.question import QuestionSet, QuestionComposerResponse
 from app.modules.question_composer.agent.question_agent import QuestionComposerAgent
 
-router = APIRouter()
+route = APIRouter(prefix='/question', tag=["Question"])
 question_agent = QuestionComposerAgent()
 
-@router.post("/compose", response_model=QuestionComposerResponse)
+@route.post("/compose", response_model=QuestionComposerResponse)
 async def compose_questions(context: Dict[str, Any]):
     """
     Compose a set of questions based on the given context
@@ -17,7 +17,7 @@ async def compose_questions(context: Dict[str, Any]):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/dependent/{question_set_id}", response_model=List[Question])
+@route.get("/dependent/{question_set_id}", response_model=List[Question])
 async def get_dependent_questions(question_set_id: str, answer: Dict[str, Any]):
     """
     Get questions that depend on the given answer
