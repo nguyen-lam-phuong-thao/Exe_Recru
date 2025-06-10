@@ -1,5 +1,3 @@
-from .question_agent_route import route as question_agent_router
+# V1 routes package - MUST import all route instances
 
-__all__ = [
-	'question_agent_router',
-]
+from .question_routes import route as question_route

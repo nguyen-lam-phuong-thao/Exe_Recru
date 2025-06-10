@@ -6,22 +6,17 @@ from app.core.base_model import APIResponse
 from app.middleware.translation_manager import _
 from app.exceptions.handlers import handle_exceptions
 from app.modules.agentic_rag.schemas.rag_schema import RAGRequest
-from app.modules.agentic_rag.repositories.rag_repo import RAGRepository
+from app.modules.agentic_rag.repositories.rag_repo import RAGRepo
 
 # Router for Agentic RAG operations
 route: APIRouter = APIRouter(prefix='/rag', tags=['Agentic RAG'])
-
-
-def get_rag_repo():
-	"""Dependency to get RAG repository instance."""
-	return RAGRepository()
 
 
 @route.post('/generate', response_model=APIResponse)
 @handle_exceptions
 async def generate_rag_response(
 	request: RAGRequest,
-	rag_repo: RAGRepository = Depends(get_rag_repo),
+	rag_repo: RAGRepo = Depends(),
 ) -> APIResponse:
 	"""Generate an LLM response using RAG with document retrieval."""
 	result = await rag_repo.generate(request)

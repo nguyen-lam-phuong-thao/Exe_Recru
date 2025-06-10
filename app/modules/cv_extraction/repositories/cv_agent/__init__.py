@@ -14,14 +14,9 @@ class CVAnalyzer:
 	async def analyze_cv_content(
 		self,
 		cv_content: str,
-		# meeting_type and custom_prompt seem irrelevant for CV analysis, removing them
-		# If specific analysis parameters are needed later, they can be added.
 	):
 		try:
 			self.logger.info(f'Starting CV analysis with content length: {len(cv_content or "")}')
-
-			# The CVProcessorWorkflow is already initialized with the API key.
-			# No need to re-initialize based on meeting_type for CVs.
 			processor = self.cv_processor
 
 			result = await processor.analyze_cv(cv_content)

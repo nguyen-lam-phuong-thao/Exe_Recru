@@ -3,27 +3,63 @@ Configuration for the Agentic RAG module.
 """
 
 import os
+import logging
 from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
+
+
+# Color codes for logging
+class LogColors:
+	HEADER = '\033[95m'
+	OKBLUE = '\033[94m'
+	OKCYAN = '\033[96m'
+	OKGREEN = '\033[92m'
+	WARNING = '\033[93m'
+	FAIL = '\033[91m'
+	ENDC = '\033[0m'
+	BOLD = '\033[1m'
+
+
+logger.info(f'{LogColors.HEADER}[AgenticRAG-CoreConfig] Loading core configuration{LogColors.ENDC}')
 
 # Check if running in Docker environment
 DOCKER_ENVIRONMENT = os.getenv('DOCKER_ENVIRONMENT', 'False').lower() == 'true'
+logger.info(f'{LogColors.OKBLUE}[AgenticRAG-CoreConfig] Docker environment detected: {DOCKER_ENVIRONMENT}{LogColors.ENDC}')
 
-# Qdrant configuration
-# In Docker, use the service name; otherwise use localhost
-QDRANT_HOST = 'qdrant' if DOCKER_ENVIRONMENT else 'localhost'
-# Important: Use port 6334 for HTTP API (not 6333 which is for gRPC)
+# Qdrant configuration - sử dụng local Qdrant từ docker-compose.yml
+# Sử dụng cùng cấu hình như main app
+QDRANT_HOST = os.getenv('QDRANT_HOST', 'qdrant' if DOCKER_ENVIRONMENT else 'localhost')
+QDRANT_PORT = os.getenv('QDRANT_PORT', '6333')
 QDRANT_URL = os.getenv(
 	'QDRANT_URL',
-	'https://3b8399d1-fff9-4b31-9f6e-a5e4fcfffc77.us-east-1-0.aws.cloud.qdrant.io:6333',
+	f'http://{QDRANT_HOST}:{QDRANT_PORT}',  # Sử dụng local Qdrant từ docker-compose
 )
-QDRANT_API_KEY = os.getenv(
-	'QDRANT_API_KEY',
-	'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.qUBAYKVmnrDttHhgelrgCEtUsI_lP9uad5waFf2KBMs',
-)
+QDRANT_API_KEY = os.getenv('QDRANT_API_KEY', '')  # Không cần API key cho local Qdrant
 QDRANT_COLLECTION = os.getenv('QDRANT_COLLECTION', 'agentic_rag_kb')
+
+logger.info(f'{LogColors.OKCYAN}[AgenticRAG-CoreConfig] Qdrant configuration - Host: {QDRANT_HOST}, Port: {QDRANT_PORT}, URL: {QDRANT_URL}{LogColors.ENDC}')
+logger.info(f'{LogColors.OKBLUE}[AgenticRAG-CoreConfig] Default collection: {QDRANT_COLLECTION}{LogColors.ENDC}')
 
 # Embedding configuration
 EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL', 'models/embedding-001')
+logger.info(f'{LogColors.OKCYAN}[AgenticRAG-CoreConfig] Embedding model: {EMBEDDING_MODEL}{LogColors.ENDC}')
+
+# File extraction configuration
+MAX_FILE_SIZE = int(os.getenv('MAX_FILE_SIZE', '10485760'))  # 10MB default
+SUPPORTED_FILE_TYPES = {
+	'application/pdf': '.pdf',
+	'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
+	'text/plain': '.txt',
+	'text/markdown': '.md',
+	'application/msword': '.doc',
+}
+logger.info(f'{LogColors.OKCYAN}[AgenticRAG-CoreConfig] File extraction - Max size: {MAX_FILE_SIZE} bytes, Supported types: {list(SUPPORTED_FILE_TYPES.keys())}{LogColors.ENDC}')
+
+# Collection management
+DEFAULT_COLLECTION = 'global'
+COLLECTION_PREFIX = 'rag_'
+logger.info(f'{LogColors.OKCYAN}[AgenticRAG-CoreConfig] Collection management - Default: {DEFAULT_COLLECTION}, Prefix: {COLLECTION_PREFIX}{LogColors.ENDC}')
 
 
 class QdrantConfig(BaseModel):
@@ -38,3 +74,4 @@ class QdrantConfig(BaseModel):
 
 
 settings = QdrantConfig()
+logger.info(f'{LogColors.OKGREEN}[AgenticRAG-CoreConfig] Configuration settings initialized successfully{LogColors.ENDC}')

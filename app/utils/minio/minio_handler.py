@@ -56,9 +56,9 @@ class MinioHandler:
 		try:
 			if not self.minio_client.bucket_exists(self.bucket_name):
 				self.minio_client.make_bucket(self.bucket_name)
-				logger.info(f"Bucket '{self.bucket_name}' created successfully.")
+				logger.info(f'Bucket {self.bucket_name} created successfully')
 			else:
-				logger.info(f"Bucket '{self.bucket_name}' already exists.")
+				logger.info(f'Bucket {self.bucket_name} already exists')
 		except S3Error as err:
 			logger.error(f'Error checking/creating bucket: {err}')
 			raise
@@ -270,37 +270,24 @@ class MinioHandler:
 		    A presigned URL for the file
 		"""
 		try:
-			# Generate URL
-			logger.info(f"Generating URL for '{object_name}'")
+			from datetime import timedelta
 
-			# Check if object exists
-			try:
-				self.minio_client.stat_object(self.bucket_name, object_name)
-				logger.info(f'Object exists: {object_name}')
-			except S3Error:
-				logger.warning(f'Object not found: {object_name}')
-				raise FileNotFoundError(f'Object not found: {object_name}')
+			expires_delta = timedelta(seconds=expires) if expires else timedelta(days=7)
 
-			# For public access, we can just construct the URL directly
-			# This will only work if the bucket has public read access configured
-			url = f'http{"s" if settings.MINIO_SECURE else ""}://{settings.MINIO_ENDPOINT}/{self.bucket_name}/{object_name}'
+			url = self.minio_client.presigned_get_object(
+				bucket_name=self.bucket_name,
+				object_name=object_name,
+				expires=expires_delta,
+			)
 
-			# If you need authentication, use presigned URL with maximum allowed expiration
-			if expires is not None:
-				url = self.minio_client.presigned_get_object(
-					bucket_name=self.bucket_name,
-					object_name=object_name,
-					expires=expires,
-				)
-
-			logger.info(f'URL generated: {url}')
+			logger.info(f'Generated presigned URL for: {object_name}')
 			return url
 
 		except S3Error as err:
-			logger.error(f'Error generating URL: {err}')
+			logger.error(f'Error generating presigned URL: {err}')
 			raise
 		except FileNotFoundError as err:
-			logger.error(f'File not found for URL generation: {err}')
+			logger.error(f'File not found when generating URL: {err}')
 			raise
 
 	def remove_file(self, object_name: str) -> bool:
@@ -321,6 +308,41 @@ class MinioHandler:
 		except S3Error as err:
 			logger.error(f'Error removing file from MinIO: {err}')
 			return False
+
+	def get_file_content(self, object_name: str) -> bytes:
+		"""
+		Get file content as bytes from MinIO.
+
+		Args:
+		    object_name: The path of the object in MinIO storage
+
+		Returns:
+		    File content as bytes
+		"""
+		try:
+			# First normalize the path to avoid double slashes
+			object_name = object_name.replace('//', '/')
+			logger.info(f'Getting file content: {object_name}')
+
+			# Get file from MinIO
+			response = self.minio_client.get_object(bucket_name=self.bucket_name, object_name=object_name)
+
+			# Read all data
+			file_content = response.read()
+
+			# Close the response
+			response.close()
+			response.release_conn()
+
+			logger.info(f'File content retrieved successfully: {len(file_content)} bytes')
+			return file_content
+
+		except S3Error as err:
+			logger.error(f'Error getting file content from MinIO: {err}')
+			raise
+		except Exception as err:
+			logger.error(f'File not found in MinIO: {err}')
+			raise
 
 
 # Create a singleton instance

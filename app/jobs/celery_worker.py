@@ -4,11 +4,10 @@ from app.core.config import Settings
 
 # Khởi tạo Celery
 settings = Settings()
-print('=' * 300)
 print(settings.CELERY_BROKER_URL)
 print('Celery worker is starting...')
 celery_app = Celery(
-	'meobeo-ai-worker',  # More descriptive app name
+	'cgsem-ai-worker',  # More descriptive app name
 	broker=settings.CELERY_BROKER_URL,
 	backend=settings.CELERY_RESULT_BACKEND,
 	include=['app.jobs.tasks'],  # Include tasks module

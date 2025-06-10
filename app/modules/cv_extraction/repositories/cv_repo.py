@@ -8,9 +8,6 @@ from app.modules.cv_extraction.repositories.cv_agent import CVAnalyzer
 from app.modules.cv_extraction.schemas.cv import ProcessCVRequest
 from app.utils.pdf import (
 	PDFToTextConverter,
-	DocxToTextConverter,
-	TextFileReader,
-	PDFToMarkdownConverter,
 )
 
 
@@ -41,18 +38,6 @@ class CVRepository:
 				print('[DEBUG] Initialized PDFToTextConverter')
 				extracted_text = converter.extract_text()
 				print(f'[DEBUG] PDF text extraction complete, extracted {len(extracted_text)} characters')
-			elif file_extension == 'docx':
-				print('[DEBUG] Processing DOCX file')
-				converter_docx = DocxToTextConverter(docx_path=file_path)
-				print('[DEBUG] Initialized DocxToTextConverter')
-				extracted_text = converter_docx.extract_text()
-				print(f'[DEBUG] DOCX text extraction complete, extracted {len(extracted_text)} characters')
-			elif file_extension == 'txt':
-				print('[DEBUG] Processing TXT file')
-				reader = TextFileReader(file_path=file_path)
-				print('[DEBUG] Initialized TextFileReader')
-				extracted_text = reader.read_text()
-				print(f'[DEBUG] TXT text extraction complete, extracted {len(extracted_text)} characters')
 			else:
 				print(f'[DEBUG] Unsupported file type detected: {file_extension}')
 				if os.path.exists(file_path):
@@ -95,7 +80,8 @@ class CVRepository:
 		print('[DEBUG] Initialized CVAnalyzer')
 		try:
 			print('[DEBUG] Starting CV analysis')
-			result = await cv_analyzer.analyze_cv_content(extracted_text['markdown'])
+			print(f'[DEBUG] Extracted text: {extracted_text}')
+			result = await cv_analyzer.analyze_cv_content(extracted_text['text'])
 			print(f'[DEBUG] CV analysis result: {result}')
 		except Exception as e:
 			print(f'[DEBUG] Exception during CV analysis: {str(e)}')
@@ -133,7 +119,7 @@ class CVRepository:
 
 		try:
 			async with aiohttp.ClientSession() as session:
-				async with session.get(url) as response:
+				async with session.get(url, ssl=False) as response:  # Thêm ssl=False để bỏ qua SSL verification
 					print(f'Response: {response}')
 					if response.status == 200:
 						print(f'Download successful (Status: {response.status})')

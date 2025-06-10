@@ -1,3 +1,4 @@
+import logging
 from typing import List, Optional
 import uuid
 import io
@@ -28,22 +29,49 @@ from app.modules.agentic_rag.schemas.kb_schema import (
 	ViewDocumentResponse,
 )
 from app.core.config import GOOGLE_API_KEY
-from app.modules.agentic_rag.core.config import settings
+from app.modules.agentic_rag.core.config import (
+	settings,
+	DEFAULT_COLLECTION,
+	COLLECTION_PREFIX,
+	MAX_FILE_SIZE,
+	SUPPORTED_FILE_TYPES,
+)
+from app.modules.chat.services.file_extraction_service import file_extraction_service
+
+
+logger = logging.getLogger(__name__)
+
+
+# Color codes for logging
+class LogColors:
+	HEADER = '\033[95m'
+	OKBLUE = '\033[94m'
+	OKCYAN = '\033[96m'
+	OKGREEN = '\033[92m'
+	WARNING = '\033[93m'
+	FAIL = '\033[91m'
+	ENDC = '\033[0m'
+	BOLD = '\033[1m'
 
 
 class KBRepository:
 	"""Repository for interacting with the Qdrant knowledge base."""
 
-	def __init__(self) -> None:
+	def __init__(self, collection_name: str = None) -> None:
+		logger.info(f'{LogColors.HEADER}[KBRepository] Initializing Knowledge Base Repository{LogColors.ENDC}')
+
 		# Initialize Qdrant client and vector store
 		qdrant_url: str = settings.QdrantUrl
 		qdrant_api_key: str = settings.QdrantApiKey
-		self.collection_name: str = settings.QdrantCollection
-		self.embedding_model_name: str = 'models/embedding-001'  # Store model name
-		self.vector_size: int = 768  # Dimension for models/embedding-001
+		self.collection_name: str = collection_name or DEFAULT_COLLECTION
+		# Add collection prefix for better organization
+		if not self.collection_name.startswith(COLLECTION_PREFIX):
+			self.collection_name = f'{COLLECTION_PREFIX}{self.collection_name}'
 
-		# Print connection details for debugging
-		print(f'KBRepository: Connecting to Qdrant at {qdrant_url}')
+		self.embedding_model_name: str = 'models/embedding-001'
+		self.vector_size: int = 768
+
+		logger.info(f'{LogColors.OKBLUE}[KBRepository] Configuration - URL: {qdrant_url}, Collection: {self.collection_name}, Vector Size: {self.vector_size}{LogColors.ENDC}')
 
 		# Add retry logic for Docker networking issues
 		max_retries = 5
@@ -51,181 +79,264 @@ class KBRepository:
 
 		for attempt in range(max_retries):
 			try:
+				logger.info(f'{LogColors.OKCYAN}[KBRepository] Attempting Qdrant client connection (attempt {attempt + 1}/{max_retries}){LogColors.ENDC}')
 				# Initialize Qdrant client
 				self.client: QdrantClient = QdrantClient(url=qdrant_url, api_key=qdrant_api_key if qdrant_api_key else None)
-				print('KBRepository: Initialized Qdrant client successfully')
+				logger.info(f'{LogColors.OKGREEN}[KBRepository] Qdrant client initialized successfully{LogColors.ENDC}')
 				break
 			except Exception as e:
 				if attempt < max_retries - 1:
-					print(f'KBRepository: Error initializing Qdrant client (attempt {attempt + 1}/{max_retries}): {e}')
-					print(f'KBRepository: Retrying in {retry_delay} seconds...')
+					logger.info(f'{LogColors.WARNING}[KBRepository] Qdrant client connection failed (attempt {attempt + 1}/{max_retries}): {e}{LogColors.ENDC}')
+					logger.info(f'{LogColors.OKBLUE}[KBRepository] Retrying in {retry_delay} seconds...{LogColors.ENDC}')
 					time.sleep(retry_delay)
 				else:
-					print(f'KBRepository: Error initializing Qdrant client after {max_retries} attempts: {e}')
+					logger.info(f'{LogColors.FAIL}[KBRepository] Qdrant client connection failed after {max_retries} attempts: {e}{LogColors.ENDC}')
 					raise CustomHTTPException(status_code=500, message=_('error_initializing_qdrant_client'))
 
 		# Initialize embeddings using Google's GenerativeAI embeddings
 		try:
+			logger.info(f'{LogColors.OKCYAN}[KBRepository] Initializing Google GenerativeAI embeddings with model: {self.embedding_model_name}{LogColors.ENDC}')
 			self.embedding = GoogleGenerativeAIEmbeddings(model=self.embedding_model_name, google_api_key=GOOGLE_API_KEY)
-			print('KBRepository: Initialized Google GenerativeAI embeddings')
+			logger.info(f'{LogColors.OKGREEN}[KBRepository] Google GenerativeAI embeddings initialized successfully{LogColors.ENDC}')
 		except Exception as e:
-			print(f'KBRepository: Error initializing embeddings: {e}')
+			logger.info(f'{LogColors.FAIL}[KBRepository] Error initializing embeddings: {e}{LogColors.ENDC}')
 			raise CustomHTTPException(message=_('error_occurred'))
+
+		# Initialize file extraction service
+		try:
+			logger.info(f'{LogColors.OKCYAN}[KBRepository] Initializing file extraction service{LogColors.ENDC}')
+			self.file_extraction = file_extraction_service
+			logger.info(f'{LogColors.OKGREEN}[KBRepository] File extraction service initialized successfully{LogColors.ENDC}')
+		except Exception as e:
+			logger.info(f'{LogColors.FAIL}[KBRepository] Error initializing file extraction service: {e}{LogColors.ENDC}')
+			raise CustomHTTPException(message=_('error_initializing_file_extraction'))
 
 		# Ensure collection exists
 		try:
+			logger.info(f'{LogColors.OKCYAN}[KBRepository] Checking collection existence: {self.collection_name}{LogColors.ENDC}')
 			collection_exists = False
 			try:
 				collection_info = self.client.get_collection(collection_name=self.collection_name)
 				if collection_info.status == CollectionStatus.GREEN:
 					collection_exists = True
-					print(f"KBRepository: Collection '{self.collection_name}' already exists and is ready.")
-			except Exception as e:  # Catches specific "not found" or general connection errors
-				print(f"KBRepository: Collection '{self.collection_name}' not found or error checking: {e}. Attempting to create.")
+					logger.info(f'{LogColors.OKGREEN}[KBRepository] Collection {self.collection_name} exists and is ready (Status: GREEN){LogColors.ENDC}')
+			except Exception as e:
+				logger.info(f'{LogColors.WARNING}[KBRepository] Collection {self.collection_name} not found or error checking: {e}. Will attempt creation{LogColors.ENDC}')
 
 			if not collection_exists:
-				print(f"KBRepository: Creating collection '{self.collection_name}' with vector size {self.vector_size}.")
+				logger.info(f'{LogColors.OKBLUE}[KBRepository] Creating new collection: {self.collection_name} with vector size: {self.vector_size}{LogColors.ENDC}')
 				self.client.create_collection(
 					collection_name=self.collection_name,
 					vectors_config=VectorParams(size=self.vector_size, distance=Distance.COSINE),
 				)
-				print(f"KBRepository: Collection '{self.collection_name}' created successfully.")
+				logger.info(f'{LogColors.OKGREEN}[KBRepository] Collection {self.collection_name} created successfully{LogColors.ENDC}')
 
 		except Exception as e:
-			print(f"KBRepository: Error ensuring collection '{self.collection_name}' exists: {e}")
+			logger.info(f'{LogColors.FAIL}[KBRepository] Error ensuring collection {self.collection_name} exists: {e}{LogColors.ENDC}')
 			raise CustomHTTPException(message=_('error_creating_or_checking_collection'))
 
 		try:
 			# Create or load existing Qdrant collection via LangChain wrapper
+			logger.info(f'{LogColors.OKCYAN}[KBRepository] Creating vectorstore connection for collection: {self.collection_name}{LogColors.ENDC}')
+
 			# Add retry logic for collection creation/connection
 			for attempt in range(max_retries):
 				try:
 					self.vectorstore = QdrantVectorStore(
 						client=self.client,
 						collection_name=self.collection_name,
-						embedding=self.embedding,  # Corrected: embedding to embeddings
-						metadata_payload_key='metadata',  # Using the default metadata key
+						embedding=self.embedding,
+						metadata_payload_key='metadata',
 					)
-					print(f"KBRepository: Connected to Qdrant collection '{self.collection_name}' at {qdrant_url}")
+					logger.info(f'{LogColors.OKGREEN}[KBRepository] Vectorstore connected successfully to collection {self.collection_name} at {qdrant_url}{LogColors.ENDC}')
 					break
 				except Exception as e:
 					if attempt < max_retries - 1:
-						print(f'KBRepository: Error connecting to collection (attempt {attempt + 1}/{max_retries}): {e}')
-						print(f'KBRepository: Retrying in {retry_delay} seconds...')
+						logger.info(f'{LogColors.WARNING}[KBRepository] Vectorstore connection failed (attempt {attempt + 1}/{max_retries}): {e}{LogColors.ENDC}')
+						logger.info(f'{LogColors.OKBLUE}[KBRepository] Retrying vectorstore connection in {retry_delay} seconds...{LogColors.ENDC}')
 						time.sleep(retry_delay)
 					else:
-						raise  # Re-raise to be caught by outer try-except
+						raise
 		except Exception as e:
-			print(f'KBRepository: Error initializing Qdrant vector store: {e}')
+			logger.info(f'{LogColors.FAIL}[KBRepository] Error initializing Qdrant vector store: {e}{LogColors.ENDC}')
 			raise CustomHTTPException(message=_('error_occurred'))
 
-	async def add_documents(self, request: AddDocumentsRequest) -> List[str]:
-		"""Add documents to the knowledge base."""
+	def _get_full_collection_name(self, collection_id: str) -> str:
+		"""Get full collection name with prefix."""
+		if collection_id.startswith(COLLECTION_PREFIX):
+			return collection_id
+		return f'{COLLECTION_PREFIX}{collection_id}'
+
+	def create_collection(self, collection_id: str) -> bool:
+		"""Create a new collection."""
+		collection_name = self._get_full_collection_name(collection_id)
+		logger.info(f'{LogColors.HEADER}[KBRepository] Creating collection: {collection_name}{LogColors.ENDC}')
+
 		try:
+			self.client.create_collection(
+				collection_name=collection_name,
+				vectors_config=VectorParams(size=self.vector_size, distance=Distance.COSINE),
+			)
+			logger.info(f'{LogColors.OKGREEN}[KBRepository] Collection created successfully: {collection_name}{LogColors.ENDC}')
+			return True
+		except Exception as e:
+			logger.info(f'{LogColors.FAIL}[KBRepository] Error creating collection {collection_name}: {e}{LogColors.ENDC}')
+			return False
+
+	def collection_exists(self, collection_id: str) -> bool:
+		"""Check if collection exists."""
+		collection_name = self._get_full_collection_name(collection_id)
+		try:
+			self.client.get_collection(collection_name=collection_name)
+			return True
+		except Exception:
+			return False
+
+	def _get_collection_vectorstore(self, collection_id: str) -> QdrantVectorStore:
+		"""Get vectorstore for specific collection."""
+		collection_name = self._get_full_collection_name(collection_id)
+		logger.info(f'{LogColors.OKCYAN}[KBRepository] Creating vectorstore for collection: {collection_name}{LogColors.ENDC}')
+
+		return QdrantVectorStore(
+			client=self.client,
+			collection_name=collection_name,
+			embedding=self.embedding,
+			metadata_payload_key='metadata',
+		)
+
+	async def add_documents(self, request: AddDocumentsRequest, collection_id: str = None) -> List[str]:
+		"""Add documents to the knowledge base."""
+		collection_id = collection_id or DEFAULT_COLLECTION
+		logger.info(f'{LogColors.HEADER}[KBRepository] Adding {len(request.documents)} documents to collection: {collection_id}{LogColors.ENDC}')
+
+		try:
+			# Ensure collection exists
+			if not self.collection_exists(collection_id):
+				logger.info(f'{LogColors.OKBLUE}[KBRepository] Collection does not exist, creating: {collection_id}{LogColors.ENDC}')
+				self.create_collection(collection_id)
+
+			# Get collection-specific vectorstore
+			vectorstore = self._get_collection_vectorstore(collection_id)
+
 			docs: List[Document] = []
-			for doc in request.documents:
+			for i, doc in enumerate(request.documents):
+				logger.info(f'{LogColors.OKCYAN}[KBRepository] Processing document {i + 1}/{len(request.documents)}: ID={doc.id}{LogColors.ENDC}')
 				docs.append(
 					Document(
 						page_content=doc.content,
-						metadata=doc.metadata,
+						metadata={**doc.metadata, 'collection_id': collection_id},
 						id=doc.id,
 					)
 				)
-			self.vectorstore.add_documents(documents=docs)
+
+			logger.info(f'{LogColors.OKBLUE}[KBRepository] Adding {len(docs)} documents to vectorstore{LogColors.ENDC}')
+			vectorstore.add_documents(documents=docs)
+
 			ids: List[str] = [doc.id for doc in request.documents]
-			print(f'KBRepository: Added documents with IDs: {ids}')
+			logger.info(f'{LogColors.OKGREEN}[KBRepository] Successfully added documents to collection {collection_id}: {ids}{LogColors.ENDC}')
 			return ids
 		except Exception as e:
-			print(f'KBRepository: Error adding documents: {e}')
+			logger.info(f'{LogColors.FAIL}[KBRepository] Error adding documents to collection {collection_id}: {e}{LogColors.ENDC}')
 			raise CustomHTTPException(message=_('error_occurred'))
 
-	async def query(self, request: QueryRequest) -> QueryResponse:
+	async def query(self, request: QueryRequest, collection_id: str = None) -> QueryResponse:
 		"""Query the knowledge base for similar documents."""
+		collection_id = collection_id or DEFAULT_COLLECTION
+		logger.info(f'{LogColors.HEADER}[KBRepository] Querying collection {collection_id}: "{request.query[:50]}..."{LogColors.ENDC}')
+
 		try:
-			results = self.vectorstore.similarity_search(
+			# Check if collection exists
+			if not self.collection_exists(collection_id):
+				logger.info(f'{LogColors.WARNING}[KBRepository] Collection not found: {collection_id}{LogColors.ENDC}')
+				return QueryResponse(results=[])
+
+			# Get collection-specific vectorstore
+			vectorstore = self._get_collection_vectorstore(collection_id)
+
+			logger.info(f'{LogColors.OKBLUE}[KBRepository] Executing similarity search in collection: {collection_id}{LogColors.ENDC}')
+			results = vectorstore.similarity_search(
 				query=request.query,
 				k=request.top_k,
 			)
+
 			items: List[QueryResponseItem] = []
-			for res in results:
+			for i, res in enumerate(results):
+				logger.info(f'{LogColors.OKCYAN}[KBRepository] Processing result {i + 1}: ID={res.id}{LogColors.ENDC}')
 				item = QueryResponseItem(
-					id=res.id,  # type: ignore
+					id=res.id,
 					content=res.page_content,
-					score=getattr(res, 'score', 0.0),  # type: ignore
+					score=getattr(res, 'score', 0.0),
 					metadata=res.metadata or {},
 				)
 				items.append(item)
-			print(f"KBRepository: Retrieved {len(items)} results for query '{request.query}'")
+
+			logger.info(f'{LogColors.OKGREEN}[KBRepository] Query completed for collection {collection_id} - Retrieved {len(items)} results{LogColors.ENDC}')
 			return QueryResponse(results=items)
 		except Exception as e:
-			print(f'KBRepository: Error querying knowledge base: {e}')
+			logger.info(f'{LogColors.FAIL}[KBRepository] Error querying collection {collection_id}: {e}{LogColors.ENDC}')
 			raise CustomHTTPException(message=_('error_occurred'))
 
-	async def upload_file(self, file: UploadFile) -> UploadDocumentResponse:
+	async def upload_file(self, file: UploadFile, collection_id: str = None) -> UploadDocumentResponse:
 		"""Upload a file, parse it, and add it to the knowledge base."""
-		try:
-			print(f'[DEBUG] KBRepository.upload_file: Processing file: {file.filename}')
+		collection_id = collection_id or DEFAULT_COLLECTION
+		logger.info(f'{LogColors.HEADER}[KBRepository] Uploading file {file.filename} to collection: {collection_id}{LogColors.ENDC}')
 
-			# Read file content
+		try:
+			# Validate file size
 			content = await file.read()
-			text_content = ''
+			if len(content) > MAX_FILE_SIZE:
+				logger.info(f'{LogColors.FAIL}[KBRepository] File too large: {len(content)} bytes > {MAX_FILE_SIZE}{LogColors.ENDC}')
+				raise CustomHTTPException(message=_('file_too_large'))
+
+			# Validate file type
+			if file.content_type not in SUPPORTED_FILE_TYPES:
+				logger.info(f'{LogColors.FAIL}[KBRepository] Unsupported file type: {file.content_type}{LogColors.ENDC}')
+				raise CustomHTTPException(message=_('unsupported_file_type'))
+
+			# Extract text content using file extraction service
+			logger.info(f'{LogColors.OKBLUE}[KBRepository] Extracting text content from file{LogColors.ENDC}')
+			extraction_result = self.file_extraction.extract_text_from_file(
+				file_content=content,
+				file_type=file.content_type,
+				file_name=file.filename,
+			)
+
+			if not extraction_result['extraction_success']:
+				logger.info(f'{LogColors.FAIL}[KBRepository] Text extraction failed: {extraction_result["extraction_error"]}{LogColors.ENDC}')
+				raise CustomHTTPException(message=_('error_extracting_text'))
+
+			text_content = extraction_result['content']
+			if not text_content.strip():
+				logger.info(f'{LogColors.WARNING}[KBRepository] No content extracted from file{LogColors.ENDC}')
+				raise CustomHTTPException(message=_('empty_file_content'))
+
+			# Ensure collection exists
+			if not self.collection_exists(collection_id):
+				logger.info(f'{LogColors.OKBLUE}[KBRepository] Creating collection: {collection_id}{LogColors.ENDC}')
+				self.create_collection(collection_id)
+
+			# Get collection-specific vectorstore
+			vectorstore = self._get_collection_vectorstore(collection_id)
+
 			doc_id = str(uuid.uuid4())
 			metadata = {
 				'source': file.filename,
 				'file_type': file.content_type,
 				'upload_date': str(uuid.uuid1().time),
+				'collection_id': collection_id,
+				'char_count': extraction_result['char_count'],
 			}
 
-			# Process file based on content type
-			if file.filename.lower().endswith('.pdf'):
-				# Parse PDF file - using simple extraction to avoid dependencies
-				try:
-					# In a real implementation, use a proper PDF extraction library
-					# For now, we'll use a simple placeholder
-					text_content = f'PDF content extracted from {file.filename}'
-					print(f'[DEBUG] KBRepository.upload_file: Parsed PDF file (simplified extraction)')
-				except Exception as pdf_error:
-					print(f'[DEBUG] KBRepository.upload_file: Error parsing PDF: {pdf_error}')
-					raise CustomHTTPException(message=_('error_parsing_pdf'))
-			elif file.filename.lower().endswith('.txt'):
-				# Parse text file
-				try:
-					text_content = content.decode('utf-8')
-					print(f'[DEBUG] KBRepository.upload_file: Parsed TXT file with {len(text_content)} characters')
-				except UnicodeDecodeError:
-					print(f'[DEBUG] KBRepository.upload_file: UTF-8 decode error, trying with latin-1')
-					text_content = content.decode('latin-1')
-					print(f'[DEBUG] KBRepository.upload_file: Parsed TXT file with latin-1 encoding')
-			elif file.filename.lower().endswith('.md'):
-				# Parse markdown file
-				try:
-					text_content = content.decode('utf-8')
-					print(f'[DEBUG] KBRepository.upload_file: Parsed Markdown file with {len(text_content)} characters')
-				except UnicodeDecodeError:
-					print(f'[DEBUG] KBRepository.upload_file: UTF-8 decode error, trying with latin-1')
-					text_content = content.decode('latin-1')
-					print(f'[DEBUG] KBRepository.upload_file: Parsed Markdown file with latin-1 encoding')
-			else:
-				# Unsupported file type
-				print(f'[DEBUG] KBRepository.upload_file: Unsupported file type: {file.filename}')
-				raise CustomHTTPException(message=_('unsupported_file_type'))
-
-			# Check if we extracted any content
-			if not text_content.strip():
-				print(f'[DEBUG] KBRepository.upload_file: No content extracted from file: {file.filename}')
-				raise CustomHTTPException(message=_('empty_file_content'))
-
-			# Create a document and add it to vectorstore
+			# Create document
 			langchain_doc = Document(page_content=text_content, metadata=metadata)
 
-			print(f'[DEBUG] KBRepository.upload_file: Adding document to vector store with ID: {doc_id}')
-			ids = self.vectorstore.add_documents(documents=[langchain_doc], ids=[doc_id])
+			logger.info(f'{LogColors.OKBLUE}[KBRepository] Adding document to collection: {collection_id}{LogColors.ENDC}')
+			ids = vectorstore.add_documents(documents=[langchain_doc], ids=[doc_id])
+
 			if not ids:
-				print(f'[DEBUG] KBRepository.upload_file: Failed to add document to vector store')
 				raise CustomHTTPException(message=_('error_adding_document_to_vector_store'))
 
-			# Create and return response
-			return UploadDocumentResponse(
+			response = UploadDocumentResponse(
 				id=doc_id,
 				filename=file.filename,
 				content_type=file.content_type,
@@ -233,105 +344,105 @@ class KBRepository:
 				metadata=metadata,
 			)
 
-		except CustomHTTPException as e:
-			# Re-raise custom exceptions
-			raise e
+			logger.info(f'{LogColors.OKGREEN}[KBRepository] File uploaded successfully to collection {collection_id}: {file.filename}{LogColors.ENDC}')
+			return response
+
+		except CustomHTTPException:
+			raise
 		except Exception as e:
-			print(f'[DEBUG] KBRepository.upload_file: Unexpected error: {str(e)}')
+			logger.info(f'{LogColors.FAIL}[KBRepository] Error uploading file: {e}{LogColors.ENDC}')
 			raise CustomHTTPException(message=_('error_uploading_file'))
 
-	async def get_document(self, document_id: str) -> Optional[ViewDocumentResponse]:
+	async def get_document(self, document_id: str, collection_id: str = None) -> Optional[ViewDocumentResponse]:
 		"""Retrieve a document from the knowledge base by its ID."""
-		try:
-			print(f'[DEBUG] KBRepository.get_document: Retrieving document with ID: {document_id}')
+		collection_id = collection_id or DEFAULT_COLLECTION
+		collection_name = self._get_full_collection_name(collection_id)
+		logger.info(f'{LogColors.HEADER}[KBRepository] Retrieving document {document_id} from collection: {collection_id}{LogColors.ENDC}')
 
-			# Retrieve the document from Qdrant
+		try:
 			points = self.client.retrieve(
-				collection_name=self.collection_name,
+				collection_name=collection_name,
 				ids=[document_id],
 				with_payload=True,
 				with_vectors=False,
 			)
 
-			if not points or len(points) == 0:
-				print(f'[DEBUG] KBRepository.get_document: Document not found with ID: {document_id}')
+			if not points:
 				return None
 
-			# Extract document data from the retrieved point
 			point = points[0]
 			content = point.payload.get('page_content', '') if point.payload else ''
 			metadata = point.payload.get('metadata', {}) if point.payload else {}
 
-			print(f'[DEBUG] KBRepository.get_document: Successfully retrieved document with ID: {document_id}')
-
-			# Create and return the response
 			return ViewDocumentResponse(id=document_id, content=content, metadata=metadata)
 
 		except Exception as e:
-			print(f'[DEBUG] KBRepository.get_document: Error retrieving document: {str(e)}')
+			logger.info(f'{LogColors.FAIL}[KBRepository] Error retrieving document: {e}{LogColors.ENDC}')
 			raise CustomHTTPException(message=_('error_retrieving_document'))
 
-	async def delete_document(self, document_id: str) -> bool:
+	async def delete_document(self, document_id: str, collection_id: str = None) -> bool:
 		"""Delete a document from the knowledge base by its ID."""
+		collection_id = collection_id or DEFAULT_COLLECTION
+		collection_name = self._get_full_collection_name(collection_id)
+		logger.info(f'{LogColors.HEADER}[KBRepository] Deleting document {document_id} from collection: {collection_id}{LogColors.ENDC}')
+
 		try:
-			print(f'[DEBUG] KBRepository.delete_document: Attempting to delete document with ID: {document_id}')
-
-			# Check if document exists first
-			existing_points = self.client.retrieve(
-				collection_name=self.collection_name,
-				ids=[document_id],
-				with_payload=False,
-				with_vectors=False,
-			)
-
-			if not existing_points:
-				print(f'[DEBUG] KBRepository.delete_document: Document with ID {document_id} not found for deletion.')
-				return False
-
-			# Perform delete operation
 			self.client.delete(
-				collection_name=self.collection_name,
+				collection_name=collection_name,
 				points_selector=[document_id],
 			)
-
-			print(f'[DEBUG] KBRepository.delete_document: Deletion command issued for document with ID: {document_id}')
 			return True
-
 		except Exception as e:
-			print(f'[DEBUG] KBRepository.delete_document: Error deleting document: {str(e)}')
+			logger.info(f'{LogColors.FAIL}[KBRepository] Error deleting document: {e}{LogColors.ENDC}')
 			raise CustomHTTPException(message=_('error_deleting_document'))
 
-	async def list_all_documents(self) -> List[ViewDocumentResponse]:
+	async def list_all_documents(self, collection_id: str = None) -> List[ViewDocumentResponse]:
 		"""List all documents from the knowledge base."""
+		collection_id = collection_id or DEFAULT_COLLECTION
+		collection_name = self._get_full_collection_name(collection_id)
+		logger.info(f'{LogColors.HEADER}[KBRepository] Listing documents from collection: {collection_id}{LogColors.ENDC}')
+
 		try:
-			print('[DEBUG] KBRepository.list_all_documents: Listing all documents')
 			all_documents: List[ViewDocumentResponse] = []
 			next_page_offset = None
 
 			while True:
-				# Scroll through all points in the collection
 				points, next_page_offset = self.client.scroll(
-					collection_name=self.collection_name,
-					limit=100,  # Fetch 100 documents per request
+					collection_name=collection_name,
+					limit=100,
 					offset=next_page_offset,
-					with_payload=True,  # We need the payload for content and metadata
-					with_vectors=False,  # We don't need the vectors for listing
+					with_payload=True,
+					with_vectors=False,
 				)
 
 				for point in points:
-					# Ensure point.id is correctly handled (it can be int, str, or UUID)
 					doc_id = str(point.id)
 					content = point.payload.get('page_content', '') if point.payload else ''
 					metadata = point.payload.get('metadata', {}) if point.payload else {}
-
 					all_documents.append(ViewDocumentResponse(id=doc_id, content=content, metadata=metadata))
 
-				if not next_page_offset:  # No more pages
+				if not next_page_offset:
 					break
 
-			print(f'[DEBUG] KBRepository.list_all_documents: Retrieved {len(all_documents)} documents.')
+			logger.info(f'{LogColors.OKGREEN}[KBRepository] Listed {len(all_documents)} documents from collection: {collection_id}{LogColors.ENDC}')
 			return all_documents
 
 		except Exception as e:
-			print(f'[DEBUG] KBRepository.list_all_documents: Error listing documents: {str(e)}')
+			logger.info(f'{LogColors.FAIL}[KBRepository] Error listing documents: {e}{LogColors.ENDC}')
 			raise CustomHTTPException(message=_('error_listing_documents'))
+
+	def list_collections(self) -> List[str]:
+		"""List all available collections."""
+		logger.info(f'{LogColors.HEADER}[KBRepository] Listing all collections{LogColors.ENDC}')
+
+		try:
+			collections = self.client.get_collections().collections
+			collection_names = [col.name for col in collections if col.name.startswith(COLLECTION_PREFIX)]
+			# Remove prefix for user-friendly names
+			clean_names = [name.replace(COLLECTION_PREFIX, '') for name in collection_names]
+
+			logger.info(f'{LogColors.OKGREEN}[KBRepository] Found {len(clean_names)} collections: {clean_names}{LogColors.ENDC}')
+			return clean_names
+		except Exception as e:
+			logger.info(f'{LogColors.FAIL}[KBRepository] Error listing collections: {e}{LogColors.ENDC}')
+			return []

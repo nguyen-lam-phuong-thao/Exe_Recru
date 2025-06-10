@@ -45,24 +45,3 @@ class ValidationException(CustomHTTPException):
 
 	def __init__(self, message=_('validation_failed')):
 		super().__init__(status_code=422, message=message)
-
-
-class QuestionGenerationException(CustomHTTPException):
-	"""QuestionGenerationException"""
-
-	def __init__(self, message=_('error_generating_questions')):
-		super().__init__(status_code=500, message=message)
-
-
-class KnowledgeBaseConnectionException(CustomHTTPException):
-	"""KnowledgeBaseConnectionException"""
-
-	def __init__(self, message=_('error_connecting_knowledge_base')):
-		super().__init__(status_code=503, message=message)
-
-
-class SelfReflectionException(CustomHTTPException):
-	"""SelfReflectionException"""
-
-	def __init__(self, message=_('error_in_self_reflection')):
-		super().__init__(status_code=500, message=message)

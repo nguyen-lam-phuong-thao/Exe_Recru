@@ -125,7 +125,7 @@ def handle_exceptions(func):
 			print(f'OMG! An HTTP asdasderror!: {repr(ex)}')
 			response_data = APIResponse(
 				error_code=BaseErrorCode.ERROR_CODE_FAIL,
-				message=str(ex).split(':')[-1],  # Changed to str(ex) for better error message handling
+				message=str(ex).split(': ')[-1],  # Changed to str(ex) for better error message handling
 				description=None,
 				data=None,
 			)

@@ -1,10 +1,5 @@
 import os
-import fitz  # PyMuPDF
-import docx
-import pymupdf4llm  # For Markdown conversion
-import io
-import markdown2
-from weasyprint import CSS, HTML
+import fitz
 
 
 class MDToPDFConverter:
@@ -21,7 +16,7 @@ class MDToPDFConverter:
           size: A4;
           margin: 2.5cm 2cm;
           @top-center {
-            content: "Meobeo.ai";
+            content: "cgsem.ai";
             font-family: 'Montserrat', sans-serif;
             font-size: 10pt;
             font-weight: 600;
@@ -151,6 +146,11 @@ class MDToPDFConverter:
 		"""
 		Convert the markdown text to a styled PDF file using WeasyPrint.
 		"""
+		import io
+
+		import markdown2
+		from weasyprint import CSS, HTML
+
 		# Convert markdown to HTML with extra features
 		html_content = markdown2.markdown(self.markdown_text, extras=['tables', 'fenced-code-blocks', 'code-friendly'])
 
@@ -179,7 +179,6 @@ class PDFToTextConverter:
 	def __init__(self, file_path: str):
 		self.file_path = file_path
 		self.doc = fitz.open(file_path)
-		self.to_markdown_converter = PDFToMarkdownConverter(file_path)
 
 	def extract_text(self) -> dict:
 		"""
@@ -198,13 +197,52 @@ class PDFToTextConverter:
 
 			# Extract content in each format
 			result['text'] = '\n'.join([page.get_text('text') for page in self.doc])
-			result['markdown'] = self.to_markdown_converter.convert_to_markdown()
 			return result
 		except Exception as e:
 			print(f'[DEBUG] Error extracting text from PDF: {str(e)}')
 			print(f'[DEBUG] Exception type: {type(e).__name__}')
 			print(f'[DEBUG] Exception occurred in file: {self.file_path}')
 			return {}  # Return empty dict or raise a custom exception
+
+	@staticmethod
+	def extract_text_from_file(file_content, filetype='pdf'):
+		"""
+		Extracts text from a PDF file content in multiple formats.
+
+		Args:
+		    file_content: File content as BytesIO or bytes
+		    filetype: Type of file (default: 'pdf')
+
+		Returns:
+		    dict: Dictionary with extracted text
+		"""
+		results = {}
+		try:
+			# Handle different input types
+			if hasattr(file_content, 'read'):
+				# It's already a file-like object
+				doc = fitz.open(stream=file_content, filetype=filetype)
+			else:
+				# It's bytes, convert to BytesIO
+				import io
+
+				file_stream = io.BytesIO(file_content)
+				doc = fitz.open(stream=file_stream, filetype=filetype)
+
+			# Extract text from all pages
+			text_parts = []
+			for page in doc:
+				page_text = page.get_text('text')
+				if page_text.strip():
+					text_parts.append(page_text)
+
+			results['text'] = '\n'.join(text_parts)
+			doc.close()
+
+			return results
+		except Exception as e:
+			print(f'[DEBUG] Error extracting text from PDF: {str(e)}')
+			return {'text': ''}  # Return empty text instead of empty dict
 
 	def search_for_text(self, search_string: str) -> list:
 		"""
@@ -217,53 +255,3 @@ class PDFToTextConverter:
 
 	def close(self):
 		self.doc.close()
-
-
-class PDFToMarkdownConverter:
-	def __init__(self, file_path: str):
-		self.file_path = file_path
-
-	def convert_to_markdown(self) -> str:
-		"""
-		Converts the PDF to Markdown using pymupdf4llm.
-		"""
-		try:
-			# The pymupdf4llm.to_markdown function expects a fitz.Document object
-			doc = fitz.open(self.file_path)
-			markdown_output = pymupdf4llm.to_markdown(doc)
-			doc.close()
-			return markdown_output
-		except Exception as e:
-			print(f'Error converting PDF to Markdown: {e}')
-			return ''
-
-
-class DocxToTextConverter:
-	def __init__(self, docx_path: str):
-		self.docx_path = docx_path
-
-	def extract_text(self) -> str:
-		try:
-			doc = docx.Document(self.docx_path)
-			full_text = []
-			for para in doc.paragraphs:
-				full_text.append(para.text)
-			return '\n'.join(full_text)
-		except Exception as e:
-			# Log error or handle as needed
-			print(f'Error extracting text from DOCX: {e}')
-			return ''
-
-
-class TextFileReader:
-	def __init__(self, file_path: str):
-		self.file_path = file_path
-
-	def read_text(self) -> str:
-		try:
-			with open(self.file_path, 'r', encoding='utf-8') as f:
-				return f.read()
-		except Exception as e:
-			# Log error or handle as needed
-			print(f'Error reading text file: {e}')
-			return ''
