@@ -1,353 +1,146 @@
----
-description: 
-globs: 
-alwaysApply: true
----
 
-## Architecture Overview
-This project modules follows a strict 3-layer architecture:
-- **Routes Layer** (`routes/`) - FastAPI routers handling HTTP requests
-- **Repository Layer** (`repository/`) - Business logic and orchestration  
-- **Data Access Layer** (`dal/`) - Database operations and queries
-- **Schemas Layer** (`schemas/`) - Pydantic models for request/response validation
-- **Models Layer** (`models/`) - SQLAlchemy models representing database entities
+# `cv_extraction` Module — Technical Documentation
 
-## Layer Communication Rules
-1. **Routes → Repository → DAL** (strict one-way dependency)
-2. **NO cross-module imports** (routes cannot import DAL directly)
-3. **Repositories can reuse other repositories**
-4. **Each layer must only communicate with the layer directly below it**
-5. **Repo layer should not directly access Database querry and operations** - all database interactions must go through the DAL layer
-6. **DAL layer should not contain business logic** - only database operations
-7. **Models should not contain business logic** - only represent database entities
-8. **Schemas should not contain business logic** - only validation and serialization
-9. **Error handling must be consistent** across all layers using centralized exception management
-10. **All API responses must use `APIResponse` from base_model.py for consistency
+Module `cv_extraction` chịu trách nhiệm **trích xuất thông tin từ CV** bằng AI, bao gồm:
+- Phân tích nội dung CV dạng text hoặc file PDF
+- Làm sạch, phân đoạn, nhận diện các section
+- Trích xuất dữ liệu có cấu trúc (học vấn, kinh nghiệm, kỹ năng…)
+- Suy luận đặc điểm người dùng (soft skills, vai trò phù hợp…)
+- Chuyển đổi kết quả sang dạng API/DB để lưu trữ hoặc hiển thị
 
-## Base Classes and Inheritance
+## Cấu trúc tổng thể thư mục
 
-### DAL Layer (`dal/`)
-- **MUST inherit from `BaseDAL[T]`** from base_dal.py
-- Provides standard CRUD operations: `get_by_id()`, `get_all()`, `create()`, `update()`, `delete()`
-- Includes transaction management: `transaction()`, `begin_transaction()`, `commit()`, `rollback()`
-- Initialize with: `def __init__(self, db: Session, model: Type[T] = None)`
-- If model not provided in init, pass it in super().__init__(db, ModelClass)
-
-### Models (Database Entities)
-- **MUST inherit from `BaseEntity`** from base_model.py
-- Automatically includes: `id` (UUID), `create_date`, `update_date`, `is_deleted`
-- Provides: `to_dict()`, `dict()`, `items()` methods for serialization
-- Use SQLAlchemy declarative syntax
-
-### Request/Response Schemas (Pydantic Models)
-- **Request schemas MUST inherit from `RequestSchema`** or `FilterableRequestSchema` from base_model.py
-- **Response schemas MUST inherit from `ResponseSchema`** from base_model.py
-- `FilterableRequestSchema` automatically includes: `page`, `page_size`, `filters` for pagination and dynamic filtering
-- Use `APIResponse` from base_model.py for ALL API responses with standard format
-- Use `PaginatedResponse[T]` from base_model.py for paginated data
-- Set `model_config = ConfigDict(from_attributes=True)` for response schemas
-
-### Enums
-- **MUST inherit from `BaseEnum`** from base_enums.py
-- Provides automatic value checking with `__contains__` method
-- Use for constants and predefined values
-
-## Routes Layer (`routes/`)
-
-### File Structure
 ```
-routes/
-├── __init__.py
-└── v1/
-    ├── __init__.py
-    ├── user_routes.py
-    ├── meeting_routes.py
-    └── auth_routes.py
-```
-
-### Naming Convention
-- Files: `{module}_routes.py` (e.g., user_routes.py, meeting_routes.py)
-- Router instance: **MUST be named `route`** (never rename under any circumstance)
-- Place in versioned folders: `v1/`, `v2/`, etc.
-
-### Router Setup
-```python
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
-from app.core.database import get_db
-from app.core.base_model import APIResponse
-from app.exceptions.handlers import handle_exceptions
-
-route = APIRouter(prefix="/users", tags=["users"])
-
-@route.get("/", response_model=APIResponse)
-@handle_exceptions
-async def get_users(db: Session = Depends(get_db)):
-    # Implementation
-```
-
-### Version Folder Rules
-- Each version folder (`v1/`, `v2/`) **MUST have __init__.py**
-- __init__.py **MUST import all `route` instances** from `*_routes.py` files
-- Example __init__.py:
-```python
-from .user_routes import route as user_route
-from .meeting_routes import route as meeting_route
-from .auth_routes import route as auth_route
-```
-
-### Route Response Requirements
-- **ALL routes MUST return `APIResponse`** from base_model.py
-- **MUST use `@handle_exceptions` decorator** from handlers.py
-- Set appropriate `response_model=APIResponse`
-- Return format:
-```python
-return APIResponse(
-    error_code=0,
-    message=_('success'),
-    data=your_data
-)
-```
-
-## Repository Layer (`repository/`)
-
-### Naming Convention
-- Files: `{module}_repo.py` (e.g., user_repo.py, `meeting_repo.py`)
-- Classes: `{Module}Repo` (e.g., `UserRepo`, `MeetingRepo`) - **NOT** `{Module}Repository`
-
-### Structure Requirements
-- **MUST have `db: Session = Depends(get_db)` in `__init__`**
-- **MUST attach all needed DAL instances in `__init__`**
-- **MUST contain business logic only**
-- **Can reuse other repositories by dependency injection**
-- **MUST follow SOLID principles**
-
-### Template
-```python
-from sqlalchemy.orm import Session
-from fastapi import Depends
-from app.core.database import get_db
-from app.modules.users.dal.user_dal import UserDAL
-from app.exceptions.exception import NotFoundException
-from app.middleware.translation_manager import _
-
-class UserRepo:
-    def __init__(self, db: Session = Depends(get_db)):
-        self.db = db
-        self.user_dal = UserDAL(db)
-        # Attach other DALs as needed
-    
-    def get_user_by_id(self, user_id: str):
-        user = self.user_dal.get_by_id(user_id)
-        if not user:
-            raise NotFoundException(_('user_not_found'))
-        return user
-```
-
-## DAL Layer (`dal/`)
-
-### Naming Convention
-- Files: `{module}_dal.py` (e.g., user_dal.py, meeting_dal.py)
-- Classes: `{Module}DAL` (e.g., `UserDAL`, `MeetingDAL`)
-
-### Requirements
-- **MUST inherit from `BaseDAL[T]`** from base_dal.py
-- **MUST only contain database operations**
-- **NO business logic**
-- **NO exception handling beyond database errors**
-
-### Template
-```python
-from sqlalchemy.orm import Session
-from app.core.base_dal import BaseDAL
-from app.modules.users.models.user_model import User
-
-class UserDAL(BaseDAL[User]):
-    def __init__(self, db: Session):
-        super().__init__(db, User)
-    
-    def get_user_by_email(self, email: str):
-        return self.db.query(self.model).filter(
-            self.model.email == email,
-            self.model.is_deleted == False
-        ).first()
-```
-
-## Error Handling
-
-### In Repository Layer
-- **MUST use exceptions from exception.py**
-- **MUST use translation manager** with `_('')` from translation_manager.py
-- **NO error_code in exceptions** - error codes are handled at route level
-- **NO direct HTTP status codes** - exceptions handle status codes internally
-
-### Exception Types Available
-```python
-from app.exceptions.exception import (
-    NotFoundException,      # 404 - Resource not found
-    ValidationException,    # 422 - Validation failed
-    UnauthorizedException, # 401 - Not authenticated
-    ForbiddenException,    # 403 - Not authorized
-    CustomHTTPException    # Generic HTTP exception
-)
-from app.middleware.translation_manager import _
-
-# Examples:
-raise NotFoundException(_('user_not_found'))
-raise ValidationException(_('invalid_email_format'))
-raise UnauthorizedException(_('token_expired'))
-raise ForbiddenException(_('insufficient_permissions'))
-```
-
-### In Routes Layer
-- **MUST use `@handle_exceptions` decorator** from handlers.py
-- **Return `APIResponse` format** with appropriate error_code
-- **Handle specific business exceptions and convert to APIResponse**
-
-### Translation Keys
-- **Always use translation keys** instead of hardcoded messages
-- **No error_code parameter** in exception constructors
-- Translation files located in `app/locales/{lang}.json`
-
-## Request/Response Patterns
-
-### Request Validation
-```python
-# app/modules/users/schemas/user_request.py
-from app.core.base_model import RequestSchema, FilterableRequestSchema
-from typing import Optional
-
-class CreateUserRequest(RequestSchema):
-    email: str
-    name: str
-    password: str
-
-class SearchUserRequest(FilterableRequestSchema):
-    # Automatically includes: page, page_size, filters
-    username: Optional[str] = None
-    status: Optional[str] = None
-```
-
-### Response Schemas
-```python
-# app/modules/users/schemas/user_response.py
-from app.core.base_model import ResponseSchema, APIResponse, PaginatedResponse
-from pydantic import ConfigDict
-from typing import List
-
-class UserResponse(ResponseSchema):
-    model_config = ConfigDict(from_attributes=True)
-    
-    id: str
-    email: str
-    name: str
-    create_date: str
-
-class SearchUserResponse(APIResponse):
-    pass
-```
-
-### Route Response Format
-```python
-@route.get("/", response_model=APIResponse)
-@handle_exceptions
-async def search_users(
-    request: SearchUserRequest = Depends(),
-    repo: UserRepo = Depends()
-):
-    result = repo.search_users(request)
-    return APIResponse(
-        error_code=0,
-        message=_('success'),
-        data=PaginatedResponse(
-            items=result.items,
-            paging=PagingInfo(
-                total=result.total_count,
-                total_pages=result.total_pages,
-                page=result.page,
-                page_size=result.page_size
-            )
-        )
-    )
-```
-
-## Transaction Management
-
-### Using BaseDAL Transactions
-```python
-# In Repository
-def complex_operation(self, data):
-    with self.user_dal.transaction():
-        user = self.user_dal.create(user_data)
-        # Other operations within transaction
-        return user
-```
-
-## Dynamic Filtering
-
-### Using FilterableRequestSchema
-```python
-# Supports dynamic filters via filters field
-# Example request:
-{
-    "page": 1,
-    "page_size": 10,
-    "filters": [
-        {
-            "field": "username",
-            "operator": "contains",
-            "value": "john"
-        },
-        {
-            "field": "status", 
-            "operator": "eq",
-            "value": "active"
-        }
-    ]
-}
-```
-
-## Module Folder Structure
-```
-app/modules/{module_name}/
-├── __init__.py
-├── dal/
-│   ├── __init__.py
-│   └── {module}_dal.py
-├── models/
-│   ├── __init__.py
-│   └── {module}_model.py
-├── repository/
-│   ├── __init__.py
-│   └── {module}_repo.py
-├── routes/
-│   ├── __init__.py
-│   └── v1/
+cv_extraction/
+├── repositories/
+│   ├── cv_repo.py
+│   └── cv_agent/
 │       ├── __init__.py
-│       └── {module}_routes.py
+│       ├── ai_to_api_mapper.py
+│       ├── agent_schema.py
+│       ├── prompts.py
+│       ├── llm_setup.py
+│       └── cv_processor/
+│           └── __init__.py
 └── schemas/
-    ├── __init__.py
-    ├── {module}_request.py
-    └── {module}_response.py
+    └── cv.py
 ```
 
-## Key Principles
-1. **Separation of Concerns**: Each layer has a single responsibility
-2. **Dependency Injection**: Use FastAPI's dependency system consistently
-3. **Type Safety**: Use proper type hints and generics
-4. **Error Consistency**: Use centralized exception handling with translation
-5. **Internationalization**: Always use translation manager for user-facing messages
-6. **Transaction Safety**: Use BaseDAL's transaction management
-7. **Code Reusability**: Leverage base classes and inheritance
-8. **Standard Response Format**: Always use APIResponse for consistent API responses
-9. **No Cross-Layer Imports**: Strict adherence to layer communication rules
-10. **SOLID Principles**: Especially in repository design
+## 1. `schemas/cv.py` — API & DB Schemas
 
-## Naming Standards Summary
-- **Routes**: `{module}_routes.py` with `route` instance
-- **Repository**: `{module}_repo.py` with `{Module}Repo` class
-- **DAL**: `{module}_dal.py` with `{Module}DAL` class
-- **Models**: `{module}_model.py` inheriting `BaseEntity`
-- **Requests**: `{module}_request.py` inheriting `RequestSchema` or `FilterableRequestSchema`
-- **Responses**: `{module}_response.py` inheriting `ResponseSchema`
-- **Always use APIResponse[T] for route responses**
+Chứa các schema phục vụ việc gửi/nhận dữ liệu từ/to API hoặc DB:
+
+- `ProcessCVRequest`: Input từ người dùng gồm `cv_file_url`.
+- `CVBase`, `CVCreate`, `CVResponse`: Các schema mô tả dữ liệu CV chuẩn hóa dùng cho DB/API.
+- Các sub-schema như `EducationEntry`, `ExperienceEntry`, `ProjectEntry`, v.v.
+
+> **Lưu ý**: Đây là *chuẩn hóa cuối cùng*, khác với kết quả từ AI (AI output thường phức tạp và mô tả chi tiết hơn).
+
+## 2. `repositories/cv_repo.py` — Entry Point chính
+
+Chịu trách nhiệm:
+- Tải file CV (PDF) từ `cv_file_url`
+- Trích xuất text từ file (dùng `PDFToTextConverter`)
+- Gọi `CVAnalyzer` để phân tích nội dung text
+- Trả về `APIResponse` chứa text gốc + kết quả phân tích
+
+Không thao tác DB, **chỉ xử lý nội dung và chuẩn hóa kết quả**.
+
+## 3. `repositories/cv_agent/` — Lõi xử lý AI
+
+### a. `agent_schema.py` — AI Output Schema
+Định nghĩa kết quả đầu ra từ AI:
+- `CVAnalysisResult`: Kết quả tổng hợp từ AI
+- Các schema nhỏ như `PersonalInfoItem`, `ListEducationItem`, `ListWorkExperienceItem`, v.v.
+- Thiết kế chi tiết, thân thiện với LLM, bao quát các dạng dữ liệu phong phú.
+
+### b. `prompts.py` — Prompt templates
+Lưu trữ tất cả các prompt sử dụng để giao tiếp với LLM:
+- Làm sạch CV (`CV_CLEANING_PROMPT`)
+- Nhận diện section (`SECTION_IDENTIFICATION_PROMPT`)
+- Trích xuất chi tiết theo schema (`EXTRACT_SECTION_PROMPT_TEMPLATE`)
+- Suy luận đặc điểm (`INFERENCE_PROMPT`), rút trích từ khóa (`EXTRACT_KEYWORDS_PROMPT`), tóm tắt CV (`CV_SUMMARY_PROMPT`)
+
+> Dễ dàng nâng cấp, thay đổi prompt hoặc thêm version mới để A/B test.
+
+### c. `llm_setup.py` — Cấu hình LLM
+Khởi tạo đối tượng Gemini thông qua:
+```python
+ChatGoogleGenerativeAI(model='gemini-2.0-flash', api_key=GOOGLE_API_KEY, ...)
+```
+Dễ thay thế bằng OpenAI hoặc mô hình khác nếu cần.
+
+### d. `cv_processor/__init__.py` — LangGraph Workflow
+Là “engine” trung tâm điều khiển toàn bộ pipeline xử lý AI:
+- Gồm các `node` đại diện cho từng bước:
+  - `input_handler_node`, `cv_parser_node`, `section_identifier_node`
+  - `llm_chunk_decision_node`, `information_extractor_node`, `characteristic_inference_node`
+  - `output_aggregator_node`
+- Sử dụng `LangGraph` để tạo graph pipeline, dễ mở rộng, thay đổi luồng xử lý
+- Theo dõi token, chi phí sử dụng LLM
+
+Trả về `CVAnalysisResult` (hoặc error nếu thất bại).
+
+## 4. `cv_agent/__init__.py` — CVAnalyzer
+
+Là lớp wrapper để xử lý:
+- Nhận nội dung text CV
+- Khởi tạo `CVProcessorWorkflow`
+- Trả về `CVAnalysisResult` hoặc thông báo lỗi
+
+Được gọi trong `cv_repo.py`.
+
+## 5. `ai_to_api_mapper.py` — Chuyển đổi kết quả AI → API Schema
+
+Cầu nối giữa `CVAnalysisResult` (AI output) và `CVBase`/`CVResponse` (API schema):
+- Mapping tên field: `personal_information.full_name` → `name`
+- Flatten danh sách: `ListEducationItem.items` → `education: List[EducationEntry]`
+- Chuyển đổi kiểu dữ liệu: `str → datetime`, `list → str`, v.v.
+
+Dễ mở rộng nếu schema thay đổi.
+
+## Luồng xử lý tổng thể
+
+```
+[API Request]
+    ↓
+[cv_repo.py]
+    ↓
+Tải file từ URL → Đọc nội dung
+    ↓
+[CVAnalyzer]
+    ↓
+[CVProcessorWorkflow]
+    ↓
+[LLM → Prompt → Structured Output]
+    ↓
+Tổng hợp: Text gốc + kết quả trích xuất + inference
+    ↓
+Trả về APIResponse
+```
+
+Nếu cần lưu vào DB:
+```
+CVAnalysisResult → (qua ai_to_cvbase) → CVCreate → DAL.save()
+```
+
+
+## Gợi ý mở rộng
+
+| Mục tiêu | Gợi ý |
+|---------|-------|
+| Thêm LLM khác | Viết `llm_setup_openai.py` và thêm config chuyển đổi |
+| Lưu kết quả CV vào DB | Dùng `ai_to_cvbase()` → gọi DAL trong repo |
+| Gợi ý việc làm phù hợp | Thêm node `job_recommendation_node` vào workflow |
+| Tăng tốc xử lý | Parallel hóa trích xuất từng section |
+| Multi-language CVs | Thêm LLM translation trước khi phân tích |
+
+## Tổng kết
+
+`cv_extraction` là module phức tạp và mạnh mẽ, kết hợp:
+- Xử lý file
+- Phân tích ngôn ngữ tự nhiên (NLP)
+- AI workflow engine
+- Chuẩn hóa schema và cấu trúc hóa dữ liệu
+
+

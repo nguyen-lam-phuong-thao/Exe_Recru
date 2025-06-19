@@ -30,15 +30,15 @@ MODEL_NAME = 'model/gemini-2.0-flash'
 
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 
-# Google OAuth Settings
-CLIENT_SECRET_FILE = os.path.join(os.path.dirname(__file__), 'client-secret.json')
-with open(CLIENT_SECRET_FILE) as f:
-	google_creds = json.load(f)['web']
+# # Google OAuth Settings
+# CLIENT_SECRET_FILE = os.path.join(os.path.dirname(__file__), 'client-secret.json')
+# with open(CLIENT_SECRET_FILE) as f:
+# 	google_creds = json.load(f)['web']
 
-GOOGLE_CLIENT_ID = google_creds['client_id']
-GOOGLE_CLIENT_SECRET = google_creds['client_secret']
-# Update the redirect URI to support Next.js frontend
-GOOGLE_REDIRECT_URI = 'https://api.wc504.io.vn/api/v1/auth/google/callback'
+# GOOGLE_CLIENT_ID = google_creds['client_id']
+# GOOGLE_CLIENT_SECRET = google_creds['client_secret']
+# # Update the redirect URI to support Next.js frontend
+# GOOGLE_REDIRECT_URI = 'https://api.wc504.io.vn/api/v1/auth/google/callback'
 
 # Frontend redirect URLs for OAuth flows - callback server on port 3000
 FRONTEND_SUCCESS_URL = os.getenv('FRONTEND_SUCCESS_URL', 'http://127.0.0.1:5500/auth/google/callback')
@@ -54,11 +54,6 @@ REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv('REFRESH_TOKEN_EXPIRE_DAYS', '7'))
 
 FERNET_KEY = os.getenv('FERNET_KEY', '4pI2ZAxB7X8N9sM5R8k_AfF4PLbJnvYsV2gJJei8BjI=')
 
-# Facebook Graph API Settings
-FACEBOOK_ACCESS_TOKEN = os.getenv('FACEBOOK_ACCESS_TOKEN', '')
-FACEBOOK_PAGE_ID = os.getenv('FACEBOOK_PAGE_ID', '102602521717131')
-FACEBOOK_GRAPH_API_VERSION = os.getenv('FACEBOOK_GRAPH_API_VERSION', 'v22.0')
-FACEBOOK_GRAPH_BASE_URL = f'https://graph.facebook.com/{FACEBOOK_GRAPH_API_VERSION}'
 
 # MinIO Settings
 MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT', 'minio:9000')
@@ -103,11 +98,6 @@ class Settings(BaseModel):
 	CELERY_BROKER_URL: str = CELERY_BROKER_URL
 	CELERY_RESULT_BACKEND: str = CELERY_RESULT_BACKEND
 
-	# Facebook Graph API Settings
-	FACEBOOK_ACCESS_TOKEN: str = FACEBOOK_ACCESS_TOKEN
-	FACEBOOK_PAGE_ID: str = FACEBOOK_PAGE_ID
-	FACEBOOK_GRAPH_API_VERSION: str = FACEBOOK_GRAPH_API_VERSION
-	FACEBOOK_GRAPH_BASE_URL: str = FACEBOOK_GRAPH_BASE_URL
 
 
 @lru_cache()

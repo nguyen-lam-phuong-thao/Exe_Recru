@@ -2,9 +2,11 @@ import aiohttp
 import aiofiles
 import uuid
 import os
+import logging
 from app.core.base_model import APIResponse
 from app.middleware.translation_manager import _
 from app.modules.cv_extraction.repositories.cv_agent import CVAnalyzer
+from app.modules.cv_extraction.repositories.cv_agent.ai_to_api_mapper import ai_to_cvbase
 from app.modules.cv_extraction.schemas.cv import ProcessCVRequest
 from app.utils.pdf import (
 	PDFToTextConverter,
@@ -12,36 +14,39 @@ from app.utils.pdf import (
 
 
 class CVRepository:
+	def __init__(self):
+		self.logger = logging.getLogger(self.__class__.__name__)
+
 	async def process_cv(self, request: ProcessCVRequest) -> APIResponse:
-		print('[DEBUG] Starting process_cv method with request:', request)
+		self.logger.info(f'Starting process_cv method with request: {request}')
 		# DOWNLOAD CV FROM URL
-		print(f'[DEBUG] Attempting to download CV from URL: {request.cv_file_url}')
+		self.logger.info(f'Attempting to download CV from URL: {request.cv_file_url}')
 		file_path = await self._download_file(request.cv_file_url)
 		if not file_path:
-			print('[DEBUG] Download failed, returning error response')
+			self.logger.error('Download failed, returning error response')
 			return APIResponse(
 				error_code=1,
 				message=_('failed_to_download_file'),
 				data=None,
 			)
 
-		print(f'[DEBUG] File downloaded successfully to: {file_path}')
+		self.logger.info(f'File downloaded successfully to: {file_path}')
 		extracted_text = None
 		file_extension = 'pdf'
-		print(f'[DEBUG] Detected file extension: {file_extension}')
+		self.logger.info(f'Detected file extension: {file_extension}')
 		converter = None
 
 		try:
 			if file_extension == 'pdf':
-				print('[DEBUG] Processing PDF file')
+				self.logger.info('Processing PDF file')
 				converter = PDFToTextConverter(file_path=file_path)
-				print('[DEBUG] Initialized PDFToTextConverter')
+				self.logger.info('Initialized PDFToTextConverter')
 				extracted_text = converter.extract_text()
-				print(f'[DEBUG] PDF text extraction complete, extracted {len(extracted_text)} characters')
+				self.logger.info(f'PDF text extraction complete, extracted {len(extracted_text)} characters')
 			else:
-				print(f'[DEBUG] Unsupported file type detected: {file_extension}')
+				self.logger.error(f'Unsupported file type detected: {file_extension}')
 				if os.path.exists(file_path):
-					print(f'[DEBUG] Removing unsupported file: {file_path}')
+					self.logger.info(f'Removing unsupported file: {file_path}')
 					os.remove(file_path)
 				return APIResponse(
 					error_code=1,
@@ -50,26 +55,25 @@ class CVRepository:
 				)
 
 		except Exception as e:
-			print(f'[DEBUG] Exception during text extraction: {str(e)}')
-			print(f'[DEBUG] Exception type: {type(e).__name__}')
+			self.logger.error(f'Exception during text extraction: {str(e)}')
 			return APIResponse(
 				error_code=1,
 				message=_('error_extracting_cv_content'),
 				data=None,
 			)
 		finally:
-			print('[DEBUG] Entering finally block for cleanup')
+			self.logger.info('Entering finally block for cleanup')
 			if isinstance(converter, PDFToTextConverter):
-				print('[DEBUG] Closing PDF converter')
+				self.logger.info('Closing PDF converter')
 				converter.close()
 			if os.path.exists(file_path):
-				print(f'[DEBUG] Removing temporary file: {file_path}')
+				self.logger.info(f'Removing temporary file: {file_path}')
 				os.remove(file_path)
 
-		print('[DEBUG] Process completed successfully')
-		print(f'[DEBUG] Extracted text length: {len(extracted_text) if extracted_text else 0}')
+		self.logger.info('Process completed successfully')
+		self.logger.info(f'Extracted text length: {len(extracted_text) if extracted_text else 0}')
 		if not extracted_text:
-			print('[DEBUG] No text extracted, returning error response')
+			self.logger.error('No text extracted, returning error response')
 			return APIResponse(
 				error_code=1,
 				message=_('no_text_extracted'),
@@ -77,14 +81,21 @@ class CVRepository:
 			)
 
 		cv_analyzer = CVAnalyzer()
-		print('[DEBUG] Initialized CVAnalyzer')
+		self.logger.info('Initialized CVAnalyzer')
 		try:
-			print('[DEBUG] Starting CV analysis')
-			print(f'[DEBUG] Extracted text: {extracted_text}')
-			result = await cv_analyzer.analyze_cv_content(extracted_text['text'])
-			print(f'[DEBUG] CV analysis result: {result}')
+			self.logger.info('Starting CV analysis')
+			self.logger.info(f'Extracted text: {extracted_text}')
+			ai_result = await cv_analyzer.analyze_cv_content(extracted_text['text'])
+			self.logger.info(f'CV analysis result: {ai_result}')
+			if ai_result is None:
+				return APIResponse(
+					error_code=1,
+					message=_('error_analyzing_cv'),
+					data=None,
+				)
+			mapped_result = ai_to_cvbase(ai_result)
 		except Exception as e:
-			print(f'[DEBUG] Exception during CV analysis: {str(e)}')
+			self.logger.error(f'Exception during CV analysis: {str(e)}')
 			return APIResponse(
 				error_code=1,
 				message=_('error_analyzing_cv'),
@@ -96,7 +107,7 @@ class CVRepository:
 			data={
 				'cv_file_url': request.cv_file_url,
 				'extracted_text': extracted_text['text'],
-				'cv_analysis_result': result,
+				'cv_analysis_result': mapped_result.dict(),
 			},
 		)
 
@@ -104,33 +115,32 @@ class CVRepository:
 		temp_dir = 'temp_cvs'
 		if not os.path.exists(temp_dir):
 			os.makedirs(temp_dir)
-			print(f'Created temporary directory: {temp_dir}')
+			self.logger.info(f'Created temporary directory: {temp_dir}')
 
 		# Extract file extension from the URL
 		file_extension = 'pdf'
 		if file_extension not in ['pdf', 'docx', 'txt']:
-			# Print a message about invalid file type
-			print(f'Invalid file type: {file_extension} for URL: {url}')
+			self.logger.error(f'Invalid file type: {file_extension} for URL: {url}')
 			return None
 
 		file_name = f'cv_{uuid.uuid4()}.{file_extension}'
 		file_path = os.path.join(temp_dir, file_name)
-		print(f'Attempting to download file from {url} to {file_path}')
+		self.logger.info(f'Attempting to download file from {url} to {file_path}')
 
 		try:
 			async with aiohttp.ClientSession() as session:
-				async with session.get(url, ssl=False) as response:  # Thêm ssl=False để bỏ qua SSL verification
-					print(f'Response: {response}')
+				async with session.get(url, ssl=False) as response:
+					self.logger.info(f'Response: {response}')
 					if response.status == 200:
-						print(f'Download successful (Status: {response.status})')
+						self.logger.info(f'Download successful (Status: {response.status})')
 						async with aiofiles.open(file_path, 'wb') as f:
 							await f.write(await response.read())
-						print(f'File saved to {file_path}')
+						self.logger.info(f'File saved to {file_path}')
 						return file_path
 					else:
-						print(f'Failed to download file from {url}, status: {response.status}')
+						self.logger.error(f'Failed to download file from {url}, status: {response.status}')
 						return None
 
 		except Exception as e:
-			print(f'Error downloading file from {url}: {e}')
+			self.logger.error(f'Error downloading file from {url}: {e}')
 			return None

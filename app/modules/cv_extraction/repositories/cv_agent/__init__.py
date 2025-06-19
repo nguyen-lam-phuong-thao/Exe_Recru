@@ -1,31 +1,31 @@
 from app.core.config import GOOGLE_API_KEY
-
-# Changed from MeetingProcessor to CVProcessorWorkflow based on the new implementation
 from .cv_processor import CVProcessorWorkflow
+from app.modules.cv_extraction.repositories.cv_agent.agent_schema import CVAnalysisResult
 import logging
-
+from typing import Optional
 
 class CVAnalyzer:
-	def __init__(self):
-		self.logger = logging.getLogger(self.__class__.__name__)
-		# Initialize CVProcessorWorkflow instead of MeetingProcessor
-		self.cv_processor = CVProcessorWorkflow(api_key=GOOGLE_API_KEY)
+    """
+    Provides a stable interface for analyzing CV content using CVProcessorWorkflow.
+    Returns a CVAnalysisResult on success, or None on error.
+    """
+    def __init__(self):
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.cv_processor = CVProcessorWorkflow(api_key=GOOGLE_API_KEY)
 
-	async def analyze_cv_content(
-		self,
-		cv_content: str,
-	):
-		try:
-			self.logger.info(f'Starting CV analysis with content length: {len(cv_content or "")}')
-			processor = self.cv_processor
-
-			result = await processor.analyze_cv(cv_content)
-			return result
-		except Exception as e:
-			self.logger.exception(f'Error in CVAnalyzer.analyze_cv_content: {str(e)}')
-			# Return a more structured error, perhaps aligning with CVAnalysisResult structure
-			return {
-				'error': str(e),
-				'raw_cv_content': cv_content,
-				'llm_token_usage': (processor.token_tracker.get_usage() if hasattr(processor, 'token_tracker') else None),
-			}
+    async def analyze_cv_content(self, cv_content: str) -> Optional[CVAnalysisResult]:
+        """
+        Analyze the given CV content and return a CVAnalysisResult.
+        Returns None if an error occurs.
+        """
+        try:
+            self.logger.info(f'Starting CV analysis with content length: {len(cv_content or "")}')
+            result = await self.cv_processor.analyze_cv(cv_content)
+            if isinstance(result, CVAnalysisResult):
+                return result
+            else:
+                self.logger.error(f'CV analysis did not return a CVAnalysisResult. Got: {type(result)}')
+                return None
+        except Exception as e:
+            self.logger.exception(f'Error in CVAnalyzer.analyze_cv_content: {str(e)}')
+            return None
