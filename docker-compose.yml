@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: luongnguyenminhan/enteviu-api:latest
+    image: nguyenlamphuongthao/exe-api:latest
     ports:
       - "8000:8000"
     volumes:
