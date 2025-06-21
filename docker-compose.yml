@@ -27,6 +27,21 @@ services:
     restart: always
     networks:
       - enterviu-network
+
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY:-minioadmin}
+    command: server /data --console-address ":9001"
+    networks:
+      - enterviu-network
+
   # celery:
   #   build:
   #     context: .
@@ -69,3 +84,4 @@ networks:
 
 volumes:
   audio_data:
+  minio-data:
