@@ -29,13 +29,13 @@ jobs:
       # Build and push API image
       - name: Build and push API image
         run: |
-          docker build -t luongnguyenminhan/enteviu-api:latest .
-          docker push luongnguyenminhan/enteviu-api:latest
+          docker build -t nguyenlamphuongthao/exe-api:latest .
+          docker push nguyenlamphuongthao/exe-api:latest
 
       # Test the API service (optional)
       - name: Test API service
         run: |
-          docker run -d --name test-api -p 8000:8000 --env ENV=development luongnguyenminhan/enteviu-api:latest
+          docker run -d --name test-api -p 8000:8000 --env ENV=development nguyenlamphuongthao/exe-api:latest
           sleep 30
           docker ps
           docker logs test-api
@@ -53,4 +53,4 @@ jobs:
         run: |
           echo "Deployment step - configure based on your deployment target"
           echo "Image pushed successfully:"
-          echo "- luongnguyenminhan/enteviu-api:latest"
+          echo "- nguyenlamphuongthao/exe-api:latest"
