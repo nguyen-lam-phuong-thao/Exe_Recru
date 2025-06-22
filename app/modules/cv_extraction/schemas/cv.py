@@ -11,8 +11,8 @@ class ProcessCVRequest(RequestSchema):
 class EducationEntry(BaseModel):
     degree: str
     institution: str
-    start_year: int
-    end_year: int
+    start_year: Optional[int] = None
+    end_year: Optional[int] = None
     description: Optional[str] = None
 
     class Config:
@@ -21,7 +21,7 @@ class EducationEntry(BaseModel):
 class ExperienceEntry(BaseModel):
     title: str
     company: str
-    start_date: date
+    start_date: Optional[date] = None
     end_date: Optional[date] = None
     description: Optional[str] = None
 

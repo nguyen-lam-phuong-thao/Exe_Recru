@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends, Header, File, UploadFile
 
 from app.core.base_model import APIResponse
 from app.core.config import FERNET_KEY
@@ -20,7 +20,7 @@ async def get_user_info():
 
 @route.post('/process', response_model=APIResponse)
 async def process_cv(
-	request: ProcessCVRequest,
+	file: UploadFile = File(...),
 	checksum: str = Header(...),
 	cv_repo: CVRepository = Depends(CVRepository),
 ):
@@ -36,4 +36,4 @@ async def process_cv(
 			data=None,
 		)
 
-	return await cv_repo.process_cv(request)
+	return await cv_repo.process_uploaded_cv(file)
