@@ -245,6 +245,7 @@ class CVAnalysisResult(BaseModel):
 	)
 
 	cv_summary: Optional[str] = Field(None, description='A brief, LLM-generated summary of the entire CV.')
+	alignment_with_jd: Optional[str] = None
 	extracted_keywords: Optional[ListKeywordItem] = Field(
 		default_factory=ListKeywordItem,
 		description='List of general keywords extracted from the CV content.',
@@ -280,6 +281,7 @@ class CVState(TypedDict):
 	# Input and processed CV data
 	raw_cv_content: Optional[str]  # Initial input from user/service (Output of InputHandlerNode to ParserNode)
 	processed_cv_text: Optional[str]  # Cleaned CV text (Output of ParserNode)
+	job_description: Optional[str] = None
 
 	# Section identification
 	identified_sections: Optional[List[str]]  # List of section names (Output of SectionIdentifierNode)
