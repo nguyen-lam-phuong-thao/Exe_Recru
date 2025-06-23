@@ -62,7 +62,7 @@ Processed CV Text:
 
 CV_JD_ALIGNMENT_PROMPT = """
 You are a hiring expert. Evaluate how well the following candidate's CV matches the provided job description.
-Structure your response with:
+Response with only the following information:
 1. **Key Matches**: Mention specific qualifications, experiences, or skills in the CV that align with job requirements.
 2. **Missing Elements**: Highlight any important qualifications or skills required in the JD that are missing from the CV.
 3. **Overall Match Score** (0–100): Estimate how well the candidate fits the role.
