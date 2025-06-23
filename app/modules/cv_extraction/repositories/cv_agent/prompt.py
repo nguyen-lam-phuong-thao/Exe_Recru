@@ -60,15 +60,33 @@ Processed CV Text:
 {processed_cv_text}
 """
 
+CV_JD_ALIGNMENT_PROMPT = """
+You are a hiring expert. Evaluate how well the following candidate's CV matches the provided job description.
+Structure your response with:
+1. **Key Matches**: Mention specific qualifications, experiences, or skills in the CV that align with job requirements.
+2. **Missing Elements**: Highlight any important qualifications or skills required in the JD that are missing from the CV.
+3. **Overall Match Score** (0–100): Estimate how well the candidate fits the role.
+4. **Suggestions for Improvement**: Advise how the candidate can tailor their resume better for this job.
+
+Processed CV Text:
+{processed_cv_text}
+
+Job Description:
+{job_description}
+"""
+
 # --- CV Summary Prompt ---
 CV_SUMMARY_PROMPT = """
-Based on the entire processed CV text provided below, generate a concise professional summary of the candidate.
+Based on the entire processed CV text provided below, generate a concise professional summary of the candidate’s CV, focusing on how it aligns with the given job description.
 - Highlight key experiences, skills, and career objectives if apparent.
-- If the CV is for a specific industry, include relevant industry context.
+- Highlight key overlapping experiences, skills, and potential gaps.
 Aim for 3-5 sentences.
 
 Processed CV Text:
 {processed_cv_text}
+
+Job Description:
+{job_description}
 """
 
 # --- Characteristic Inference System Prompt ---

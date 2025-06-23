@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header, File, UploadFile
+from fastapi import APIRouter, Depends, Header, File, UploadFile, Form
 
 from app.core.base_model import APIResponse
 from app.core.config import FERNET_KEY
@@ -21,6 +21,7 @@ async def get_user_info():
 @route.post('/process', response_model=APIResponse)
 async def process_cv(
 	file: UploadFile = File(...),
+	jd_file: UploadFile = File(...),
 	checksum: str = Header(...),
 	cv_repo: CVRepository = Depends(CVRepository),
 ):
@@ -36,4 +37,7 @@ async def process_cv(
 			data=None,
 		)
 
-	return await cv_repo.process_uploaded_cv(file)
+	# Read JD text if provided
+	jd_text = (await jd_file.read()).decode('utf-8')
+
+	return await cv_repo.process_uploaded_cv(file, job_description=jd_text)
