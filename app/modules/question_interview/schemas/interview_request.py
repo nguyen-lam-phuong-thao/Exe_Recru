@@ -1,0 +1,49 @@
+"""
+Interview request schemas.
+"""
+
+from typing import List, Optional, Dict, Any
+from pydantic import Field
+from app.core.base_model import RequestSchema, FilterableRequestSchema
+
+
+class QuestionGenerationRequest(RequestSchema):
+	"""Request for generating interview questions"""
+
+	session_id: Optional[str] = Field(None, description='Session ID for tracking an ongoing interview')
+	user_id: Optional[str] = Field(None, description='User ID')
+	cv_data: Optional[Dict[str, Any]] = Field(None, description='CV data from cv_extraction module. If not provided, general questions will be generated.')
+	previous_questions: List[Dict[str, Any]] = Field(default_factory=list, description='Previously asked questions')
+	focus_areas: List[str] = Field(default_factory=list, description='Specific areas to focus on')
+	max_questions: int = Field(4, description='Maximum number of questions to generate')
+	max_iterations: int = Field(5, description='Maximum workflow iterations')
+
+
+class AnalyzeUserProfileRequest(RequestSchema):
+	"""Request for analyzing user profile completeness"""
+
+	user_profile: Dict[str, Any] = Field(..., description='User profile data to analyze')
+	previous_questions: List[Dict[str, Any]] = Field(default_factory=list, description='Previously asked questions')
+
+
+class GetQuestionSessionRequest(RequestSchema):
+	"""Request for getting question session"""
+
+	session_id: str = Field(..., description='Session ID to retrieve')
+
+
+class SearchQuestionSessionsRequest(FilterableRequestSchema):
+	"""Request for searching question sessions with filtering"""
+
+	user_id: Optional[str] = Field(None, description='Filter by user ID')
+	status: Optional[str] = Field(None, description='Filter by session status')
+	session_id: Optional[str] = Field(None, description='Filter by session ID')
+
+
+class SubmitInterviewAnswerRequest(RequestSchema):
+	"""Request to submit an answer for evaluation."""
+	session_id: str = Field(..., description="The ID of the current interview session.")
+	question_id: str = Field(..., description="The ID of the question being answered.")
+	answer_text: str = Field(..., description="The user's answer to the question.")
+	cv_data: Optional[Dict[str, Any]] = Field(None, description="CV data (if available) to enhance evaluation.")
+	question_metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata of the question to support evaluation (e.g., rubric, skills).")
