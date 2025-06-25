@@ -2,7 +2,6 @@
 
 from sqlalchemy import Column, ForeignKey, String, Text
 from sqlalchemy.orm import relationship
-
 from app.core.base_model import BaseEntity
 
 

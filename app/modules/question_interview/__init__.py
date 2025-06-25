@@ -1,5 +1,5 @@
 """
-Question Composer Module.
+Interview Module.
 This module provides intelligent question generation for user profiling using LangChain and LangGraph.
 """
 
@@ -20,4 +20,4 @@ class LogColors:
 	BOLD = '\033[1m'
 
 
-logger.info(f'{LogColors.HEADER}[QuestionComposer-Module] Question Composer module initialized{LogColors.ENDC}')
+logger.info(f'{LogColors.HEADER}[Interview-Module] Interview module initialized{LogColors.ENDC}')
