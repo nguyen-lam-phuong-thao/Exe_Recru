@@ -25,15 +25,15 @@ class User(BaseEntity):
 	last_login_at = Column(DateTime(timezone=True), nullable=True)
 
 	# Chat system relationships
-	conversations = relationship('Conversation', back_populates='user', cascade='all, delete-orphan')
-	messages = relationship('Message', back_populates='user', cascade='all, delete-orphan')
-	files = relationship('File', back_populates='user', cascade='all, delete-orphan')
+	# conversations = relationship('Conversation', back_populates='user', cascade='all, delete-orphan')
+	# messages = relationship('Message', back_populates='user', cascade='all, delete-orphan')
+	# files = relationship('File', back_populates='user', cascade='all, delete-orphan')
 
 	# User logs relationship
-	user_logs = relationship('UserLog', back_populates='user', cascade='all, delete-orphan')
+	# user_logs = relationship('UserLog', back_populates='user', cascade='all, delete-orphan')
 
 	# Agent relationship (if users can own agents)
-	agents = relationship('Agent', back_populates='user', cascade='all, delete-orphan')
+	# agents = relationship('Agent', back_populates='user', cascade='all, delete-orphan')
 
 	# Question Composer relationship
 	question_sessions = relationship('QuestionSession', back_populates='user', cascade='all, delete-orphan')

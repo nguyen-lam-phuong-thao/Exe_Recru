@@ -5,9 +5,7 @@ Question Composer API routes.
 import logging
 from typing import Dict, Any
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 
-from app.core.database import get_db
 from app.core.base_model import APIResponse, PaginatedResponse, PagingInfo
 from app.exceptions.handlers import handle_exceptions
 from app.middleware.translation_manager import _
@@ -33,10 +31,8 @@ logger = logging.getLogger(__name__)
 route = APIRouter(prefix='/question-composer', tags=['Question Composer'])
 
 
-# Dependency injection
-def get_interview_composer_repo(db: Session = Depends(get_db)) -> InterviewComposerRepo:
-	"""Get question composer repository instance"""
-	return InterviewComposerRepo(db)
+def get_interview_composer_repo() -> InterviewComposerRepo:
+	return InterviewComposerRepo()
 
 
 @route.post(
@@ -108,9 +104,9 @@ async def get_question_session(session_id: str, repo: InterviewComposerRepo = De
 	"""
 	logger.info(f'Getting question session: {session_id}')
 
-	result = repo.get_question_session(session_id)
+	result = await repo.get_question_session(session_id)
 
-	return APIResponse(error_code=0, message=_('success'), data=result.model_dump())
+	return APIResponse(error_code=0, message=_('success'), data=result)
 
 
 @route.get(
@@ -121,22 +117,17 @@ async def get_question_session(session_id: str, repo: InterviewComposerRepo = De
 )
 @handle_exceptions
 async def search_question_sessions(
-	request: SearchQuestionSessionsRequest = Depends(),
 	repo: InterviewComposerRepo = Depends(get_interview_composer_repo),
 ) -> APIResponse:
 	"""
 	Search question sessions với filtering.
 
-	- **request**: Search criteria và filters
-
 	Returns danh sách sessions matching criteria.
 	"""
 	logger.info('Searching question sessions')
 
-	results = repo.search_question_sessions(request)
+	results = await repo.search_question_sessions()
 
-	# For simplicity, returning all results without pagination
-	# In production, you might want to implement proper pagination
 	return APIResponse(
 		error_code=0,
 		message=_('success'),

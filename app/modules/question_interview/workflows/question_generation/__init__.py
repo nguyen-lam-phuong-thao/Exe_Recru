@@ -191,8 +191,18 @@ YÊU CẦU:
 				'format_instructions': self.question_parser.get_format_instructions(),
 			})
 
-			# Update state
-			new_questions = result.questions
+			# Convert dicts to Question objects if needed
+			new_questions = []
+			for q in result.questions:
+				if isinstance(q, Question):
+					new_questions.append(q)
+				elif isinstance(q, dict):
+					try:
+						new_questions.append(Question(**q))
+					except Exception as e:
+						logger.warning(f"Invalid question dict from LLM: {q} ({e})")
+			# Filter out any with missing required fields
+			new_questions = [q for q in new_questions if q.id and q.Question and q.Question_type and q.Question_data is not None]
 			logger.info(f'Generated {len(new_questions)} questions')
 
 			# Create generation history entry

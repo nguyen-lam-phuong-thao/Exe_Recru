@@ -5,7 +5,7 @@ Question session database model.
 from sqlalchemy import Column, String, Text, Integer, Float, Boolean, JSON, ForeignKey
 from sqlalchemy.orm import relationship
 from app.core.base_model import BaseEntity
-
+from app.modules.users.models.users import User
 
 class QuestionSession(BaseEntity):
 	"""
@@ -17,8 +17,8 @@ class QuestionSession(BaseEntity):
 	__tablename__ = 'question_sessions'
 
 	# Session identification
-	session_id = Column(String(255), nullable=False, index=True)
-	user_id = Column(String(255), ForeignKey('users.id'), nullable=True, index=True)
+	session_id = Column(String(36), nullable=False, index=True)
+	user_id = Column(String(36), ForeignKey('users.id'), nullable=True, index=True)
 
 	# Session status
 	status = Column(String(50), nullable=False, default='active')  # active, completed, expired
@@ -51,8 +51,8 @@ class QuestionSession(BaseEntity):
 	error_message = Column(Text, nullable=True)
 	last_error_at = Column(String(255), nullable=True)
 
-	# Relationships
-	user = relationship('User', back_populates='question_sessions')
+	# ✅ Relationships (dùng class User đã import, không dùng chuỗi)
+	user = relationship(User, back_populates='question_sessions')
 
 	def __repr__(self):
 		return f"<QuestionSession(session_id='{self.session_id}', status='{self.status}', iteration={self.current_iteration})>"
