@@ -110,7 +110,8 @@ Hãy đánh giá mức độ đầy đủ thông tin và quyết định có c�
 			])
 
 			# Format previous questions
-			previous_q_text = '\n'.join([f'- {q.Question} ({q.Question_type})' for q in state['all_previous_questions']]) if state['all_previous_questions'] else 'Chưa có câu hỏi nào'
+			previous_q_text = '\n'.join([f'- {q["Question"]}' if isinstance(q, dict) and "Question" in q else f'- {q.Question}' if hasattr(q, 'Question') else ''
+				for q in state['all_previous_questions'] if isinstance(q, (dict, Question))]) if state['all_previous_questions'] else 'Chưa có câu hỏi nào'
 
 			# Run analysis
 			chain = analysis_prompt | self.llm | self.analysis_parser
@@ -178,7 +179,12 @@ YÊU CẦU:
 			])
 
 			# Format data
-			previous_q_text = '\n'.join([f'- {q.Question}' for q in state['all_previous_questions']]) if state['all_previous_questions'] else 'Chưa có'
+			all_prev_qs = state.get('all_previous_questions')
+			if not all_prev_qs:
+				all_prev_qs = []
+			previous_q_text = '\n'.join([
+				f'- {q["Question"]}' if isinstance(q, dict) and "Question" in q else f'- {q.Question}' if hasattr(q, 'Question') else ''
+				for q in all_prev_qs if isinstance(q, (dict, Question))]) if all_prev_qs else 'Chưa có'
 
 			focus_text = ', '.join(state['focus_areas']) if state['focus_areas'] else 'Thông tin tổng quát'
 
@@ -193,7 +199,7 @@ YÊU CẦU:
 
 			# Convert dicts to Question objects if needed
 			new_questions = []
-			for q in result.questions:
+			for q in getattr(result, 'questions', []):
 				if isinstance(q, Question):
 					new_questions.append(q)
 				elif isinstance(q, dict):
@@ -201,8 +207,33 @@ YÊU CẦU:
 						new_questions.append(Question(**q))
 					except Exception as e:
 						logger.warning(f"Invalid question dict from LLM: {q} ({e})")
+				else:
+					logger.warning(f"Skipping invalid question (not dict or Question): {q}")
 			# Filter out any with missing required fields
-			new_questions = [q for q in new_questions if q.id and q.Question and q.Question_type and q.Question_data is not None]
+			new_questions = [q for q in new_questions if hasattr(q, 'id') and hasattr(q, 'Question') and hasattr(q, 'Question_type') and hasattr(q, 'Question_data') and q.id and q.Question and q.Question_type and q.Question_data is not None]
+			if not new_questions:
+				if not state['cv_data'] or (isinstance(state['cv_data'], dict) and not any(state['cv_data'].values())):
+					# No CV: fallback to orientation questions
+					orientation_questions = [
+						Question(
+							id="orientation_1",
+							Question="Bạn đang tìm kiếm công việc trong lĩnh vực nào?",
+							Question_type="text_input",
+							subtitle="Giúp chúng tôi hiểu định hướng nghề nghiệp của bạn.",
+							Question_data=[],
+						),
+						Question(
+							id="orientation_2",
+							Question="Vị trí công việc bạn mong muốn là gì?",
+							Question_type="text_input",
+							subtitle="Chia sẻ vai trò hoặc vị trí bạn hướng tới.",
+							Question_data=[],
+						),
+					]
+					new_questions = orientation_questions
+				else:
+					logger.error("LLM did not return valid questions for provided CV data.")
+					raise ValueError("Failed to generate valid questions from LLM output.")
 			logger.info(f'Generated {len(new_questions)} questions')
 
 			# Create generation history entry

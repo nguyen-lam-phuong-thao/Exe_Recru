@@ -34,6 +34,20 @@ class InterviewComposerRepo:
 		self.compiled_workflow = self.workflow.workflow.compile(checkpointer=self.memory)
 		logger.info('InterviewComposerRepo initialized (in-memory)')
 
+	def _safe_questions_list(self, raw_list):
+		safe_list = []
+		for q in (raw_list or []):
+			if isinstance(q, Question):
+				safe_list.append(q)
+			elif isinstance(q, dict):
+				try:
+					safe_list.append(Question(**q))
+				except Exception as e:
+					logger.warning(f"Invalid previous_question dict: {q} ({e})")
+			else:
+				logger.warning(f"Skipping invalid previous_question (not dict or Question): {q}")
+		return safe_list
+
 	async def generate_questions(self, request: QuestionGenerationRequest) -> QuestionGenerationResponse:
 		"""
 		Generate intelligent questions based on user profile and history.
@@ -42,7 +56,7 @@ class InterviewComposerRepo:
 		session_id = request.session_id or str(uuid.uuid4())
 		logger.info(f'Using session_id: {session_id}')
 		user_profile = UserProfile(**(request.cv_data or {}))
-		previous_questions = [Question(**q) for q in (request.previous_questions or [])]
+		previous_questions = self._safe_questions_list(request.previous_questions)
 		# Build initial state if new session
 		state = await self.memory.get(session_id)
 		if not state:
@@ -106,19 +120,14 @@ class InterviewComposerRepo:
 
 			# Convert previous questions
 			logger.info('Processing previous questions for analysis')
-			previous_questions = []
-			if request.previous_questions:
-				logger.info(f'Converting {len(request.previous_questions)} previous questions')
-				previous_questions = [Question(**q) for q in request.previous_questions]
-				logger.info(f'Successfully converted {len(previous_questions)} questions')
+			previous_questions = self._safe_questions_list(request.previous_questions)
+			logger.info(f'Successfully converted {len(previous_questions)} questions')
 
-				# Log question type distribution
-				question_types = {}
-				for q in previous_questions:
-					question_types[q.Question_type] = question_types.get(q.Question_type, 0) + 1
-				logger.info(f'Question type distribution: {question_types}')
-			else:
-				logger.info('No previous questions to analyze')
+			# Log question type distribution
+			question_types = {}
+			for q in previous_questions:
+				question_types[q.Question_type] = question_types.get(q.Question_type, 0) + 1
+			logger.info(f'Question type distribution: {question_types}')
 
 			# Use workflow for analysis
 			temp_state = {

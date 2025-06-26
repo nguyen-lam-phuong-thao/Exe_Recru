@@ -51,7 +51,6 @@ class QuestionSession(BaseEntity):
 	error_message = Column(Text, nullable=True)
 	last_error_at = Column(String(255), nullable=True)
 
-	# ✅ Relationships (dùng class User đã import, không dùng chuỗi)
 	user = relationship(User, back_populates='question_sessions')
 
 	def __repr__(self):
