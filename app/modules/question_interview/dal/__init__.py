@@ -1,1 +1,0 @@
-# DAL for question_interview module 

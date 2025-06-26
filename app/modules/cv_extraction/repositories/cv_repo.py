@@ -15,6 +15,8 @@ from app.modules.cv_extraction.schemas.cv import ProcessCVRequest
 from app.utils.pdf import (
 	PDFToTextConverter,
 )
+from app.modules.question_interview.repository.question_interview_repo import InterviewComposerRepo
+from app.modules.question_interview.schemas.interview_request import QuestionGenerationRequest
 
 
 class CVRepository:
@@ -97,6 +99,16 @@ class CVRepository:
 					data=None,
 				)
 			mapped_result = ai_to_cvbase(ai_result)
+
+			# # --- Integration: Call question generation with cv_data ---
+			# cv_data = mapped_result.dict()
+			# self.logger.info(f"Passing cv_data to question generation: {cv_data}")
+			# question_repo = InterviewComposerRepo()
+			# question_request = QuestionGenerationRequest(focus_areas=[], cv_data=cv_data)
+			# question_response = await question_repo.generate_questions(question_request)
+			# self.logger.info(f"Question generation response: {question_response}")
+			# # --- End integration ---
+
 		except Exception as e:
 			self.logger.error(f'Analysis failed: {str(e)}')
 			return APIResponse(

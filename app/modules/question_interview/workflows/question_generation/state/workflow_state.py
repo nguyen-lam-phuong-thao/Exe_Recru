@@ -20,7 +20,7 @@ class QuestionGenerationState(TypedDict):
 
 	# Core user data
 	user_profile: UserProfile
-	cv_data: Dict[str, Any]
+	# cv_data: Dict[str, Any]
 
 	# Question generation
 	generated_questions: List[Question]

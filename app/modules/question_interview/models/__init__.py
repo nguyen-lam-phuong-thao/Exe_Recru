@@ -1,1 +1,0 @@
-# Models for question_interview module 

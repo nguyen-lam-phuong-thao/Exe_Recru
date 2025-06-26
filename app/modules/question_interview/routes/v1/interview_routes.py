@@ -47,13 +47,14 @@ async def generate_questions(
 	repo: InterviewComposerRepo = Depends(get_interview_composer_repo),
 ) -> APIResponse:
 	"""
-	Generate câu hỏi thông minh dựa trên profile người dùng.
+	Generate intelligent questions based on focus areas provided by the user.
 
-	- **request**: Thông tin request bao gồm user profile và câu hỏi đã hỏi
+	- **request**: Only focus_areas is accepted from the user.
 
-	Returns danh sách câu hỏi được generate và analysis.
+	Returns generated questions and analysis.
 	"""
-	logger.info(f'Generating questions for session: {request.session_id}')
+	print("pingping")
+	logger.info(f'Generating questions for focus areas: {request.focus_areas}')
 
 	result = await repo.generate_questions(request)
 

@@ -110,8 +110,15 @@ Hãy đánh giá mức độ đầy đủ thông tin và quyết định có c�
 			])
 
 			# Format previous questions
-			previous_q_text = '\n'.join([f'- {q["Question"]}' if isinstance(q, dict) and "Question" in q else f'- {q.Question}' if hasattr(q, 'Question') else ''
-				for q in state['all_previous_questions'] if isinstance(q, (dict, Question))]) if state['all_previous_questions'] else 'Chưa có câu hỏi nào'
+			previous_q_text = '\n'.join([
+				f'- {q["Question"]}' if isinstance(q, dict) and "Question" in q
+				else f'- {getattr(q, "Question", "")}' if hasattr(q, 'Question')
+				else ''
+				for q in state.get('all_previous_questions', [])
+				if (isinstance(q, dict) and "Question" in q) or hasattr(q, 'Question')
+			])
+			if not previous_q_text.strip():
+				previous_q_text = 'Chưa có câu hỏi nào'
 
 			# Run analysis
 			chain = analysis_prompt | self.llm | self.analysis_parser
@@ -183,8 +190,14 @@ YÊU CẦU:
 			if not all_prev_qs:
 				all_prev_qs = []
 			previous_q_text = '\n'.join([
-				f'- {q["Question"]}' if isinstance(q, dict) and "Question" in q else f'- {q.Question}' if hasattr(q, 'Question') else ''
-				for q in all_prev_qs if isinstance(q, (dict, Question))]) if all_prev_qs else 'Chưa có'
+				f'- {q["Question"]}' if isinstance(q, dict) and "Question" in q
+				else f'- {getattr(q, "Question", "")}' if hasattr(q, 'Question')
+				else ''
+				for q in all_prev_qs
+				if (isinstance(q, dict) and "Question" in q) or hasattr(q, 'Question')
+			])
+			if not previous_q_text.strip():
+				previous_q_text = 'Chưa có'
 
 			focus_text = ', '.join(state['focus_areas']) if state['focus_areas'] else 'Thông tin tổng quát'
 

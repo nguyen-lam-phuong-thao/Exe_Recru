@@ -58,7 +58,7 @@ class UserProfile(BaseModel):
 class QuestionGenerationRequest(BaseModel):
 	"""Request for generating questions"""
 
-	cv_data: Optional[UserProfile] = Field(None, description='Existing user profile data')
+	# cv_data: Optional[UserProfile] = Field(None, description='Existing user profile data')
 	previous_questions: List[Question] = Field(default_factory=list, description='Previously asked questions')
 	focus_areas: List[str] = Field(default_factory=list, description='Specific areas to focus on')
 	max_questions: int = Field(4, description='Maximum number of questions to generate')
