@@ -6,6 +6,7 @@ import logging
 from fastapi import File, UploadFile
 import tempfile
 import shutil
+from typing import Optional
 from app.core.base_model import APIResponse
 from app.middleware.translation_manager import _
 from app.modules.cv_extraction.repositories.cv_agent import CVAnalyzer
@@ -20,7 +21,7 @@ class CVRepository:
 	def __init__(self):
 		self.logger = logging.getLogger(self.__class__.__name__)
 
-	async def process_uploaded_cv(self, file: UploadFile) -> APIResponse:
+	async def process_uploaded_cv(self, file: UploadFile, job_description: Optional[str] = None) -> APIResponse:
 		self.logger.info(f"Processing uploaded file: {file.filename}")
 
 		# Validate extension
@@ -88,7 +89,7 @@ class CVRepository:
 		self.logger.info('Analyzing extracted text with CVAnalyzer')
 		try:
 			cv_analyzer = CVAnalyzer()
-			ai_result = await cv_analyzer.analyze_cv_content(extracted_text['text'])
+			ai_result = await cv_analyzer.analyze_cv_content(extracted_text['text'], job_description)
 			if ai_result is None:
 				return APIResponse(
 					error_code=1,
@@ -111,6 +112,7 @@ class CVRepository:
 				'filename': file.filename,
 				'extracted_text': extracted_text['text'],
 				'cv_analysis_result': mapped_result.dict(),
+				'jd_alignment': ai_result.alignment_with_jd  # ✅ Add this line
 			},
 		)
 

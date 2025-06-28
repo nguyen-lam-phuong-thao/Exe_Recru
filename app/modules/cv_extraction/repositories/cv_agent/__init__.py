@@ -13,14 +13,14 @@ class CVAnalyzer:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.cv_processor = CVProcessorWorkflow(api_key=GOOGLE_API_KEY)
 
-    async def analyze_cv_content(self, cv_content: str) -> Optional[CVAnalysisResult]:
+    async def analyze_cv_content(self, cv_content: str, job_description: Optional[str] = None) -> Optional[CVAnalysisResult]:
         """
         Analyze the given CV content and return a CVAnalysisResult.
         Returns None if an error occurs.
         """
         try:
             self.logger.info(f'Starting CV analysis with content length: {len(cv_content or "")}')
-            result = await self.cv_processor.analyze_cv(cv_content)
+            result = await self.cv_processor.analyze_cv(cv_content, job_description)
             if isinstance(result, CVAnalysisResult):
                 return result
             else:

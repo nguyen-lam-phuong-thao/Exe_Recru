@@ -25,6 +25,7 @@ from app.modules.cv_extraction.repositories.cv_agent.prompt import (
 	GENERAL_EXTRACTION_SYSTEM_PROMPT,
 	EXTRACT_SECTION_PROMPT_TEMPLATE,
 	EXTRACT_KEYWORDS_PROMPT,
+	CV_JD_ALIGNMENT_PROMPT ,
 	CV_SUMMARY_PROMPT,
 	INFERENCE_SYSTEM_PROMPT,
 	INFERENCE_PROMPT,
@@ -270,6 +271,7 @@ Focus on semantic understanding and logical grouping, not keyword matching.
 		"""Extracts detailed information from CV chunks using LLM directly in this node."""
 		self.logger.info(f'InformationExtractorNode: Starting LLM-based information extraction. state: {state.get("chunking_result")}')
 		processed_cv_text = state.get('processed_cv_text', '')
+		job_description = state.get('job_description', '')
 		chunking_result = state.get('chunking_result', LLMChunkingResult(chunks=[]))
 
 		self.logger.info(f'InformationExtractorNode: Processing CV text of length: {len(processed_cv_text)}')
@@ -420,7 +422,7 @@ Focus on accuracy and completeness of extraction.
 
 		# --- CV Summary Generation ---
 		self.logger.info('InformationExtractorNode: Starting CV summary generation')
-		summary_prompt = CV_SUMMARY_PROMPT.format(processed_cv_text=processed_cv_text)
+		summary_prompt = CV_SUMMARY_PROMPT.format(processed_cv_text=processed_cv_text, job_description=job_description)
 		input_tokens_sum = count_tokens(summary_prompt, 'gemini')
 		self.token_tracker.add_input_tokens(input_tokens_sum)
 		self.logger.info(f'InformationExtractorNode: Summary generation input tokens: {input_tokens_sum}')
@@ -575,7 +577,20 @@ Focus on accuracy and completeness of extraction.
 
 		return workflow.compile(checkpointer=self.memory)
 
-	async def analyze_cv(self, cv_content: str) -> Optional[CVAnalysisResult]:
+	async def align_with_jd(self, result: CVAnalysisResult, job_description: str) -> Optional[str]:
+		try:
+			self.logger.info("Running CV-to-JD alignment")
+			prompt = CV_JD_ALIGNMENT_PROMPT.format(
+				processed_cv_text=result.processed_cv_text or "",
+				job_description=job_description,
+			)
+			response = await self.llm.ainvoke(prompt)
+			return response.content
+		except Exception as e:
+			self.logger.error(f"JD alignment failed: {str(e)}")
+			return None
+
+	async def analyze_cv(self, cv_content: str, job_description: Optional[str] = None) -> Optional[CVAnalysisResult]:
 		"""
 		Public method to process a CV and return the analysis result.
 		Returns a CVAnalysisResult on success, or None on error.
@@ -591,6 +606,7 @@ Focus on accuracy and completeness of extraction.
 			'messages': [],
 			'raw_cv_content': cv_content,
 			'processed_cv_text': None,
+			'job_description': job_description,  # ✅ Add this
 			'chunking_result': LLMChunkingResult(chunks=[]),
 			'personal_info_item': None,
 			'education_items': ListEducationItem(),
@@ -612,7 +628,18 @@ Focus on accuracy and completeness of extraction.
 			final_state_result = await self.workflow.ainvoke(initial_state, config=config)
 			if final_state_result and 'final_analysis_result' in final_state_result:
 				self.logger.info('CV analysis completed successfully.')
-				return final_state_result['final_analysis_result']
+
+				final_result = final_state_result['final_analysis_result']
+
+				# JD Alignment: optional
+				if job_description:
+					self.logger.debug(f"CV Summary: {final_result.cv_summary}")
+					self.logger.debug(f"Job Description: {job_description[:100]}...")  # to avoid flooding logs
+					final_result.alignment_with_jd = await self.align_with_jd(final_result, job_description)
+				else:
+					final_result.alignment_with_jd = None
+
+				return final_result
 			else:
 				self.logger.error('CV analysis finished but no final_analysis_result found in state.')
 				return None
