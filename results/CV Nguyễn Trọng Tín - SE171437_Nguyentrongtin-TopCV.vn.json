@@ -1,0 +1,67 @@
+{
+  "error_code": 0,
+  "message": "cv_processed_successfully",
+  "description": null,
+  "data": {
+    "filename": "CV Nguyễn Trọng Tín - SE171437_Nguyentrongtin-TopCV.vn.pdf",
+    "extracted_text": "NGUYỄN TRỌNG TÍN\nApplying position : AI engineer (internship)\nCONTACT\n📅\nSeptember 10, 2003 \n📞\n089-673-6189\n\nTrongtin1009.2003@gmail.co\nm\n🏠\nPhu Nhuan District,Ho Chi \nMinh city\n🔗\nhttps://www.facebook.com/t\nrong.tin.1297943 \nSKILLS\nTECHNICAL SKILLS\nPython:(1 year )   \nSql:(1 years)\nR :(5 months)\nHTML/CSS:(Basic)\nGit/GitHub:(Basic)\nLIBRARY/ FRAMEWORK\nDjango :(5 months)\nTensorflow:(8 months)\nPytorch:(6 months)\nSOFT SKILLS\nProblem-solving skills\nStrong Presentation skills\nCommunication skills\nAdaptability skills\nHigh Teamwork spirit skills\nOBJECTIVES\nShort-term:\n Successfully in internship jobs to gain more knowledge \nand experience in AI project\n Experience about AI workflow in practical projects\nLong-term:\n 5 years later became senior \nEDUCATION\n🎓\nFPT University (HCM)\n|\n2021\n-\n2025\nMAJOR: Artificial intelligence     \nSEMESTER: 7/9\nWORK EXPERIENCE\n💼\nFPT Software  \n|\n9/2024\n-\n12/2024\nLMS for the student\nI played a member role in building the website, \nspecifically the quiz module. The backend helped the \nsystem create sets of questions and answers,submit \ntests and also used HTML/CSS to create the \nfrontend for the application.\n💼\nTeam project\n|\n12/2024\n-\n3/2025\nColorize Black & White Images \nI was a member and the idea for the project was to \nuse Stable Diffusion to optimize color prediction for \nblack & white images in terms of image naturalness,\nsaturation, and color quality.\nI also deployed the UI for this project using Streamlit.\n\n\nLANGUAGES\nEnglish  : ~ (6.0 Ielts)\n \nJapanese  (basic)\nCERTIFICATE\nLink GitHub: \nhttps://github.com/Qcymaq/Colorization-for-\ngrayscale-images \n﻿\n💼\n Team project    \n|\n2/2024\n-\nIn Progress\n Applying AI in reviewing and evaluating CVs\nMy team is working on an idea for an AI application \nthat will use student's information in CVs and the \ncompany requirements to evaluate the profile and \nsuggest areas for improvement and optimization. \nWe are going to deploy this AI application to be an \napp in mobile phone. \n",
+    "cv_analysis_result": {
+      "name": "NGUYỄN TRỌNG TÍN",
+      "email": "Trongtin1009.2003@gmail.com",
+      "phone": "089-673-6189",
+      "summary": "Nguyễn Trọng Tín is a highly motivated Artificial Intelligence student seeking an AI Engineering internship.  His coursework at FPT University (HCM) and projects demonstrate proficiency in Python, TensorFlow, and PyTorch, along with experience in backend and frontend development (Django, HTML/CSS).  His projects, including a CV evaluation application and image colorization using Stable Diffusion, showcase practical AI application skills.  While his experience with Git/GitHub is basic, his strong technical foundation and demonstrated problem-solving abilities make him a promising candidate.",
+      "education": [
+        {
+          "degree": "",
+          "institution": "FPT University (HCM)",
+          "start_year": null,
+          "end_year": null,
+          "description": "Semester 7 of 9"
+        }
+      ],
+      "experience": [
+        {
+          "title": "Team Member, LMS for Students",
+          "company": "FPT Software",
+          "start_date": null,
+          "end_date": null,
+          "description": "Developed the quiz module for a student learning management system (LMS).; This included backend development for question and answer management, test submission, and frontend development using HTML/CSS."
+        },
+        {
+          "title": "Team Member",
+          "company": "Team Project: Colorize Black & White Images",
+          "start_date": null,
+          "end_date": null,
+          "description": "Utilized Stable Diffusion to optimize color prediction for black and white images, focusing on naturalness, saturation, and color quality.; Deployed the UI using Streamlit."
+        },
+        {
+          "title": "Team Member",
+          "company": "Team Project: Applying AI in Reviewing and Evaluating CVs",
+          "start_date": null,
+          "end_date": null,
+          "description": "Working on an AI application that uses student CV information and company requirements to evaluate candidate profiles and suggest improvements.; The team plans to deploy this as a mobile application."
+        }
+      ],
+      "skills": [
+        "Python",
+        "SQL",
+        "R",
+        "HTML/CSS",
+        "Git/GitHub",
+        "Django",
+        "TensorFlow",
+        "PyTorch",
+        "Problem-solving",
+        "Presentation",
+        "Communication",
+        "Adaptability",
+        "Teamwork",
+        "English",
+        "Japanese"
+      ],
+      "projects": [],
+      "certifications": []
+    },
+    "jd_alignment": "1. **Key Matches**: The CV highlights relevant skills in Python, TensorFlow, and PyTorch, all crucial for an AI Engineer.  The projects, especially \"Colorize Black & White Images\" and \"Applying AI in Reviewing and Evaluating CVs,\" demonstrate practical application of AI techniques and relevant experience with Streamlit and backend/frontend development (although frontend is basic).  The candidate's education in Artificial Intelligence at FPT University is also a strong match.\n\n2. **Missing Elements**: The CV lacks specifics about the candidate's experience with deploying AI models to production environments.  There is no mention of experience with cloud platforms (AWS, GCP, Azure),  version control beyond basic Git/GitHub usage,  or specific AI algorithms beyond Stable Diffusion.  Quantifiable achievements in projects (e.g., accuracy improvements, performance metrics) are also missing.\n\n3. **Overall Match Score**: 65\n\n4. **Suggestions for Improvement**:  The candidate should quantify their achievements in each project (e.g., \"Improved color prediction accuracy by 15%\").  They should add details about the technologies used in their projects, especially regarding deployment and cloud platforms.  Highlighting specific AI algorithms used and their proficiency level would strengthen the application.  Adding a portfolio link showcasing the projects would be very beneficial.  The objective section is too general; it should be tailored to the specific internship's goals and responsibilities.  Finally, the CV could benefit from a more professional format."
+  }
+}

@@ -3,7 +3,9 @@ import os
 import logging
 from typing import List, Dict, Any, Optional
 from langchain_google_genai import ChatGoogleGenerativeAI
-from app.core.config import GOOGLE_API_KEY
+from app.core.config import GOOGLE_API_KEY, MODEL_NAME
+from app.modules.job_matching.schemas.job_matching import JobResult, CourseResult
+from app.modules.job_matching.prompts import JOB_SUGGESTION_PROMPT, COURSE_SUGGESTION_PROMPT
 
 # Thiết lập logger
 logger = logging.getLogger(__name__)
@@ -11,85 +13,10 @@ logger = logging.getLogger(__name__)
 def initialize_llm():
     """Khởi tạo LLM cho job matching"""
     return ChatGoogleGenerativeAI(
-        model='gemini-2.0-flash',
+        model='gemini-2.0-flash',  # Sử dụng model 1.5 để tránh quota limit
         api_key=GOOGLE_API_KEY,
         temperature=0.7,
     )
-
-# Prompt cho gợi ý việc làm
-JOB_SUGGESTION_PROMPT = """
-Bạn là chuyên gia tư vấn nghề nghiệp. Dựa trên thông tin CV của ứng viên, hãy gợi ý các vị trí việc làm phù hợp.
-
-**Thông tin CV:**
-- Kỹ năng: {skills}
-- Kinh nghiệm làm việc: {experience}
-- Dự án: {projects}
-- Chứng chỉ: {certifications}
-- Tóm tắt: {summary}
-
-**Yêu cầu:**
-1. Gợi ý 5 vị trí việc làm phù hợp nhất 
-2. Cho mỗi vị trí, đưa ra:
-   - Tên vị trí
-   - Mô tả ngắn gọn
-   - Công ty
-   - Địa điểmđiểm
-   - Lý do phù hợp (dựa trên kỹ năng/kinh nghiệm)
-   - Mức độ phù hợp (1-10)
-3. Sắp xếp theo mức độ phù hợp giảm dần
-
-**QUAN TRỌNG: Chỉ trả về JSON thuần túy, không có markdown formatting, không có text giải thích.**
-
-**Định dạng trả về (chỉ JSON):**
-{{
-  "job_suggestions": [
-    {{
-      "position": "Tên vị trí",
-      "description": "Mô tả ngắn gọn",
-      "company": "Tên công ty",
-      "location": "Địa điểm",
-      "reason": "Lý do phù hợp",
-      "match_score": 8,
-      "required_skills": ["skill1", "skill2"],
-      "missing_skills": ["skill3", "skill4"]
-    }}
-  ]
-}}
-"""
-
-# Prompt cho gợi ý khóa học
-COURSE_SUGGESTION_PROMPT = """
-Bạn là chuyên gia tư vấn đào tạo. Dựa trên thông tin CV và các kỹ năng còn thiếu, hãy gợi ý các khóa học phù hợp.
-
-**Thông tin CV:**
-- Kỹ năng hiện tại: {current_skills}
-- Kỹ năng còn thiếu: {missing_skills}
-- Mục tiêu nghề nghiệp: {career_goals}
-
-**Yêu cầu:**
-1. Gợi ý 5 khóa học phù hợp nhất
-2. Cho mỗi khóa học, đưa ra:
-   - Tên khóa học
-   - Nhà cung cấp (Coursera, Udemy, edX, etc.)
-   - Kỹ năng sẽ học được
-   - Thời gian học ước tính
-   - Mức độ phù hợp (1-10)
-3. Ưu tiên các khóa học bổ sung kỹ năng còn thiếu
-
-**Định dạng trả về (JSON):**
-{{
-  "course_suggestions": [
-    {{
-      "course_name": "Tên khóa học",
-      "provider": "Nhà cung cấp",
-      "skills_covered": ["skill1", "skill2"],
-      "duration": "4-6 tuần",
-      "match_score": 9,
-      "description": "Mô tả ngắn gọn khóa học"
-    }}
-  ]
-}}
-"""
 
 class JobMatchingService:
     def __init__(self):
@@ -225,7 +152,7 @@ class JobMatchingService:
             logger.error(f"Error calling LLM: {e}")
             raise
 
-    async def match_jobs(self, filename: str) -> List[Dict[str, Any]]:
+    async def match_jobs(self, filename: str) -> List[JobResult]:
         """Match jobs based on CV analysis results"""
         logger.info(f"Starting job matching for filename: {filename}")
         
@@ -281,10 +208,32 @@ class JobMatchingService:
             try:
                 # Thử parse trực tiếp
                 result = json.loads(response.content)
-                job_suggestions = result.get("job_suggestions", [])
-                logger.info(f"Successfully parsed JSON directly, found {len(job_suggestions)} job suggestions")
-                logger.info(f"Job suggestions: {json.dumps(job_suggestions, indent=2, ensure_ascii=False)}")
-                return job_suggestions
+                job_suggestions_raw = result.get("job_suggestions", [])
+                logger.info(f"Successfully parsed JSON directly, found {len(job_suggestions_raw)} job suggestions")
+                logger.info(f"Job suggestions: {json.dumps(job_suggestions_raw, indent=2, ensure_ascii=False)}")
+                
+                # Chuyển đổi thành JobResult objects
+                job_results = []
+                for job_data in job_suggestions_raw:
+                    try:
+                        job_result = JobResult(
+                            job_id=job_data.get("position", ""),  # Sử dụng position làm job_id
+                            title=job_data.get("position", ""),
+                            description=job_data.get("description", ""),
+                            company=job_data.get("company", ""),
+                            location=job_data.get("location", ""),
+                            match_score=job_data.get("match_score"),
+                            required_skills=job_data.get("required_skills", []),
+                            missing_skills=job_data.get("missing_skills", [])
+                        )
+                        job_results.append(job_result)
+                    except Exception as e:
+                        logger.error(f"Error creating JobResult from {job_data}: {e}")
+                        continue
+                
+                logger.info(f"Successfully created {len(job_results)} JobResult objects")
+                return job_results
+                
             except json.JSONDecodeError as e:
                 logger.error(f"JSON decode error: {e}")
                 logger.error(f"Raw LLM response: {response.content}")
@@ -303,10 +252,30 @@ class JobMatchingService:
                             json_str = content[start:end].strip()
                             logger.info(f"Extracted JSON string: {json_str}")
                             result = json.loads(json_str)
-                            job_suggestions = result.get("job_suggestions", [])
-                            logger.info(f"Successfully extracted JSON from markdown, found {len(job_suggestions)} job suggestions")
-                            logger.info(f"Job suggestions: {json.dumps(job_suggestions, indent=2, ensure_ascii=False)}")
-                            return job_suggestions
+                            job_suggestions_raw = result.get("job_suggestions", [])
+                            logger.info(f"Successfully extracted JSON from markdown, found {len(job_suggestions_raw)} job suggestions")
+                            
+                            # Chuyển đổi thành JobResult objects
+                            job_results = []
+                            for job_data in job_suggestions_raw:
+                                try:
+                                    job_result = JobResult(
+                                        job_id=job_data.get("position", ""),
+                                        title=job_data.get("position", ""),
+                                        description=job_data.get("description", ""),
+                                        company=job_data.get("company", ""),
+                                        location=job_data.get("location", ""),
+                                        match_score=job_data.get("match_score"),
+                                        required_skills=job_data.get("required_skills", []),
+                                        missing_skills=job_data.get("missing_skills", [])
+                                    )
+                                    job_results.append(job_result)
+                                except Exception as e:
+                                    logger.error(f"Error creating JobResult from {job_data}: {e}")
+                                    continue
+                            
+                            logger.info(f"Successfully created {len(job_results)} JobResult objects from markdown")
+                            return job_results
                         else:
                             logger.error("Could not find closing ``` marker")
                     
@@ -322,10 +291,30 @@ class JobMatchingService:
                             logger.info(f"Trying to parse regex match {i+1}: {json_str[:100]}...")
                             result = json.loads(json_str)
                             if "job_suggestions" in result:
-                                job_suggestions = result.get("job_suggestions", [])
-                                logger.info(f"Successfully extracted JSON using regex, found {len(job_suggestions)} job suggestions")
-                                logger.info(f"Job suggestions: {json.dumps(job_suggestions, indent=2, ensure_ascii=False)}")
-                                return job_suggestions
+                                job_suggestions_raw = result.get("job_suggestions", [])
+                                logger.info(f"Successfully extracted JSON using regex, found {len(job_suggestions_raw)} job suggestions")
+                                
+                                # Chuyển đổi thành JobResult objects
+                                job_results = []
+                                for job_data in job_suggestions_raw:
+                                    try:
+                                        job_result = JobResult(
+                                            job_id=job_data.get("position", ""),
+                                            title=job_data.get("position", ""),
+                                            description=job_data.get("description", ""),
+                                            company=job_data.get("company", ""),
+                                            location=job_data.get("location", ""),
+                                            match_score=job_data.get("match_score"),
+                                            required_skills=job_data.get("required_skills", []),
+                                            missing_skills=job_data.get("missing_skills", [])
+                                        )
+                                        job_results.append(job_result)
+                                    except Exception as e:
+                                        logger.error(f"Error creating JobResult from {job_data}: {e}")
+                                        continue
+                                
+                                logger.info(f"Successfully created {len(job_results)} JobResult objects from regex")
+                                return job_results
                         except Exception as regex_error:
                             logger.error(f"Failed to parse regex match {i+1}: {regex_error}")
                             continue
@@ -341,7 +330,7 @@ class JobMatchingService:
             logger.error(f"Error in match_jobs: {e}")
             return []
 
-    async def match_courses(self, filename: str) -> List[Dict[str, Any]]:
+    async def match_courses(self, filename: str) -> List[CourseResult]:
         """Gợi ý khóa học phù hợp dựa trên CV"""
         logger.info(f"Starting course matching for filename: {filename}")
         
@@ -388,10 +377,31 @@ class JobMatchingService:
             try:
                 # Thử parse trực tiếp
                 result = json.loads(response.content)
-                course_suggestions = result.get("course_suggestions", [])
-                logger.info(f"Successfully parsed JSON directly, found {len(course_suggestions)} course suggestions")
-                logger.info(f"Course suggestions: {json.dumps(course_suggestions, indent=2, ensure_ascii=False)}")
-                return course_suggestions
+                course_suggestions_raw = result.get("course_suggestions", [])
+                logger.info(f"Successfully parsed JSON directly, found {len(course_suggestions_raw)} course suggestions")
+                logger.info(f"Course suggestions: {json.dumps(course_suggestions_raw, indent=2, ensure_ascii=False)}")
+                
+                # Chuyển đổi thành CourseResult objects
+                course_results = []
+                for course_data in course_suggestions_raw:
+                    try:
+                        course_result = CourseResult(
+                            course_name=course_data.get("course_name", ""),  # Sử dụng course_name
+                            title=course_data.get("course_name", ""),
+                            description=course_data.get("description", ""),
+                            provider=course_data.get("provider", ""),
+                            duration=course_data.get("duration", ""),
+                            match_score=course_data.get("match_score"),
+                            skills_covered=course_data.get("skills_covered", [])
+                        )
+                        course_results.append(course_result)
+                    except Exception as e:
+                        logger.error(f"Error creating CourseResult from {course_data}: {e}")
+                        continue
+                
+                logger.info(f"Successfully created {len(course_results)} CourseResult objects")
+                return course_results
+                
             except json.JSONDecodeError as e:
                 logger.error(f"JSON decode error: {e}")
                 logger.error(f"Raw LLM response: {response.content}")
@@ -410,10 +420,29 @@ class JobMatchingService:
                             json_str = content[start:end].strip()
                             logger.info(f"Extracted JSON string: {json_str}")
                             result = json.loads(json_str)
-                            course_suggestions = result.get("course_suggestions", [])
-                            logger.info(f"Successfully extracted JSON from markdown, found {len(course_suggestions)} course suggestions")
-                            logger.info(f"Course suggestions: {json.dumps(course_suggestions, indent=2, ensure_ascii=False)}")
-                            return course_suggestions
+                            course_suggestions_raw = result.get("course_suggestions", [])
+                            logger.info(f"Successfully extracted JSON from markdown, found {len(course_suggestions_raw)} course suggestions")
+                            
+                            # Chuyển đổi thành CourseResult objects
+                            course_results = []
+                            for course_data in course_suggestions_raw:
+                                try:
+                                    course_result = CourseResult(
+                                        course_name=course_data.get("course_name", ""),
+                                        title=course_data.get("course_name", ""),
+                                        description=course_data.get("description", ""),
+                                        provider=course_data.get("provider", ""),
+                                        duration=course_data.get("duration", ""),
+                                        match_score=course_data.get("match_score"),
+                                        skills_covered=course_data.get("skills_covered", [])
+                                    )
+                                    course_results.append(course_result)
+                                except Exception as e:
+                                    logger.error(f"Error creating CourseResult from {course_data}: {e}")
+                                    continue
+                            
+                            logger.info(f"Successfully created {len(course_results)} CourseResult objects from markdown")
+                            return course_results
                         else:
                             logger.error("Could not find closing ``` marker")
                     
@@ -429,10 +458,29 @@ class JobMatchingService:
                             logger.info(f"Trying to parse regex match {i+1}: {json_str[:100]}...")
                             result = json.loads(json_str)
                             if "course_suggestions" in result:
-                                course_suggestions = result.get("course_suggestions", [])
-                                logger.info(f"Successfully extracted JSON using regex, found {len(course_suggestions)} course suggestions")
-                                logger.info(f"Course suggestions: {json.dumps(course_suggestions, indent=2, ensure_ascii=False)}")
-                                return course_suggestions
+                                course_suggestions_raw = result.get("course_suggestions", [])
+                                logger.info(f"Successfully extracted JSON using regex, found {len(course_suggestions_raw)} course suggestions")
+                                
+                                # Chuyển đổi thành CourseResult objects
+                                course_results = []
+                                for course_data in course_suggestions_raw:
+                                    try:
+                                        course_result = CourseResult(
+                                            course_name=course_data.get("course_name", ""),
+                                            title=course_data.get("course_name", ""),
+                                            description=course_data.get("description", ""),
+                                            provider=course_data.get("provider", ""),
+                                            duration=course_data.get("duration", ""),
+                                            match_score=course_data.get("match_score"),
+                                            skills_covered=course_data.get("skills_covered", [])
+                                        )
+                                        course_results.append(course_result)
+                                    except Exception as e:
+                                        logger.error(f"Error creating CourseResult from {course_data}: {e}")
+                                        continue
+                                
+                                logger.info(f"Successfully created {len(course_results)} CourseResult objects from regex")
+                                return course_results
                         except Exception as regex_error:
                             logger.error(f"Failed to parse regex match {i+1}: {regex_error}")
                             continue
