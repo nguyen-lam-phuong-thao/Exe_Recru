@@ -1,0 +1,76 @@
+{
+  "error_code": 0,
+  "message": "cv_processed_successfully",
+  "description": null,
+  "data": {
+    "filename": "CV Nguyen Luong Tuan (K17 HCM) - ai intern-TopCV.vn.pdf",
+    "extracted_text": "📞\n0984582105\n✉\nnguyenluongtuan1309@\ngmail.com\n🏠\nThu Duc\n City, Ho Chi Minh City,\nVietnam\nNguyen Luong Tuan\n(K17 HCM)\nAI intern\nShort-Term Goals:\n Develop and implement AI solutions to optimize processes and enhance\noperational efficiency within the company. Participate in research projects\nand AI product development to deliver immediate value to clients.\nLong-Term Goals:\nBecome an AI expert capable of leading initiatives that drive innovation\nand integrate technology into the company's business model.T\nWORK EXPERIENCE\n9/2024\n-\n12/2024\nFPTU STEM IN HIGHSCHOOL\nAI intern\n• Fine-tuned the YOLO model for obstacle detection to assist in\nautonomous vehicle navigation on the Arduino platform.\n• Implemented facial recognition for the development of an automated\nattendance tracking system.\nEDUCATION\nHO CHI MINH FPT\nUNIVERSITY\nArtificial intelligence\n2021\n-\npresent\nSKILLS\nTech skill\nComputer Vision, Machine\nLearning, NLP, Software\n Engineering\nSoft skill\nProblem Solving in a Short-\nTerm,Critical\nThinking,Teamwork,Leadership,Ti\nme\nmanagement,Attention to detail\nCERTIFICATIONS\nMarch 2024\nSoftware Development Lifecycle\n(Cousera)\nMay 2024\nBig Data(Cousera)\nJuly 2024\nDeep Learning(Cousera)\nPROJECTS\n\nJanuary 2024\n-\nApril 2024\nSecond author\n• Research Paper Submission ICCRI-International Conference on Control,\nRobotics and Informatics\n• Detection of Mango Leaf Diseases Using Vision Transformer (ViT)\n • Team Members: Trần Tiến Thành, Nguyễn Lương Tuân, Võ Minh\nHuy\n• Language: Python\n• Framework: TensorFlow\n• Responsibilities:\n1. Collected and preprocessed a comprehensive dataset of mango\nleaf images.\n2. Developed a Vision Transformer (ViT) model to classify diseased\nleaves.\n3. Analyzed and compared the performance of ViT, KNN, and VGG16\nmodels.\n4. Compiled results and prepared the research report.\n• Achievements:The ViT model significantly outperformed KNN and\nVGG16 in terms of accuracy and robustness.\nHONORS & AWARDS\nSPRING 2024\n Honorable Student of the Semester\nSUMMER 2024\nEXCELLENT STUDENT OF SEMESTER\n© topcv.vn\n",
+    "cv_analysis_result": {
+      "name": "Nguyen Luong Tuan",
+      "email": "nguyenluongtuan1309@gmail.com",
+      "phone": "0984582105",
+      "summary": "Nguyen Luong Tuan is an AI Intern with experience in computer vision, machine learning, and NLP, seeking to leverage these skills to optimize processes and drive innovation. His internship at FPTU STEM IN HIGHSCHOOL involved fine-tuning YOLO for obstacle detection and implementing facial recognition, aligning with practical AI application. His research on mango leaf disease detection using Vision Transformer (ViT) demonstrates experience with relevant frameworks like TensorFlow and a commitment to research. While the CV showcases a strong foundation, specific experience with [insert keywords from job description if any] may be a gap.",
+      "education": [
+        {
+          "degree": "",
+          "institution": "HO CHI MINH FPT UNIVERSITY",
+          "start_year": null,
+          "end_year": null,
+          "description": null
+        }
+      ],
+      "experience": [
+        {
+          "title": "AI Intern",
+          "company": "FPTU STEM IN HIGHSCHOOL",
+          "start_date": "2024-09-01",
+          "end_date": "2024-12-01",
+          "description": "Fine-tuned the YOLO model for obstacle detection to assist in autonomous vehicle navigation on the Arduino platform.; Implemented facial recognition for the development of an automated attendance tracking system."
+        }
+      ],
+      "skills": [
+        "Computer Vision",
+        "Machine Learning",
+        "NLP",
+        "Software Engineering",
+        "Problem Solving in a Short-Term",
+        "Critical Thinking",
+        "Teamwork",
+        "Leadership",
+        "Time Management",
+        "Attention to detail"
+      ],
+      "projects": [
+        {
+          "title": "Detection of Mango Leaf Diseases Using Vision Transformer (ViT)",
+          "tech_stack": [
+            "Python",
+            "TensorFlow"
+          ],
+          "description": "Research Paper Submission ICCRI-International Conference on Control, Robotics and Informatics (Second Author)\n* Team Members: Trần Tiến Thành, Nguyễn Lương Tuân, Võ Minh Huy\n* Language: Python\n* Framework: TensorFlow\n* Responsibilities:\n  1. Collected and preprocessed a comprehensive dataset of mango leaf images.\n  2. Developed a Vision Transformer (ViT) model to classify diseased leaves.\n  3. Analyzed and compared the performance of ViT, KNN, and VGG16 models.\n  4. Compiled results and prepared the research report.\n* Achievements: The ViT model significantly outperformed KNN and VGG16 in terms of accuracy and robustness."
+        }
+      ],
+      "certifications": [
+        {
+          "name": "Software Development Lifecycle",
+          "issuer": "Coursera",
+          "time_period": "2024-03-01",
+          "description": null
+        },
+        {
+          "name": "Big Data",
+          "issuer": "Coursera",
+          "time_period": "2024-05-01",
+          "description": null
+        },
+        {
+          "name": "Deep Learning",
+          "issuer": "Coursera",
+          "time_period": "2024-07-01",
+          "description": null
+        }
+      ]
+    },
+    "jd_alignment": "Okay, I've analyzed the candidate's CV against the job description you provided (although the job description was unreadable due to encoding issues). I will make some general assumptions about the job description, focusing on common requirements for AI Intern roles.\n\n1. **Key Matches**:\n    *   **AI Internship Experience:** The candidate has relevant AI internship experience at \"FPTU STEM IN HIGHSCHOOL\".\n    *   **Technical Skills:** The CV lists relevant technical skills including Computer Vision, Machine Learning, and NLP.\n    *   **Education:** The candidate is currently pursuing a degree in Artificial Intelligence.\n    *   **Projects:** The candidate has project experience, including a research paper submission using Vision Transformer (ViT) for image classification, demonstrating practical application of AI techniques.\n    *   **Frameworks/Languages**: The candidate has experience with Python and TensorFlow.\n    *   **Model Fine-tuning**: The candidate has experience fine-tuning the YOLO model.\n    *   **Facial Recognition**: The candidate has experience implementing facial recognition.\n\n2.  **Missing Elements**:\n    *   **Specific Tools/Technologies:** The job description likely mentions specific AI tools, libraries, or platforms (e.g., PyTorch, specific cloud platforms, etc.). The CV should explicitly state experience with these if applicable.\n    *   **Specific Project Details:** The CV lacks detail on the impact or results of the FPTU STEM IN HIGHSCHOOL internship. Quantifiable achievements are very important.\n    *   **Problem Solving Skills**: While soft skills are mentioned, the CV could benefit from examples of how these skills were applied in projects or work experience.\n    *   **Domain Knowledge**: The CV does not mention any specific domain knowledge (e.g., healthcare, finance, etc.) which might be relevant to the job.\n    *   **Contributions**: The CV does not mention the candidate's specific contributions to the team.\n\n3.  **Overall Match Score**: 65/100\n\n4.  **Suggestions for Improvement**:\n    *   **Tailor to the Job Description:** Carefully review the job description (once a readable version is available) and explicitly address each requirement in the CV. Use keywords from the job description.\n    *   **Quantify Achievements:** Add metrics to describe the impact of the candidate's work in the internship and projects (e.g., \"Improved obstacle detection accuracy by X%,\" \"Reduced attendance tracking time by Y%\").\n    *   **Expand on Internship Experience:** Provide more details about the candidate's responsibilities and accomplishments during the FPTU STEM IN HIGHSCHOOL internship.\n    *   **Showcase Problem-Solving Skills:** Provide specific examples of how the candidate used problem-solving skills to overcome challenges in projects or work experience.\n    *   **Highlight Contributions**: Emphasize the candidate's contributions to the team.\n    *   **Add a Skills Matrix:** Consider adding a skills matrix that lists specific tools, technologies, and programming languages the candidate is proficient in.\n    *   **Clarify Role in Research Paper:** While being a second author is good, clarify the candidate's specific role and contributions to the research paper beyond the listed responsibilities.\n    *   **Add a Portfolio Link (if applicable):** If the candidate has a portfolio of AI projects on GitHub or a personal website, include a link in the CV."
+  }
+}
