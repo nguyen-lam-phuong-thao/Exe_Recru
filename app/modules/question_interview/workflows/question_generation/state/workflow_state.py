@@ -19,7 +19,8 @@ class QuestionGenerationState(TypedDict):
 	"""
 
 	# Core user data
-	user_profile: UserProfile
+	cv_text: Optional[str] = None
+	job_description: Optional[str] = None
 	# cv_data: Dict[str, Any]
 
 	# Question generation
@@ -43,3 +44,5 @@ class QuestionGenerationState(TypedDict):
 	generation_history: List[Dict[str, Any]]
 	total_questions_generated: int
 	session_id: Optional[str]
+	last_question_id: Optional[str]  # Track the last question asked
+

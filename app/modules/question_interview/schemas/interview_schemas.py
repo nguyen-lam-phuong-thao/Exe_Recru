@@ -5,14 +5,6 @@ Question schemas following the frontend question API structure.
 from typing import List, Optional, Union, Any, Dict, Literal
 from pydantic import BaseModel, Field
 
-
-class QuestionOption(BaseModel):
-	"""Question option for single/multiple choice"""
-
-	id: str = Field(..., description='Unique identifier for the option')
-	label: str = Field(..., description='Display label for the option')
-
-
 class TextInputField(BaseModel):
 	"""Text input field configuration"""
 
@@ -23,24 +15,15 @@ class TextInputField(BaseModel):
 	required: bool = Field(default=True, description='Whether field is required')
 
 
-class SubQuestion(BaseModel):
-	"""Sub-question for sub_form type"""
-
-	id: str = Field(..., description='Unique identifier for sub-question')
-	Question: str = Field(..., description='Sub-question text')
-	Question_type: Literal['single_option', 'multiple_choice'] = Field(..., description='Sub-question type')
-	Question_data: List[QuestionOption] = Field(..., description='Sub-question options')
-
-
 class Question(BaseModel):
-	"""Main question structure matching frontend API"""
+	"""A question using only text_input type."""
 
 	id: str = Field(..., description='Unique identifier for the question')
-	Question: str = Field(..., description='Question text')
-	Question_type: Literal['single_option', 'multiple_choice', 'text_input', 'sub_form'] = Field(..., description='Type of question')
-	subtitle: Optional[str] = Field(None, description='Subtitle or description')
-	Question_data: Union[List[QuestionOption], List[TextInputField], List[SubQuestion]] = Field(..., description='Question data based on type')
-
+	Question: str = Field(..., description='The main question text')
+	Question_type: Literal['text_input'] = Field(..., description='Type of question (fixed to text_input)')
+	subtitle: Optional[str] = Field(None, description='Optional subtitle or helper text')
+	Question_data: List[TextInputField] = Field(..., description='List of text input fields')
+	answer: Optional[str] = Field(None, description="User's answer to this question")
 
 class UserProfile(BaseModel):
 	"""User profile structure for analysis"""
@@ -62,6 +45,14 @@ class QuestionGenerationRequest(BaseModel):
 	previous_questions: List[Question] = Field(default_factory=list, description='Previously asked questions')
 	focus_areas: List[str] = Field(default_factory=list, description='Specific areas to focus on')
 	max_questions: int = Field(4, description='Maximum number of questions to generate')
+	questions: List[Question]
+	analysis: str
+	next_focus_areas: List[str]
+	completeness_score: float
+	should_continue: bool
+	session_id: Optional[str] = Field(None, description="Session ID for back-and-forth interview flow")  # ✅
+	current_iteration: Optional[int] = 0
+	total_questions_generated: Optional[int] = 0
 
 
 class QuestionGenerationResponse(BaseModel):
@@ -82,3 +73,12 @@ class AnalysisDecision(BaseModel):
 	reasoning: str = Field(..., description='Reasoning for the decision')
 	completeness_score: float = Field(..., description='User profile completeness score (0-1)')
 	suggested_focus: List[str] = Field(default_factory=list, description='Suggested areas to focus on next')
+	cv_summary: Optional[str] = None  # ✅ New field
+
+class SubmitInterviewAnswerRequest(BaseModel):
+    """Schema for submitting answer to current question"""
+
+    session_id: str = Field(..., description="Current interview session ID")
+    answer_text: str = Field(..., description="User's answer to the last question")
+
+

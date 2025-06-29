@@ -1,0 +1,144 @@
+{
+  "cv_text": "NGUYEN LAM PHUONG THAO\n \nSKILL\nEDUCATION\nFPT University\nGPA: 8.7/10\nProgress: 2nd year\nSemester: 6/9\nLanguage: English (IELTS 6.0),\nJapanese (Elementary)\nCERTIFICATE\nEXPERIENCE\nDeveloped and managed the course module of an LMS in Django,\nusing MySQL database modeling, and backend logic.\nDesigned custom user interfaces using Bootstrap 5 and CSS,\noptimizing for user experience and responsiveness.\nImplemented and fine-tuned BERT and T5 models for automated\ncontent summarization across text and video, leveraging an\nadvanced multi-GPU setup (8 NVIDIA A100 GPUs) to achieve high\nperformance and scalability.\nPROJECT\nIdentifying and Categorizing Novel\nRacist Vietnamese Comment Types\nResearcher\n \nHo Chi Minh City\nJuly 2024 – September 2024\nConducted a comprehensive analysis of multiple research\npapers to construct the methodology for the project by\ncombining multiple method.\nPioneered the NVRC dataset and developed a targeted approach\nfor detecting region-specific racist comments on Vietnamese\nsocial media, raising community standards.\nGained an in-depth understanding of the PhoBERT and ViSoBERT\nmodels to enhance the accurate classification of harmful\ncontent.\nTraffic Light Electrical Detection\nSystem in Vietnam\nResearcher\n \nHo Chi Minh City\nFebruary 2024 – March 2024\nPerformed an in-depth review of research to construct the\nproject methodology, integrating various approaches for a\nrobust solution.\nGained a deep understanding of classifying traffic lights under\nadverse weather using YOLOv5 and PreNet for image\nenhancement.\nImproved accuracy and reliability of traffic light recognition in\nchallenging conditions, showcasing deep learning's role in\nenhancing safety for autonomous navigation.\n• Coursera: Software Development\nLifecycle Specialization\n• Coursera: Natural Language\nProcessing Specialization\n• Coursera: Applied Data Science\nwith Python Specialization\n• Coursera: IBM Full Stack\nSoftware Developer Specialization\n• Coursera: Deep Learning\nSpecialization\n• Coursera: Big Data Specialization\n• Coursera: Natural Language\nProcessing Specialization\nTechnical Skills: Python, R,\nDatabase, Machine Learning,\nDeep learning, Computer Vision,\nData Analysis, Data Visualization,\nProject Operating\nTool kits: PowerBI, MS SQL\nServer, MySQL\nSoft skills: Problem Solving,\nCritical Thinking,\nCommunication, Researching, \nFSA – Educationalwebsiteproject\nAI Intern\n+84 862-882-672 | phuongthao96dtc.2004@gmail.com\n \nHoChi MinhCity,Vietnam\nHo Chi Minh City\nSeptember 2024 – now\n",
+  "job_description": "AI Engineer",
+  "generated_questions": [
+    {
+      "id": "q1",
+      "Question": "Bạn có thể chia sẻ về một dự án AI mà bạn cảm thấy chưa thành công như mong đợi và những bài học bạn rút ra được từ kinh nghiệm đó là gì? Điều này có thể giúp chúng tôi hiểu rõ hơn về khả năng tự đánh giá và học hỏi của bạn.",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "project_failure",
+          "label": "Mô tả dự án và bài học kinh nghiệm",
+          "type": "text",
+          "placeholder": "Ví dụ: Dự án X không đạt được độ chính xác mong muốn do thiếu dữ liệu huấn luyện. Tôi đã học được tầm quan trọng của việc thu thập và chuẩn bị dữ liệu kỹ lưỡng.",
+          "required": true
+        }
+      ],
+      "answer": null
+    }
+  ],
+  "all_previous_questions": [
+    {
+      "id": "q1",
+      "Question": "Trong quá trình làm việc với các mô hình BERT và T5 cho dự án tóm tắt nội dung, bạn đã gặp những khó khăn kỹ thuật cụ thể nào và bạn đã giải quyết chúng như thế nào? Điều này giúp bạn học được điều gì?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "bert_t5_challenges",
+          "label": "Khó khăn và cách giải quyết",
+          "type": "text",
+          "placeholder": "Ví dụ: Vấn đề về hiệu suất, cách tinh chỉnh mô hình...",
+          "required": true
+        }
+      ],
+      "answer": null
+    },
+    {
+      "id": "q1",
+      "Question": "Bạn có thể chia sẻ về một dự án AI mà bạn cảm thấy chưa thành công như mong đợi và những bài học bạn rút ra được từ kinh nghiệm đó là gì? Điều này có thể giúp chúng tôi hiểu rõ hơn về khả năng tự đánh giá và học hỏi của bạn.",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "project_failure",
+          "label": "Mô tả dự án và bài học kinh nghiệm",
+          "type": "text",
+          "placeholder": "Ví dụ: Dự án X không đạt được độ chính xác mong muốn do thiếu dữ liệu huấn luyện. Tôi đã học được tầm quan trọng của việc thu thập và chuẩn bị dữ liệu kỹ lưỡng.",
+          "required": true
+        }
+      ],
+      "answer": null
+    }
+  ],
+  "current_iteration": 2,
+  "max_iterations": 5,
+  "analysis_decision": {
+    "decision": "need_more_info",
+    "missing_areas": [
+      "general_info"
+    ],
+    "reasoning": "Analysis failed: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-2.0-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 15\n}\n, links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, retry_delay {\n  seconds: 52\n}\n]",
+    "completeness_score": 0.0,
+    "suggested_focus": [
+      "skills",
+      "goals"
+    ],
+    "cv_summary": null
+  },
+  "completeness_score": 0.75,
+  "missing_areas": [
+    "Personal Characteristics",
+    "Career Goals",
+    "Personal Context"
+  ],
+  "focus_areas": [
+    "Mô tả chi tiết hơn về phong cách làm việc, điểm mạnh và điểm yếu.",
+    "Nêu rõ định hướng nghề nghiệp và mục tiêu ngắn hạn/dài hạn.",
+    "Cung cấp thêm thông tin về bối cảnh cá nhân và động lực theo đuổi ngành AI."
+  ],
+  "should_continue": false,
+  "workflow_complete": true,
+  "error_message": "429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-2.0-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 15\n}\n, links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, retry_delay {\n  seconds: 52\n}\n]",
+  "generation_history": [
+    {
+      "iteration": 0,
+      "focus_areas": [
+        "Mô tả chi tiết hơn về phong cách làm việc, điểm mạnh và tính cách cá nhân.",
+        "Nêu rõ mục tiêu nghề nghiệp, định hướng phát triển trong lĩnh vực AI.",
+        "Cung cấp thêm thông tin về bối cảnh cá nhân, động lực và lý do quan tâm đến vị trí AI Engineer."
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Trong quá trình làm việc với các mô hình BERT và T5 cho dự án tóm tắt nội dung, bạn đã gặp những khó khăn kỹ thuật cụ thể nào và bạn đã giải quyết chúng như thế nào? Điều này giúp bạn học được điều gì?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "bert_t5_challenges",
+              "label": "Khó khăn và cách giải quyết",
+              "type": "text",
+              "placeholder": "Ví dụ: Vấn đề về hiệu suất, cách tinh chỉnh mô hình...",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.7
+    },
+    {
+      "iteration": 1,
+      "focus_areas": [
+        "Mô tả chi tiết hơn về phong cách làm việc, điểm mạnh và điểm yếu.",
+        "Nêu rõ định hướng nghề nghiệp và mục tiêu ngắn hạn/dài hạn.",
+        "Cung cấp thêm thông tin về bối cảnh cá nhân và động lực theo đuổi ngành AI."
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Bạn có thể chia sẻ về một dự án AI mà bạn cảm thấy chưa thành công như mong đợi và những bài học bạn rút ra được từ kinh nghiệm đó là gì? Điều này có thể giúp chúng tôi hiểu rõ hơn về khả năng tự đánh giá và học hỏi của bạn.",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "project_failure",
+              "label": "Mô tả dự án và bài học kinh nghiệm",
+              "type": "text",
+              "placeholder": "Ví dụ: Dự án X không đạt được độ chính xác mong muốn do thiếu dữ liệu huấn luyện. Tôi đã học được tầm quan trọng của việc thu thập và chuẩn bị dữ liệu kỹ lưỡng.",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.75
+    }
+  ],
+  "total_questions_generated": 2,
+  "session_id": "cecd423e-6d48-49d2-aaef-e760390885c8",
+  "last_question_id": "q1"
+}

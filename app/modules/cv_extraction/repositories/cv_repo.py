@@ -15,8 +15,6 @@ from app.modules.cv_extraction.schemas.cv import ProcessCVRequest
 from app.utils.pdf import (
 	PDFToTextConverter,
 )
-from app.modules.question_interview.repository.question_interview_repo import InterviewComposerRepo
-from app.modules.question_interview.schemas.interview_request import QuestionGenerationRequest
 
 
 class CVRepository:
