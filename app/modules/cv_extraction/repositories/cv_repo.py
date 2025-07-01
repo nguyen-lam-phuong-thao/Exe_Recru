@@ -15,7 +15,7 @@ from app.modules.cv_extraction.schemas.cv import ProcessCVRequest
 from app.utils.pdf import (
 	PDFToTextConverter,
 )
-
+from app.modules.cv_extraction.memory.session_store import save_session_state  # <-- Add this import
 
 class CVRepository:
 	def __init__(self):
@@ -98,14 +98,19 @@ class CVRepository:
 				)
 			mapped_result = ai_to_cvbase(ai_result)
 
-			# # --- Integration: Call question generation with cv_data ---
-			# cv_data = mapped_result.dict()
-			# self.logger.info(f"Passing cv_data to question generation: {cv_data}")
-			# question_repo = InterviewComposerRepo()
-			# question_request = QuestionGenerationRequest(focus_areas=[], cv_data=cv_data)
-			# question_response = await question_repo.generate_questions(question_request)
-			# self.logger.info(f"Question generation response: {question_response}")
-			# # --- End integration ---
+			# --- Save analysis result to JSON file using session_store ---
+			session_id = str(uuid.uuid4())
+			analysis_data = {
+				"session_id": session_id,
+				"filename": file.filename,
+				"cv_text": extracted_text['text'],
+				"job_description": job_description,
+				"cv_analysis_result": ai_result.model_dump(),
+				"cv_api_result": mapped_result.dict(),
+				"jd_alignment": ai_result.alignment_with_jd,
+			}
+			save_session_state(session_id, analysis_data)
+			# --- End save ---
 
 		except Exception as e:
 			self.logger.error(f'Analysis failed: {str(e)}')
@@ -122,7 +127,8 @@ class CVRepository:
 				'filename': file.filename,
 				'extracted_text': extracted_text['text'],
 				'cv_analysis_result': mapped_result.dict(),
-				'jd_alignment': ai_result.alignment_with_jd  # ✅ Add this line
+				'jd_alignment': ai_result.alignment_with_jd,
+				'session_id': session_id,  # Return session_id for reference
 			},
 		)
 
