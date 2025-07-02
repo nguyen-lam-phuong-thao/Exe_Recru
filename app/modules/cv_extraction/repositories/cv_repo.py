@@ -184,7 +184,10 @@ class CVRepository:
 		try:
 			self.logger.info('Starting CV analysis')
 			self.logger.info(f'Extracted text: {extracted_text}')
-			ai_result = await cv_analyzer.analyze_cv_content(extracted_text['text'])
+			ai_result = await cv_analyzer.analyze_cv_content(
+				extracted_text['text'],
+				request.job_description if hasattr(request, "job_description") else None
+			)
 			self.logger.info(f'CV analysis result: {ai_result}')
 			if ai_result is None:
 				return APIResponse(
@@ -207,6 +210,7 @@ class CVRepository:
 				'cv_file_url': request.cv_file_url,
 				'extracted_text': extracted_text['text'],
 				'cv_analysis_result': mapped_result.dict(),
+				'jd_alignment': getattr(ai_result, "alignment_with_jd", None),
 			},
 		)
 

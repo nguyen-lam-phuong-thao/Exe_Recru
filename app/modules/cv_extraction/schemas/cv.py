@@ -5,7 +5,8 @@ from pydantic import BaseModel, EmailStr, field_validator
 from app.core.base_model import RequestSchema
 
 class ProcessCVRequest(RequestSchema):
-	cv_file_url: str
+    cv_file_url: str
+    job_description: Optional[str] = None
 
 # Sub-schemas
 class EducationEntry(BaseModel):
@@ -73,4 +74,4 @@ class CVResponse(CVBase):
     updated_at: date
 
     class Config:
-        orm_mode = True 
+        orm_mode = True
