@@ -1,0 +1,196 @@
+{
+  "cv_text": "NGUYEN LAM PHUONG THAO\n \nSKILL\nEDUCATION\nFPT University\nGPA: 8.7/10\nProgress: 2nd year\nSemester: 6/9\nLanguage: English (IELTS 6.0),\nJapanese (Elementary)\nCERTIFICATE\nEXPERIENCE\nDeveloped and managed the course module of an LMS in Django,\nusing MySQL database modeling, and backend logic.\nDesigned custom user interfaces using Bootstrap 5 and CSS,\noptimizing for user experience and responsiveness.\nImplemented and fine-tuned BERT and T5 models for automated\ncontent summarization across text and video, leveraging an\nadvanced multi-GPU setup (8 NVIDIA A100 GPUs) to achieve high\nperformance and scalability.\nPROJECT\nIdentifying and Categorizing Novel\nRacist Vietnamese Comment Types\nResearcher\n \nHo Chi Minh City\nJuly 2024 – September 2024\nConducted a comprehensive analysis of multiple research\npapers to construct the methodology for the project by\ncombining multiple method.\nPioneered the NVRC dataset and developed a targeted approach\nfor detecting region-specific racist comments on Vietnamese\nsocial media, raising community standards.\nGained an in-depth understanding of the PhoBERT and ViSoBERT\nmodels to enhance the accurate classification of harmful\ncontent.\nTraffic Light Electrical Detection\nSystem in Vietnam\nResearcher\n \nHo Chi Minh City\nFebruary 2024 – March 2024\nPerformed an in-depth review of research to construct the\nproject methodology, integrating various approaches for a\nrobust solution.\nGained a deep understanding of classifying traffic lights under\nadverse weather using YOLOv5 and PreNet for image\nenhancement.\nImproved accuracy and reliability of traffic light recognition in\nchallenging conditions, showcasing deep learning's role in\nenhancing safety for autonomous navigation.\n• Coursera: Software Development\nLifecycle Specialization\n• Coursera: Natural Language\nProcessing Specialization\n• Coursera: Applied Data Science\nwith Python Specialization\n• Coursera: IBM Full Stack\nSoftware Developer Specialization\n• Coursera: Deep Learning\nSpecialization\n• Coursera: Big Data Specialization\n• Coursera: Natural Language\nProcessing Specialization\nTechnical Skills: Python, R,\nDatabase, Machine Learning,\nDeep learning, Computer Vision,\nData Analysis, Data Visualization,\nProject Operating\nTool kits: PowerBI, MS SQL\nServer, MySQL\nSoft skills: Problem Solving,\nCritical Thinking,\nCommunication, Researching, \nFSA – Educationalwebsiteproject\nAI Intern\n+84 862-882-672 | phuongthao96dtc.2004@gmail.com\n \nHoChi MinhCity,Vietnam\nHo Chi Minh City\nSeptember 2024 – now\n",
+  "job_description": "AI Engineer",
+  "generated_questions": [],
+  "all_previous_questions": [
+    {
+      "id": "q1",
+      "Question": "Bạn có thể mô tả phong cách làm việc và những đặc điểm tính cách nổi bật của bạn, đặc biệt là những yếu tố có thể đóng góp vào vị trí Kỹ sư AI tại công ty chúng tôi không?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "working_style_personality",
+          "label": "Phong cách làm việc và đặc điểm tính cách",
+          "type": "text",
+          "placeholder": "Ví dụ: Làm việc nhóm, tỉ mỉ, chủ động, khả năng giải quyết vấn đề...",
+          "required": true
+        }
+      ],
+      "answer": "Làm việc nhóm, tỉ mỉ, chủ động, khả năng giải quyết vấn đề."
+    },
+    {
+      "id": "q1",
+      "Question": "Bạn có thể chia sẻ thêm về định hướng phát triển sự nghiệp của mình trong 5 năm tới, đặc biệt là trong lĩnh vực Kỹ sư AI, và những bước bạn dự định thực hiện để đạt được những mục tiêu đó không?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "career_goals_5_years",
+          "label": "Định hướng sự nghiệp trong 5 năm tới",
+          "type": "text",
+          "placeholder": "Ví dụ: Trở thành Kỹ sư AI cấp cao, chuyên về xử lý ngôn ngữ tự nhiên, và có đóng góp vào các dự án nghiên cứu lớn.",
+          "required": true
+        }
+      ],
+      "answer": "Trở thành Kỹ sư AI cấp cao, chuyên về xử lý ngôn ngữ tự nhiên, và có đóng góp vào các dự án nghiên cứu lớn."
+    },
+    {
+      "id": "q1",
+      "Question": "Bạn có thể mô tả chi tiết hơn về kinh nghiệm làm việc trong dự án FSA – Educationalwebsiteproject, đặc biệt là những kỹ năng AI cụ thể nào bạn đã áp dụng và kết quả đạt được là gì?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "fsa_project_details",
+          "label": "Chi tiết dự án FSA",
+          "type": "text",
+          "placeholder": "Ví dụ: Sử dụng thuật toán ABC để cải thiện hiệu suất trang web...",
+          "required": true
+        }
+      ],
+      "answer": "Sử dụng thuật toán ABC để cải thiện hiệu suất trang web."
+    },
+    {
+      "id": "q1",
+      "Question": "Bạn có thể chia sẻ thêm về cách bạn quản lý và tối ưu hiệu suất của các mô hình BERT và T5 trên hệ thống multi-GPU (8 NVIDIA A100 GPUs) trong dự án tóm tắt nội dung tự động không? Cụ thể, những kỹ thuật hoặc công cụ nào bạn đã sử dụng để đảm bảo hiệu quả và khả năng mở rộng?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "gpu_optimization",
+          "label": "Quản lý và tối ưu GPU",
+          "type": "text",
+          "placeholder": "Ví dụ: Data parallelism, model parallelism, TensorRT...",
+          "required": true
+        }
+      ],
+      "answer": "Data parallelism, model parallelism, TensorRT."
+    }
+  ],
+  "current_iteration": 8,
+  "max_iterations": 5,
+  "analysis_decision": {
+    "decision": "sufficient",
+    "missing_areas": [],
+    "reasoning": "The CV provides a good overview of the candidate's skills, experience, and education. The previous questions addressed personal characteristics and career goals, filling in some gaps. The CV effectively demonstrates relevant technical skills and project experience related to AI engineering.",
+    "completeness_score": 0.85,
+    "suggested_focus": [],
+    "cv_summary": "The CV highlights Nguyen Lam Phuong Thao's skills and experience in AI, particularly in NLP and computer vision. It includes project experience involving BERT and T5 models, YOLOv5, and work on detecting racist Vietnamese comments. The CV also lists relevant coursework and technical skills like Python, R, and deep learning."
+  },
+  "completeness_score": 0.85,
+  "missing_areas": [],
+  "focus_areas": [],
+  "should_continue": false,
+  "workflow_complete": true,
+  "error_message": "429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-2.0-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 15\n}\n, links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, retry_delay {\n  seconds: 2\n}\n]",
+  "generation_history": [
+    {
+      "iteration": 0,
+      "focus_areas": [
+        "Describe your working style and personality traits.",
+        "State your career goals and desired role.",
+        "Provide context about your current situation and motivations."
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Bạn có thể mô tả phong cách làm việc và những đặc điểm tính cách nổi bật của bạn, đặc biệt là những yếu tố có thể đóng góp vào vị trí Kỹ sư AI tại công ty chúng tôi không?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "working_style_personality",
+              "label": "Phong cách làm việc và đặc điểm tính cách",
+              "type": "text",
+              "placeholder": "Ví dụ: Làm việc nhóm, tỉ mỉ, chủ động, khả năng giải quyết vấn đề...",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.75
+    },
+    {
+      "iteration": 1,
+      "focus_areas": [
+        "Personal Characteristics",
+        "Career Goals",
+        "Personal Context"
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Bạn có thể chia sẻ thêm về định hướng phát triển sự nghiệp của mình trong 5 năm tới, đặc biệt là trong lĩnh vực Kỹ sư AI, và những bước bạn dự định thực hiện để đạt được những mục tiêu đó không?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "career_goals_5_years",
+              "label": "Định hướng sự nghiệp trong 5 năm tới",
+              "type": "text",
+              "placeholder": "Ví dụ: Trở thành Kỹ sư AI cấp cao, chuyên về xử lý ngôn ngữ tự nhiên, và có đóng góp vào các dự án nghiên cứu lớn.",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.7
+    },
+    {
+      "iteration": 3,
+      "focus_areas": [
+        "Elaborate on personal working style and personality traits.",
+        "Provide context about the user's background, current situation, and motivations for pursuing an AI Engineer role.",
+        "Include career goals directly in the CV."
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Bạn có thể mô tả chi tiết hơn về kinh nghiệm làm việc trong dự án FSA – Educationalwebsiteproject, đặc biệt là những kỹ năng AI cụ thể nào bạn đã áp dụng và kết quả đạt được là gì?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "fsa_project_details",
+              "label": "Chi tiết dự án FSA",
+              "type": "text",
+              "placeholder": "Ví dụ: Sử dụng thuật toán ABC để cải thiện hiệu suất trang web...",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.75
+    },
+    {
+      "iteration": 4,
+      "focus_areas": [],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Bạn có thể chia sẻ thêm về cách bạn quản lý và tối ưu hiệu suất của các mô hình BERT và T5 trên hệ thống multi-GPU (8 NVIDIA A100 GPUs) trong dự án tóm tắt nội dung tự động không? Cụ thể, những kỹ thuật hoặc công cụ nào bạn đã sử dụng để đảm bảo hiệu quả và khả năng mở rộng?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "gpu_optimization",
+              "label": "Quản lý và tối ưu GPU",
+              "type": "text",
+              "placeholder": "Ví dụ: Data parallelism, model parallelism, TensorRT...",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.85
+    }
+  ],
+  "total_questions_generated": 4,
+  "session_id": "91d3d33d-4636-4f8f-925d-85bf9fb4bc20",
+  "last_question_id": "q1"
+}

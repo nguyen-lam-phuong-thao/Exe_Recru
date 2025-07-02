@@ -6,7 +6,6 @@ from app.middleware.translation_manager import _
 from app.modules.cv_extraction.schemas.cv import ProcessCVRequest
 from app.modules.cv_extraction.repositories.cv_repo import CVRepository
 
-
 route = APIRouter(prefix='/cv', tags=['CV'])
 
 

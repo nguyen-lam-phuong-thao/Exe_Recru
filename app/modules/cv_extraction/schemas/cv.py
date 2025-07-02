@@ -48,7 +48,7 @@ class CertificationEntry(BaseModel):
 # Main schemas
 class CVBase(BaseModel):
     name: str
-    email: EmailStr
+    email: Optional[EmailStr] = None
     phone: Optional[str] = None
     summary: Optional[str] = None
     education: List[EducationEntry]

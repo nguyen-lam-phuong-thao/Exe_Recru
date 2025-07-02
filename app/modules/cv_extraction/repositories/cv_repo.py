@@ -16,7 +16,6 @@ from app.utils.pdf import (
 	PDFToTextConverter,
 )
 
-
 class CVRepository:
 	def __init__(self):
 		self.logger = logging.getLogger(self.__class__.__name__)
@@ -97,6 +96,7 @@ class CVRepository:
 					data=None,
 				)
 			mapped_result = ai_to_cvbase(ai_result)
+
 		except Exception as e:
 			self.logger.error(f'Analysis failed: {str(e)}')
 			return APIResponse(
@@ -112,7 +112,7 @@ class CVRepository:
 				'filename': file.filename,
 				'extracted_text': extracted_text['text'],
 				'cv_analysis_result': mapped_result.dict(),
-				'jd_alignment': ai_result.alignment_with_jd  # ✅ Add this line
+				'jd_alignment': ai_result.alignment_with_jd,
 			},
 		)
 
@@ -227,6 +227,22 @@ class CVRepository:
 		self.logger.info(f'Attempting to download file from {url} to {file_path}')
 
 		try:
+			async with aiohttp.ClientSession() as session:
+				async with session.get(url, ssl=False) as response:
+					self.logger.info(f'Response: {response}')
+					if response.status == 200:
+						self.logger.info(f'Download successful (Status: {response.status})')
+						async with aiofiles.open(file_path, 'wb') as f:
+							await f.write(await response.read())
+						self.logger.info(f'File saved to {file_path}')
+						return file_path
+					else:
+						self.logger.error(f'Failed to download file from {url}, status: {response.status}')
+						return None
+
+		except Exception as e:
+			self.logger.error(f'Error downloading file from {url}: {e}')
+			return None
 			async with aiohttp.ClientSession() as session:
 				async with session.get(url, ssl=False) as response:
 					self.logger.info(f'Response: {response}')
