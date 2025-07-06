@@ -63,7 +63,7 @@ class CVBase(BaseModel):
 
 class CVCreate(CVBase):
     uploaded_by: str
-    source: str  # e.g., 'manual', 'email', 'ATS', etc.
+    source: str  
 
     class Config:
         orm_mode = True
