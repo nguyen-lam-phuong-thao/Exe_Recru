@@ -215,11 +215,8 @@ class CVRepository:
 		)
 
 	async def _download_file(self, url: str) -> str | None:
-		temp_dir = 'temp_cvs'
-		if not os.path.exists(temp_dir):
-			os.makedirs(temp_dir)
-			self.logger.info(f'Created temporary directory: {temp_dir}')
-
+		# Use system temp directory to avoid permission issues
+		temp_dir = tempfile.gettempdir()
 		# Extract file extension from the URL
 		file_extension = 'pdf'
 		if file_extension not in ['pdf', 'docx', 'txt']:
@@ -244,6 +241,9 @@ class CVRepository:
 						self.logger.error(f'Failed to download file from {url}, status: {response.status}')
 						return None
 
+		except Exception as e:
+			self.logger.error(f'Error downloading file from {url}: {e}')
+			return None
 		except Exception as e:
 			self.logger.error(f'Error downloading file from {url}: {e}')
 			return None
