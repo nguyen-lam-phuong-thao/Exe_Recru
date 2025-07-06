@@ -14,7 +14,6 @@ from app.modules.cv_extraction.repositories.cv_agent.ai_to_api_mapper import ai_
 from app.modules.cv_extraction.schemas.cv import ProcessCVRequest
 from app.utils.pdf import PDFToTextConverter
 
-
 class CVRepository:
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -24,16 +23,17 @@ class CVRepository:
         file_extension = file.filename.split('.')[-1].lower()
 
         if file_extension not in ['pdf', 'docx', 'txt']:
-            self.logger.error(f'Unsupported file type: {file_extension}')
             return APIResponse(error_code=1, message=_('unsupported_cv_file_type'), data=None)
 
         try:
-            with tempfile.NamedTemporaryFile(delete=False, suffix=f'.{file_extension}') as tmp:
+            suffix = f".{file_extension}"
+            async with aiofiles.tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
                 temp_path = tmp.name
-                self.logger.info(f'Saving uploaded file to: {temp_path}')
-                shutil.copyfileobj(file.file, tmp)
+                contents = await file.read()
+                await tmp.write(contents)
+            self.logger.info(f"Saved uploaded file to {temp_path}")
         except Exception as e:
-            self.logger.error(f'Failed to save uploaded file: {str(e)}')
+            self.logger.error(f"Failed to save file: {e}")
             return APIResponse(error_code=1, message=_('failed_to_save_uploaded_file'), data=None)
 
         extracted_text = None
@@ -43,21 +43,19 @@ class CVRepository:
             if file_extension == 'pdf':
                 converter = PDFToTextConverter(file_path=temp_path)
                 extracted_text = converter.extract_text()
-                self.logger.info(f'Extracted {len(extracted_text)} characters from PDF')
+                self.logger.info(f"Extracted {len(extracted_text.get('text', ''))} characters from PDF")
             else:
-                self.logger.error(f'No converter implemented for file type: {file_extension}')
                 return APIResponse(error_code=1, message=_('unsupported_cv_file_type'), data=None)
         except Exception as e:
-            self.logger.error(f'Error during extraction: {str(e)}')
+            self.logger.error(f"Extraction error: {e}")
             return APIResponse(error_code=1, message=_('error_extracting_cv_content'), data=None)
         finally:
-            if isinstance(converter, PDFToTextConverter):
+            if converter:
                 converter.close()
             if os.path.exists(temp_path):
                 os.remove(temp_path)
-                self.logger.info(f'Temporary file deleted: {temp_path}')
 
-        if not extracted_text:
+        if not extracted_text or not extracted_text.get('text'):
             return APIResponse(error_code=1, message=_('no_text_extracted'), data=None)
 
         try:
@@ -67,7 +65,7 @@ class CVRepository:
                 return APIResponse(error_code=1, message=_('error_analyzing_cv'), data=None)
             mapped_result = ai_to_cvbase(ai_result)
         except Exception as e:
-            self.logger.error(f'Analysis failed: {str(e)}')
+            self.logger.error(f"Analysis failed: {e}")
             return APIResponse(error_code=1, message=_('error_analyzing_cv'), data=None)
 
         return APIResponse(
@@ -77,55 +75,46 @@ class CVRepository:
                 'filename': file.filename,
                 'extracted_text': extracted_text['text'],
                 'cv_analysis_result': mapped_result.dict(),
-                'jd_alignment': ai_result.alignment_with_jd,
+                'jd_alignment': getattr(ai_result, "alignment_with_jd", None),
             },
         )
 
     async def process_cv(self, request: ProcessCVRequest) -> APIResponse:
-        self.logger.info(f'Starting process_cv method with request: {request}')
+        self.logger.info(f"Processing CV from URL: {request.cv_file_url}")
         file_path = await self._download_file(request.cv_file_url)
 
         if not file_path:
-            self.logger.error('Download failed, returning error response')
             return APIResponse(error_code=1, message=_('failed_to_download_file'), data=None)
 
-        self.logger.info(f'File downloaded successfully to: {file_path}')
-        file_extension = 'pdf'
         extracted_text = None
         converter = None
 
         try:
-            if file_extension == 'pdf':
-                converter = PDFToTextConverter(file_path=file_path)
-                extracted_text = converter.extract_text()
-                self.logger.info(f'Extracted {len(extracted_text)} characters from PDF')
-            else:
-                self.logger.error(f'Unsupported file type: {file_extension}')
-                os.remove(file_path)
-                return APIResponse(error_code=1, message=_('unsupported_cv_file_type'), data=None)
+            converter = PDFToTextConverter(file_path=file_path)
+            extracted_text = converter.extract_text()
+            self.logger.info(f"Extracted {len(extracted_text.get('text', ''))} characters from PDF")
         except Exception as e:
-            self.logger.error(f'Error during extraction: {str(e)}')
+            self.logger.error(f"Extraction failed: {e}")
             return APIResponse(error_code=1, message=_('error_extracting_cv_content'), data=None)
         finally:
-            if isinstance(converter, PDFToTextConverter):
+            if converter:
                 converter.close()
             if os.path.exists(file_path):
                 os.remove(file_path)
 
-        if not extracted_text:
+        if not extracted_text or not extracted_text.get('text'):
             return APIResponse(error_code=1, message=_('no_text_extracted'), data=None)
 
         try:
             cv_analyzer = CVAnalyzer()
             ai_result = await cv_analyzer.analyze_cv_content(
-                extracted_text['text'],
-                request.job_description if hasattr(request, "job_description") else None
+                extracted_text['text'], request.job_description
             )
             if ai_result is None:
                 return APIResponse(error_code=1, message=_('error_analyzing_cv'), data=None)
             mapped_result = ai_to_cvbase(ai_result)
         except Exception as e:
-            self.logger.error(f'Error during analysis: {str(e)}')
+            self.logger.error(f"Analysis error: {e}")
             return APIResponse(error_code=1, message=_('error_analyzing_cv'), data=None)
 
         return APIResponse(
@@ -139,17 +128,11 @@ class CVRepository:
             },
         )
 
-    async def _download_file(self, url: str) -> str | None:
+    async def _download_file(self, url: str) -> Optional[str]:
         temp_dir = tempfile.gettempdir()
-        file_extension = 'pdf'  # Adjust if logic for extension parsing is added later
-
-        if file_extension not in ['pdf', 'docx', 'txt']:
-            self.logger.error(f'Invalid file type: {file_extension} for URL: {url}')
-            return None
-
-        file_name = f'cv_{uuid.uuid4()}.{file_extension}'
+        file_extension = 'pdf'
+        file_name = f"cv_{uuid.uuid4()}.{file_extension}"
         file_path = os.path.join(temp_dir, file_name)
-        self.logger.info(f'Attempting to download file from {url} to {file_path}')
 
         try:
             async with aiohttp.ClientSession() as session:
@@ -157,11 +140,11 @@ class CVRepository:
                     if response.status == 200:
                         async with aiofiles.open(file_path, 'wb') as f:
                             await f.write(await response.read())
-                        self.logger.info(f'File downloaded and saved to {file_path}')
+                        self.logger.info(f"Downloaded CV to {file_path}")
                         return file_path
                     else:
-                        self.logger.error(f'Failed to download file. Status: {response.status}')
+                        self.logger.error(f"Failed to download: HTTP {response.status}")
                         return None
         except Exception as e:
-            self.logger.error(f'Error downloading file from {url}: {e}')
+            self.logger.error(f"Download error: {e}")
             return None
