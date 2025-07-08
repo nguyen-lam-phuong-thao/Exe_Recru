@@ -1,4 +1,4 @@
-"""Init module
+"""Init module ok
 Load routes in all modules
 """
 
