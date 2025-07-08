@@ -56,7 +56,15 @@ class CVBase(BaseModel):
     experience: List[ExperienceEntry]
     skills: List[str]
     projects: Optional[List[ProjectEntry]] = None
-    certifications: Optional[List[CertificationEntry]] = None
+    certifications: Optional[List[CertificationEntry]] = None   
+    
+    @field_validator('email', mode='before')
+    def empty_string_to_none(cls, v):
+        return v or None
+
+    @field_validator('phone', 'summary', mode='before')
+    def clean_empty_str_fields(cls, v):
+        return v or None  
 
     class Config:
         orm_mode = True
