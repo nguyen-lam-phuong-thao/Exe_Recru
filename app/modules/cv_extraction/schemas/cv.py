@@ -62,9 +62,9 @@ class CVBase(BaseModel):
     def empty_string_to_none(cls, v):
         return v or None
 
-    @field_validator('phone', 'summary', mode='before')
-    def clean_empty_str_fields(cls, v):
-        return v or None  
+    # @field_validator('phone', 'summary', mode='before')
+    # def clean_empty_str_fields(cls, v):
+    #     return v or None  
 
     class Config:
         orm_mode = True
