@@ -97,7 +97,7 @@ class JobMatchingAgent:
                 logger.info(f"Prompt length: {len(prompt)}")
                 
                 # Đếm tokens
-                input_tokens = count_tokens(prompt, 'gemini-1.5-flash')
+                input_tokens = count_tokens(prompt, 'gemini-2.0-flash')
                 self.token_tracker.add_input_tokens(input_tokens)
                 
                 # Gọi LLM API
@@ -105,7 +105,7 @@ class JobMatchingAgent:
                 response = await self.llm.ainvoke(prompt)
                 
                 # Đếm output tokens
-                output_tokens = count_tokens(response.content, 'gemini-1.5-flash')
+                output_tokens = count_tokens(response.content, 'gemini-2.0-flash')
                 self.token_tracker.add_output_tokens(output_tokens)
                 
                 # In chi tiết kết quả từ LLM ra terminal
