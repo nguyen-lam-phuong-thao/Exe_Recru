@@ -4,6 +4,7 @@ from app.core.config import FERNET_KEY
 from app.middleware.translation_manager import _
 from app.modules.cv_extraction.schemas.cv import ProcessCVRequest
 from app.modules.cv_extraction.repositories.cv_repo import CVRepository
+from charset_normalizer import from_bytes  
 
 route = APIRouter(prefix='/cv', tags=['CV'])
 
@@ -27,7 +28,19 @@ async def process_cv(
     if checksum != FERNET_KEY:
         return APIResponse(error_code=1, message=_('checksum_invalid'), data=None)
 
-    jd_text = (await jd_file.read()).decode('utf-8')
+    # Read JD text if provided
+    jd_bytes = await jd_file.read()
+
+    # Detect encoding and convert to UTF-8
+    detection = from_bytes(jd_bytes).best()
+    if not detection:
+        return APIResponse(
+            error_code=1,
+            message=_("Không thể xác định mã hóa văn bản của file JD."),
+            data=None,
+        )
+
+    jd_text = detection.output()
     return await cv_repo.process_uploaded_cv(cv_file, jd_text)
 
 
@@ -45,7 +58,19 @@ async def process_cv_url(
     if checksum != FERNET_KEY:
         return APIResponse(error_code=1, message=_('checksum_invalid'), data=None)
 
-    jd_text = (await jd_file.read()).decode('utf-8')
+    # Read JD text if provided
+    jd_bytes = await jd_file.read()
+
+    # Detect encoding and convert to UTF-8
+    detection = from_bytes(jd_bytes).best()
+    if not detection:
+        return APIResponse(
+            error_code=1,
+            message=_("Không thể xác định mã hóa văn bản của file JD."),
+            data=None,
+        )
+
+    jd_text = detection.output()
 
     request = ProcessCVRequest(
         cv_file_url=cv_file_url,
