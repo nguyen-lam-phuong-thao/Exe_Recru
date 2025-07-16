@@ -38,7 +38,7 @@ def create_app():
     """Create main FastAPI app"""
     app = FastAPI(
         title=_("api_title"),
-        version="2.0.0",
+        version="3.0.0",
         description=_("api_description"),
     )
 

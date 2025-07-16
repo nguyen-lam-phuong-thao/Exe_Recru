@@ -3,6 +3,7 @@
 import os
 from typing import Optional
 from pydantic import BaseModel
+from app.core.config import GOOGLE_API_KEY
 
 class JobMatchingWorkflowConfig(BaseModel):
     """Cấu hình cho Job Matching Workflow"""
@@ -18,7 +19,7 @@ class JobMatchingWorkflowConfig(BaseModel):
     max_missing_skills: int = 10
     
     # API Configuration
-    google_api_key: Optional[str] = None
+    google_api_key: str = GOOGLE_API_KEY
     
     @classmethod
     def from_env(cls):
@@ -30,5 +31,5 @@ class JobMatchingWorkflowConfig(BaseModel):
             max_suggested_courses=int(os.getenv("JOB_MATCHING_MAX_COURSES", "5")),
             max_suggested_jobs=int(os.getenv("JOB_MATCHING_MAX_JOBS", "3")),
             max_missing_skills=int(os.getenv("JOB_MATCHING_MAX_SKILLS", "10")),
-            google_api_key=os.getenv("GOOGLE_API_KEY")
+            google_api_key=GOOGLE_API_KEY,
         )

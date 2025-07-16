@@ -49,6 +49,7 @@ class QuestionGenerationWorkflow:
 			model=self.config.model_name,
 			temperature=self.config.temperature,
 			max_tokens=self.config.max_tokens,
+			api_key=self.config.google_api_key,
 		)
 
 		# Setup parsers

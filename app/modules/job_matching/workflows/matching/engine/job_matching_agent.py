@@ -29,7 +29,7 @@ class JobMatchingAgent:
         self.token_tracker = TokenTracker()
         
         # Khởi tạo LLM giống như cv_extraction
-        self.llm = initialize_llm(GOOGLE_API_KEY)
+        self.llm = initialize_llm(self.config.google_api_key)
         
         # Circuit breaker state
         self.circuit_breaker_failures = 0

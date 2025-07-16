@@ -4,6 +4,7 @@ Workflow configuration for question generation.
 
 from typing import Dict, Any
 from pydantic import BaseModel
+from app.core.config import GOOGLE_API_KEY
 
 
 class QuestionGenerationWorkflowConfig(BaseModel):
@@ -22,6 +23,8 @@ class QuestionGenerationWorkflowConfig(BaseModel):
 	# Node settings
 	generation_retries: int = 3
 	analysis_retries: int = 2
+
+	google_api_key: str = GOOGLE_API_KEY
 
 	class Config:
 		env_prefix = 'QUESTION_WORKFLOW_'
