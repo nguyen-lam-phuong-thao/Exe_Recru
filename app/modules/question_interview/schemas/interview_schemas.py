@@ -73,12 +73,12 @@ class AnalysisDecision(BaseModel):
 	reasoning: str = Field(..., description='Reasoning for the decision')
 	completeness_score: float = Field(..., description='User profile completeness score (0-1)')
 	suggested_focus: List[str] = Field(default_factory=list, description='Suggested areas to focus on next')
-	cv_summary: Optional[str] = None
+	cv_summary: Optional[str] = None  # ✅ New field
 
 class SubmitInterviewAnswerRequest(BaseModel):
-    """Schema for submitting answer to current question (stateless, minimal payload)"""
+    """Schema for submitting answer to current question"""
+
     session_id: str = Field(..., description="Current interview session ID")
-    question_id: str = Field(..., description="ID of the question being answered")
     answer_text: str = Field(..., description="User's answer to the last question")
-    # Optionally, allow previous_questions for more context if needed
-    previous_questions: Optional[list] = Field(None, description="List of previous questions and answers for context")
+
+
