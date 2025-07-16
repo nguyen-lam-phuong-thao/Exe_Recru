@@ -11,7 +11,7 @@ SESSIONS_DIR.mkdir(exist_ok=True)
 def save_session_state(session_id: str, state: dict):
     session_file = SESSIONS_DIR / f"{session_id}.json"
 
-    # Convert Pydantic objects (e.g., Question) to dicts
+
     def convert(obj):
         if hasattr(obj, "model_dump"):
             return obj.model_dump()

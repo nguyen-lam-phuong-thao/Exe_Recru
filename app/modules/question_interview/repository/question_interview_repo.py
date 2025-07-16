@@ -238,7 +238,6 @@ class InterviewComposerRepo:
 
 			print('Request validation passed')
 
-			# Prepare user profile
 			print('Preparing user profile for analysis')
 			print(f'User profile data keys: {list(request.user_profile.keys())}')
 			user_profile = UserProfile(**request.user_profile)
