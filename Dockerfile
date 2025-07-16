@@ -32,8 +32,6 @@ RUN addgroup --system appuser && \
 RUN mkdir -p /data/audio && \
     chmod -R 777 /data/audio
     
-RUN mkdir -p /sessions && \
-    chmod -R 777 /sessions
 RUN python -m venv venv
 
 # Copy file yêu cầu và cài đặt dependencies
