@@ -44,7 +44,6 @@ async def _call_cv_extraction_api(cv_file: UploadFile, jd_text: str) -> dict:
         cv_content = await cv_file.read()
         
         async with aiohttp.ClientSession() as session:
-            # Tạo form data
             data = aiohttp.FormData()
             data.add_field('file', cv_content, filename=cv_file.filename, content_type=cv_file.content_type)
             data.add_field('jd_file', jd_text.encode('utf-8'), filename='jd.txt', content_type='text/plain')
