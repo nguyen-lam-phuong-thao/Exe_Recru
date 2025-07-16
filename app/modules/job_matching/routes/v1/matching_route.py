@@ -41,10 +41,8 @@ async def _call_cv_extraction_api(cv_file: UploadFile, jd_text: str) -> dict:
         Dict chứa kết quả từ cv_extraction
     """
     try:
-        # Đọc lại file content
         cv_content = await cv_file.read()
         
-        # Gọi API cv_extraction
         async with aiohttp.ClientSession() as session:
             # Tạo form data
             data = aiohttp.FormData()
