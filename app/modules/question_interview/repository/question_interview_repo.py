@@ -15,6 +15,7 @@ from ..workflows.question_generation.config.workflow_config import QuestionGener
 from ..schemas.interview_request import UploadCVInterviewStartRequest, AnalyzeUserProfileRequest
 from ..schemas.interview_response import QuestionGenerationResponse, UserProfileAnalysisResponse
 from ..schemas.interview_schemas import UserProfile, Question, SubmitInterviewAnswerRequest
+from app.modules.question_interview.memory.session_store import load_session_state, save_session_state, delete_session_state
 
 
 logger = logging.getLogger(__name__)
@@ -80,6 +81,7 @@ class InterviewComposerRepo:
 
 		# Run the workflow. `ainvoke` with a checkpointer handles state automatically.
 		result = await self.compiled_workflow.ainvoke(workflow_input, config=config)
+		save_session_state(session_id, result)
 
 		# Build response from the final state of the workflow
 		return QuestionGenerationResponse(
@@ -118,6 +120,7 @@ class InterviewComposerRepo:
 		}
 
 		result = await self.compiled_workflow.ainvoke(initial_state, config=config)
+		save_session_state(session_id, result)
 
 		return QuestionGenerationResponse(
 			session_id=session_id,
@@ -134,7 +137,9 @@ class InterviewComposerRepo:
 		config = {"configurable": {"thread_id": request.session_id}}
 		state = await self.memory.aget(config)
 		if not state:
-			raise NotFoundException(_("session_not_found"))
+			state = load_session_state(request.session_id)
+			if not state:
+				raise NotFoundException(_("session_not_found"))
 
 		# Attach the answer to the last unanswered question
 		unanswered_idx = None
@@ -160,6 +165,7 @@ class InterviewComposerRepo:
 		state['generated_questions'] = []
 
 		final_state = await self.compiled_workflow.ainvoke(state, config=config)
+		save_session_state(request.session_id, final_state)
 
 		# If done, return final feedback
 		# Determine if all questions have been answered
@@ -181,6 +187,7 @@ class InterviewComposerRepo:
 					for q in final_state.get("all_previous_questions", [])
 				]
 			}
+			delete_session_state(request.session_id)
 			return {
 				"feedback": final_feedback,
 				"next_question": None,

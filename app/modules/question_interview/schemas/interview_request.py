@@ -32,8 +32,5 @@ class SearchQuestionSessionsRequest(FilterableRequestSchema):
 
 class SubmitInterviewAnswerRequest(RequestSchema):
     """Request to submit an answer for evaluation."""
-    session_id: str = Field(..., description="Current interview session ID")
-    question_id: str = Field(..., description="ID of the question being answered")
-    answer_text: str = Field(..., description="User's answer to the last question")
-    # Optionally, allow previous_questions for more context if needed
-    previous_questions: Optional[list] = Field(None, description="List of previous questions and answers for context")
+    session_id: str = Field(..., description="The ID of the current interview session.")
+    answer_text: str = Field(..., description="The user's answer to the question.")

@@ -1,0 +1,34 @@
+{
+  "cv_text": "Huynh Nam Khoa\n+84 931822863 | khoahnse183001@fpt.edu.vn | github.com/Khoahn0101\nEducation\nFPT University\nBACHELOR PROGRAM OF INFORMATION TECHNOLOGY, \nARTIFICIAL INTELLIGENCE \n 2023 – Current\nProjects\nRain removal | Python, LSTM, Resnet.\n• Implemented a rain removal project using Python, LSTM, and ResNet to enhance image clarity in adverse weather.\n• Focused on removing rain from images to improve traffic light detection accuracy in adverse weather.\n• Leveraged LSTM's temporal modeling capabilities to capture rain patterns and ResNet's feature extraction power for \naccurate rain detection and removal.\n• Successfully restored details and visual fidelity to rain-affected images, contributing to improved object detection.\nOld photos restoration| Python, Densepose, Humanpose, Openpose, LSTM, CNN.\n• Developed a novel image restoration method that removes humans from images while preserving background context. \n• Employed DensePose, OpenPose, and HumanPose for precise human segmentation and pose estimation.\n• Achieved a better improvement in image restoration quality.\nSkills\nLanguages: Python, SQL , JavaScript, HTML/CSS, R.\nFrameworks: React, Node.js, TensorFlow.\nDeveloper Tools: Git, VS Code, Google Colab, PyCharm.\nLibraries: pandas, NumPy, Scikit-learn.\nData Visualization: Power BI.\nOther Skills: English (Intermediate), Microsoft Office(Excel, Word, PowerPoint).\n• Average GPA: 3.42\n• Anticipated graduation date: 12/2025\nObjective\nAs a dedicated second-year student with a strong passion for AI, machine learning, and robotics, I am seeking an internship \nopportunity where I can apply my technical skills and contribute to innovative AI projects. With an intermediate proficiency in \nEnglish, I am enthusiastic about collaborating with diverse teams to further develop my ability to communicate technical concepts \neffectively. I am committed to pursuing a career in AI engineering and am dedicated to continuous learning and professional \ngrowth.\nCertifications\nData Science Fundamentals with Python and SQL\nIBM Introduction to Machine Learning\nData Science with R\nBig Data\nDeep Learning Specialization\nIBM Full Stack Software Developer\n",
+  "job_description": "IT",
+  "generated_questions": [],
+  "all_previous_questions": [],
+  "current_iteration": 0,
+  "max_iterations": 5,
+  "analysis_decision": {
+    "decision": "need_more_info",
+    "missing_areas": [
+      "general_info"
+    ],
+    "reasoning": "Analysis failed: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-2.0-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 15\n}\n, links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, retry_delay {\n  seconds: 14\n}\n]",
+    "completeness_score": 0.0,
+    "suggested_focus": [
+      "skills",
+      "goals"
+    ],
+    "cv_summary": null
+  },
+  "completeness_score": 0.75,
+  "missing_areas": [],
+  "focus_areas": [
+    "Kinh nghiệm làm việc (nếu có)",
+    "Mức độ thành thạo các kỹ năng",
+    "Yêu cầu kỹ năng chi tiết của vị trí IT"
+  ],
+  "should_continue": false,
+  "workflow_complete": true,
+  "error_message": "429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-2.0-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 15\n}\n, links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, retry_delay {\n  seconds: 14\n}\n]",
+  "generation_history": [],
+  "total_questions_generated": 0,
+  "session_id": "881e2c75-2621-4f7e-a7c8-e26962a44a34"
+}

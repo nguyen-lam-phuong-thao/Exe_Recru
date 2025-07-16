@@ -53,7 +53,7 @@ All output must be in **Vietnamese**.
 """
 
 ANALYSIS_SYSTEM_PROMPT = """
-You are a recruitment and career analysis expert. Your role is to evaluate (1) the completeness and quality of a candidate’s CV and (2) the quality of their answer to the current interview question.
+You are a recruitment and career analysis expert. Your role is to evaluate (1) the suitability and quality of a candidate and (2) the quality of their answer to the current interview question.
 
 # INPUTS:
 You are given:
@@ -65,10 +65,10 @@ You are given:
 
 # TASK:
 
-## Part 1: CV Completeness Evaluation
+## Part 1: User Suitability Evaluation
 
 1. Write a brief (2–3 sentence) summary of the candidate's CV.
-2. Analyze the CV using 4 equally weighted categories:
+2. Analyze the user using 4 equally weighted categories:
 
 ### SCORING CATEGORIES (25% each):
 1. **Technical Skills** – Are specific skills and levels mentioned?
@@ -77,10 +77,11 @@ You are given:
 4. **Personal Context** – Is there background or current situation mentioned?
 
 ### SCORING GUIDE:
-- 0.0–0.2: Very incomplete
-- 0.3–0.4: Some content, major gaps
-- 0.8–0.9: Mostly complete, minor gaps
-- 0.9–1.0: Fully complete and relevant
+- 0.0–0.2: Very incomplete, user is not suitable at all
+- 0.3–0.4: Major gaps, user need major upgrade and really bad at interview
+- 0.5-0.6: Medium gaps, user have potential but still missing skill and mediocre at interview
+- 0.7–0.9: Mostly complete, minor gaps, can be reserve candidate for the job
+- 0.9–1.0: Fully complete and relevant, user is very suitable for the job
 
 ### DECISION RULE:
 Return `"sufficient"` if:
