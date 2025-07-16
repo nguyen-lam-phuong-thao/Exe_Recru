@@ -1,0 +1,261 @@
+{
+  "cv_text": "Nguyễn Đinh Minh Hưng\nBACKEND DEVELOPER INTERNSHIP\nKỹ sư phần mềm với hơn  năm kinh nghiệm trong lĩnh vực phát triển phần\nmềm và ứng dụng thương mại. Có kỹ năng trong ASP.NET MVC và web\nclient.Trong các vai trò đảm nhận trước đây, 80% thời gian tôi hoàn thành dự\nán đúng thời hạn. Đồng thời xây dựng quy trình quan trọng giúp tăng hiệu quả\nvà tối ưu thời gian trong dự án.\nTHÔNG TIN CÁ NHÂN\n✉\nhungndmse184183@fpt.edu.vn\n📞\n0944101461\n🌐\nhttps://www.facebook.com/pro\nfile.php?id=100018944469323\n\n9 Đương 18B Thành phố Thủ\nĐức\nHỌC VẤN\nTRƯỜNG THPT NGUYỄN HỮU HUÂN\n2019-2022\n-\nĐẠI HỌC FPT THÀNH PHỐ HỒ CHÍ\nMINH\nKỸ THUẬT PHẦN MỀM\n2022 - Hiện tại(07/2024)\nCÁC KỸ NĂNG\nKỸ NĂNG CHUYÊN MÔN\n• Có kiến thức vững  về OOP, am\nhiểu về cấu trúc dữ liệu.\n• Có kỹ năng lập trình NET, lập trình\nC++, Java..\n• Quản lý hệ thống cơ sở dữ liệu\nSQL.\n• Có kinh nghiệm về HTML5, CSS3\nKỸ NĂNG MỀM\n• Kỹ năng thuyết trình\n•  Kỹ năng giải quyết vấn đề\n• Kỹ năng tự tìm tòi, tự học\n• Kỹ năng giao tiếp\n• Kỹ năng làm việc nhóm\nDỰ ÁN\n05/2024 - 07/2024\nJewelry Production System\nKhách hàng FPT University\nSố lượng người tham gia 5\nVỊ TRÍ BACKEND DEVELOPER\n• Thiết kế và phát triển các dịch vụ Web API để hỗ trợ các\nchức năng của ứng dụng.\n• Theo dõi và xử lý các lỗi phát sinh trong quá trình phát\ntriển và triển khai.\n• Tích hợp API với các dịch vụ bên ngoài như dịch vụ\nthanh toán, dịch vụ gửi email...\n• Viết tài liệu cho các API, bao gồm các điểm cuối,\nphương thức, tham số, và các mã lỗi có thể xảy ra.\n• Xác thực và phân quyền người dùng để kiểm soát truy\ncập vào các dịch vụ và tài nguyên khác nhau.\n• Kiểm tra trang web trước khi đưa ra thị trường.\nCÔNG NGHỆ SỬ DỤNG\nC#, React, Swagger, VnPay SandBox, Azure Host\nGithub: https://github.com/SWP391-\nGROUP2/jewerlyproduction\n05/2024 - 07/2024\nMusicPlayerWPF\nVỊ TRÍ BACKEND DEVELOPER\nTạo và quản lý các mô hình dữliệu, bao gồm các thực thể\n\nMusicPlayerWPF\nKhách hàng FPT University\nSố lượng người tham gia 6\nTạo và quản lý các mô hình dữ liệu, bao gồm các thực thể\nvà mối quan hệ giữa chúng.\nThiết kế và phát triển ứng dụng theo mô hình 3 layer\nCÔNG NGHỆ SỬ DỤNG\nC#, MySQL\nGitHub: https://github.com/vandatnguyen919/MusicPlayerWPF\nCHỨNG CHỈ\nSoftware Development Lifecycle (April 7, 2024)\nUniversity of Minnesota\nWeb Design for Everybody: Basics of Web Development\n& Coding (November 30, 2023)\nUniversity of Michigan\nJava Enterprise Edition (March 1, 2024)\nLearnQuest\nDANH HIỆU VÀ GIẢI THƯỞNG\nSinh viên xuất sắc trong kì Spring 2023 tại FPT University\nGPA: 8:34\nSỞ THÍCH\nĐọc sách\nBơi lội\nNGƯỜI GIỚI THIỆU\nĐại học FPT Thành phố Hồ Chí\nEmail : daihocfpt@fpt.edu.vn\nĐiện thoại: 028 7300 1866\n",
+  "job_description": "Web Developer",
+  "generated_questions": [],
+  "all_previous_questions": [
+    {
+      "id": "q1",
+      "Question": "Bạn có thể chia sẻ một tình huống cụ thể trong quá trình làm dự án mà bạn gặp khó khăn trong việc quản lý thời gian hoặc hoàn thành công việc đúng thời hạn không? Bạn đã giải quyết vấn đề đó như thế nào và bạn học được điều gì từ kinh nghiệm đó?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "time_management",
+          "label": "Chia sẻ kinh nghiệm",
+          "type": "text",
+          "placeholder": "Ví dụ: Trong dự án X, tôi đã gặp khó khăn khi...",
+          "required": true
+        }
+      ],
+      "answer": "Khong biet"
+    },
+    {
+      "id": "q1",
+      "Question": "Bạn có thể chia sẻ một dự án cụ thể mà bạn cảm thấy chưa thực sự thành công như mong đợi, và điều gì bạn nghĩ là nguyên nhân chính dẫn đến kết quả đó? Bạn đã rút ra được bài học gì từ kinh nghiệm này để áp dụng cho các dự án sau này?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "project_failure",
+          "label": "Mô tả dự án không thành công và bài học rút ra",
+          "type": "text",
+          "placeholder": "Ví dụ: Dự án X, do thiếu kinh nghiệm trong việc...",
+          "required": true
+        }
+      ],
+      "answer": "Khong biet"
+    },
+    {
+      "id": "q1",
+      "Question": "Trong quá trình phát triển dự án Jewelry Production System hoặc MusicPlayerWPF, bạn đã đối mặt với những hạn chế hoặc thách thức kỹ thuật nào liên quan đến việc tích hợp các API hoặc cơ sở dữ liệu (ví dụ: VnPay SandBox, MySQL)? Bạn đã vượt qua những thách thức đó như thế nào và có những bài học kinh nghiệm nào bạn có thể chia sẻ?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "technical_challenges",
+          "label": "Mô tả chi tiết các thách thức và cách giải quyết",
+          "type": "text",
+          "placeholder": "Ví dụ: Vấn đề về hiệu suất khi truy vấn dữ liệu lớn từ MySQL...",
+          "required": true
+        }
+      ],
+      "answer": "Khong biet"
+    },
+    {
+      "id": "q1",
+      "Question": "Bạn đã đề cập đến việc có kinh nghiệm với ASP.NET MVC. Bạn có thể chia sẻ một tình huống cụ thể mà bạn đã sử dụng ASP.NET MVC để giải quyết một vấn đề phức tạp trong dự án, và những khó khăn bạn gặp phải cũng như cách bạn vượt qua chúng là gì?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "aspnet_mvc_challenge",
+          "label": "Tình huống sử dụng ASP.NET MVC và cách giải quyết khó khăn",
+          "type": "text",
+          "placeholder": "Ví dụ: Xây dựng hệ thống xác thực người dùng phức tạp, gặp vấn đề về hiệu năng...",
+          "required": true
+        }
+      ],
+      "answer": "Khong biet"
+    },
+    {
+      "id": "q1",
+      "Question": "Trong quá trình làm việc nhóm ở các dự án trước đây, bạn đã từng gặp phải tình huống bất đồng quan điểm với các thành viên khác chưa? Bạn đã xử lý tình huống đó như thế nào để đạt được sự đồng thuận và đảm bảo tiến độ dự án?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "teamwork_conflict",
+          "label": "Tình huống bất đồng quan điểm",
+          "type": "text",
+          "placeholder": "Ví dụ: Bất đồng về lựa chọn công nghệ, phương pháp tiếp cận...",
+          "required": true
+        }
+      ],
+      "answer": "Khong biet"
+    }
+  ],
+  "current_iteration": 10,
+  "max_iterations": 5,
+  "analysis_decision": {
+    "decision": "need_more_info",
+    "missing_areas": [
+      "Personal Characteristics",
+      "Career Goals",
+      "Personal Context"
+    ],
+    "reasoning": "Mặc dù CV cung cấp thông tin về kỹ năng kỹ thuật và kinh nghiệm dự án, nhưng lại thiếu thông tin về tính cách cá nhân, mục tiêu nghề nghiệp và bối cảnh cá nhân. Các câu trả lời \"Khong biet\" cho các câu hỏi trước đó cũng cho thấy sự thiếu chuẩn bị và khả năng tự đánh giá của ứng viên.",
+    "completeness_score": 0.7,
+    "suggested_focus": [
+      "Hỏi về phong cách làm việc nhóm và khả năng thích ứng với môi trường làm việc khác nhau.",
+      "Yêu cầu ứng viên mô tả chi tiết hơn về kinh nghiệm làm việc với ASP.NET MVC và cách giải quyết các vấn đề kỹ thuật phức tạp.",
+      "Tìm hiểu về mục tiêu nghề nghiệp dài hạn của ứng viên và cách vị trí thực tập sinh này phù hợp với mục tiêu đó."
+    ],
+    "cv_summary": "CV của Nguyễn Đinh Minh Hưng cho vị trí Backend Developer Internship. CV nêu bật kinh nghiệm phát triển phần mềm, kỹ năng lập trình (.NET, C++, Java), quản lý cơ sở dữ liệu SQL, và kinh nghiệm với HTML5, CSS3. CV cũng liệt kê các dự án đã tham gia, chứng chỉ và giải thưởng, cũng như các kỹ năng mềm và sở thích cá nhân."
+  },
+  "completeness_score": 0.7,
+  "missing_areas": [
+    "Personal Characteristics",
+    "Career Goals",
+    "Personal Context"
+  ],
+  "focus_areas": [
+    "Hỏi về phong cách làm việc nhóm và khả năng thích ứng với môi trường làm việc khác nhau.",
+    "Yêu cầu ứng viên mô tả chi tiết hơn về kinh nghiệm làm việc với ASP.NET MVC và cách giải quyết các vấn đề kỹ thuật phức tạp.",
+    "Tìm hiểu về mục tiêu nghề nghiệp dài hạn của ứng viên và cách vị trí thực tập sinh này phù hợp với mục tiêu đó."
+  ],
+  "should_continue": false,
+  "workflow_complete": true,
+  "error_message": null,
+  "generation_history": [
+    {
+      "iteration": 0,
+      "focus_areas": [
+        "Tính cách cá nhân và phong cách làm việc",
+        "Mục tiêu nghề nghiệp cụ thể",
+        "Bối cảnh cá nhân và lý do ứng tuyển"
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Bạn có thể chia sẻ một tình huống cụ thể trong quá trình làm dự án mà bạn gặp khó khăn trong việc quản lý thời gian hoặc hoàn thành công việc đúng thời hạn không? Bạn đã giải quyết vấn đề đó như thế nào và bạn học được điều gì từ kinh nghiệm đó?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "time_management",
+              "label": "Chia sẻ kinh nghiệm",
+              "type": "text",
+              "placeholder": "Ví dụ: Trong dự án X, tôi đã gặp khó khăn khi...",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.75
+    },
+    {
+      "iteration": 1,
+      "focus_areas": [
+        "Mô tả chi tiết hơn về phong cách làm việc, tính cách và điểm mạnh của bạn.",
+        "Nêu rõ định hướng nghề nghiệp và mục tiêu bạn muốn đạt được trong tương lai.",
+        "Chia sẻ thêm về bối cảnh cá nhân hoặc những yếu tố ảnh hưởng đến sự lựa chọn nghề nghiệp của bạn."
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Bạn có thể chia sẻ một dự án cụ thể mà bạn cảm thấy chưa thực sự thành công như mong đợi, và điều gì bạn nghĩ là nguyên nhân chính dẫn đến kết quả đó? Bạn đã rút ra được bài học gì từ kinh nghiệm này để áp dụng cho các dự án sau này?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "project_failure",
+              "label": "Mô tả dự án không thành công và bài học rút ra",
+              "type": "text",
+              "placeholder": "Ví dụ: Dự án X, do thiếu kinh nghiệm trong việc...",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.75
+    },
+    {
+      "iteration": 2,
+      "focus_areas": [
+        "Mục tiêu nghề nghiệp dài hạn và ngắn hạn",
+        "Mong muốn phát triển trong lĩnh vực web như thế nào",
+        "Động lực ứng tuyển vào vị trí Web Developer",
+        "Kinh nghiệm làm việc nhóm và khả năng thích nghi với môi trường làm việc mới."
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Trong quá trình phát triển dự án Jewelry Production System hoặc MusicPlayerWPF, bạn đã đối mặt với những hạn chế hoặc thách thức kỹ thuật nào liên quan đến việc tích hợp các API hoặc cơ sở dữ liệu (ví dụ: VnPay SandBox, MySQL)? Bạn đã vượt qua những thách thức đó như thế nào và có những bài học kinh nghiệm nào bạn có thể chia sẻ?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "technical_challenges",
+              "label": "Mô tả chi tiết các thách thức và cách giải quyết",
+              "type": "text",
+              "placeholder": "Ví dụ: Vấn đề về hiệu suất khi truy vấn dữ liệu lớn từ MySQL...",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.75
+    },
+    {
+      "iteration": 3,
+      "focus_areas": [
+        "Tính cách cá nhân và phong cách làm việc",
+        "Mục tiêu nghề nghiệp ngắn hạn và dài hạn",
+        "Bối cảnh cá nhân và động lực làm việc"
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Bạn đã đề cập đến việc có kinh nghiệm với ASP.NET MVC. Bạn có thể chia sẻ một tình huống cụ thể mà bạn đã sử dụng ASP.NET MVC để giải quyết một vấn đề phức tạp trong dự án, và những khó khăn bạn gặp phải cũng như cách bạn vượt qua chúng là gì?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "aspnet_mvc_challenge",
+              "label": "Tình huống sử dụng ASP.NET MVC và cách giải quyết khó khăn",
+              "type": "text",
+              "placeholder": "Ví dụ: Xây dựng hệ thống xác thực người dùng phức tạp, gặp vấn đề về hiệu năng...",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.75
+    },
+    {
+      "iteration": 4,
+      "focus_areas": [
+        "Tính cách và phong cách làm việc",
+        "Mục tiêu nghề nghiệp ngắn hạn và dài hạn",
+        "Động lực ứng tuyển vào vị trí Web Developer",
+        "Khả năng làm việc độc lập và làm việc nhóm"
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Trong quá trình làm việc nhóm ở các dự án trước đây, bạn đã từng gặp phải tình huống bất đồng quan điểm với các thành viên khác chưa? Bạn đã xử lý tình huống đó như thế nào để đạt được sự đồng thuận và đảm bảo tiến độ dự án?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "teamwork_conflict",
+              "label": "Tình huống bất đồng quan điểm",
+              "type": "text",
+              "placeholder": "Ví dụ: Bất đồng về lựa chọn công nghệ, phương pháp tiếp cận...",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.75
+    }
+  ],
+  "total_questions_generated": 5,
+  "session_id": "ee1f3424-bce6-4665-b619-d9a40053a6de",
+  "last_question_id": "q1"
+}

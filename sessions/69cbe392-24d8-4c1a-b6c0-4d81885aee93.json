@@ -1,0 +1,219 @@
+{
+  "cv_text": "Nguyễn Đinh Minh Hưng\nBACKEND DEVELOPER INTERNSHIP\nKỹ sư phần mềm với hơn  năm kinh nghiệm trong lĩnh vực phát triển phần\nmềm và ứng dụng thương mại. Có kỹ năng trong ASP.NET MVC và web\nclient.Trong các vai trò đảm nhận trước đây, 80% thời gian tôi hoàn thành dự\nán đúng thời hạn. Đồng thời xây dựng quy trình quan trọng giúp tăng hiệu quả\nvà tối ưu thời gian trong dự án.\nTHÔNG TIN CÁ NHÂN\n✉\nhungndmse184183@fpt.edu.vn\n📞\n0944101461\n🌐\nhttps://www.facebook.com/pro\nfile.php?id=100018944469323\n\n9 Đương 18B Thành phố Thủ\nĐức\nHỌC VẤN\nTRƯỜNG THPT NGUYỄN HỮU HUÂN\n2019-2022\n-\nĐẠI HỌC FPT THÀNH PHỐ HỒ CHÍ\nMINH\nKỸ THUẬT PHẦN MỀM\n2022 - Hiện tại(07/2024)\nCÁC KỸ NĂNG\nKỸ NĂNG CHUYÊN MÔN\n• Có kiến thức vững  về OOP, am\nhiểu về cấu trúc dữ liệu.\n• Có kỹ năng lập trình NET, lập trình\nC++, Java..\n• Quản lý hệ thống cơ sở dữ liệu\nSQL.\n• Có kinh nghiệm về HTML5, CSS3\nKỸ NĂNG MỀM\n• Kỹ năng thuyết trình\n•  Kỹ năng giải quyết vấn đề\n• Kỹ năng tự tìm tòi, tự học\n• Kỹ năng giao tiếp\n• Kỹ năng làm việc nhóm\nDỰ ÁN\n05/2024 - 07/2024\nJewelry Production System\nKhách hàng FPT University\nSố lượng người tham gia 5\nVỊ TRÍ BACKEND DEVELOPER\n• Thiết kế và phát triển các dịch vụ Web API để hỗ trợ các\nchức năng của ứng dụng.\n• Theo dõi và xử lý các lỗi phát sinh trong quá trình phát\ntriển và triển khai.\n• Tích hợp API với các dịch vụ bên ngoài như dịch vụ\nthanh toán, dịch vụ gửi email...\n• Viết tài liệu cho các API, bao gồm các điểm cuối,\nphương thức, tham số, và các mã lỗi có thể xảy ra.\n• Xác thực và phân quyền người dùng để kiểm soát truy\ncập vào các dịch vụ và tài nguyên khác nhau.\n• Kiểm tra trang web trước khi đưa ra thị trường.\nCÔNG NGHỆ SỬ DỤNG\nC#, React, Swagger, VnPay SandBox, Azure Host\nGithub: https://github.com/SWP391-\nGROUP2/jewerlyproduction\n05/2024 - 07/2024\nMusicPlayerWPF\nVỊ TRÍ BACKEND DEVELOPER\nTạo và quản lý các mô hình dữliệu, bao gồm các thực thể\n\nMusicPlayerWPF\nKhách hàng FPT University\nSố lượng người tham gia 6\nTạo và quản lý các mô hình dữ liệu, bao gồm các thực thể\nvà mối quan hệ giữa chúng.\nThiết kế và phát triển ứng dụng theo mô hình 3 layer\nCÔNG NGHỆ SỬ DỤNG\nC#, MySQL\nGitHub: https://github.com/vandatnguyen919/MusicPlayerWPF\nCHỨNG CHỈ\nSoftware Development Lifecycle (April 7, 2024)\nUniversity of Minnesota\nWeb Design for Everybody: Basics of Web Development\n& Coding (November 30, 2023)\nUniversity of Michigan\nJava Enterprise Edition (March 1, 2024)\nLearnQuest\nDANH HIỆU VÀ GIẢI THƯỞNG\nSinh viên xuất sắc trong kì Spring 2023 tại FPT University\nGPA: 8:34\nSỞ THÍCH\nĐọc sách\nBơi lội\nNGƯỜI GIỚI THIỆU\nĐại học FPT Thành phố Hồ Chí\nEmail : daihocfpt@fpt.edu.vn\nĐiện thoại: 028 7300 1866\n",
+  "job_description": "Web Developer",
+  "generated_questions": [],
+  "all_previous_questions": [
+    {
+      "id": "q1",
+      "Question": "Bạn có thể chia sẻ một tình huống cụ thể trong dự án Jewelry Production System, khi bạn gặp khó khăn trong việc tích hợp API với các dịch vụ bên ngoài (ví dụ: dịch vụ thanh toán), và bạn đã giải quyết vấn đề đó như thế nào?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "api_integration_challenge",
+          "label": "Tình huống khó khăn khi tích hợp API",
+          "type": "text",
+          "placeholder": "Mô tả chi tiết vấn đề, cách bạn tiếp cận, và kết quả đạt được.",
+          "required": true
+        }
+      ],
+      "answer": "Khong biet"
+    },
+    {
+      "id": "q1",
+      "Question": "Trong CV của bạn có đề cập đến kinh nghiệm làm việc với cả ASP.NET MVC và React. Bạn có thể cho biết dự án web cụ thể nào bạn đã tham gia, và vai trò của bạn trong dự án đó là gì? Bạn có thể chia sẻ thêm về những thách thức bạn đã gặp phải và cách bạn vượt qua chúng trong dự án đó không?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "project_details",
+          "label": "Chi tiết dự án web (ASP.NET MVC hoặc React)",
+          "type": "text",
+          "placeholder": "Ví dụ: Tên dự án, vai trò, thách thức, giải pháp...",
+          "required": true
+        }
+      ],
+      "answer": "Khong biet"
+    },
+    {
+      "id": "q1",
+      "Question": "Bạn có thể chia sẻ cụ thể hơn về những khó khăn lớn nhất bạn từng gặp phải trong quá trình phát triển backend cho các dự án web trước đây (ví dụ: Jewelry Production System hoặc MusicPlayerWPF) và cách bạn đã vượt qua chúng như thế nào? Điều gì đã giúp bạn học hỏi và phát triển từ những thử thách đó?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "difficulties_and_solutions",
+          "label": "Khó khăn và giải pháp",
+          "type": "text",
+          "placeholder": "Ví dụ: Khó khăn về hiệu suất, bảo mật, hoặc tích hợp với hệ thống cũ...",
+          "required": true
+        }
+      ],
+      "answer": "Khong biet"
+    },
+    {
+      "id": "q1",
+      "Question": "Trong mô tả công việc có đề cập đến việc sử dụng các framework và thư viện JavaScript hiện đại. Bạn có thể chia sẻ kinh nghiệm thực tế của bạn với một framework JavaScript cụ thể (ví dụ: Angular, Vue.js) và cách bạn áp dụng nó vào dự án web để giải quyết một vấn đề cụ thể không?",
+      "Question_type": "text_input",
+      "subtitle": null,
+      "Question_data": [
+        {
+          "id": "javascript_framework_experience",
+          "label": "Kinh nghiệm với JavaScript framework",
+          "type": "text",
+          "placeholder": "Ví dụ: Sử dụng React để xây dựng giao diện người dùng tương tác cho ứng dụng thương mại điện tử.",
+          "required": true
+        }
+      ],
+      "answer": "Khong biet"
+    }
+  ],
+  "current_iteration": 8,
+  "max_iterations": 5,
+  "analysis_decision": {
+    "decision": "need_more_info",
+    "missing_areas": [
+      "Technical Skills",
+      "Career Goals",
+      "Personal Context"
+    ],
+    "reasoning": "CV cung cấp một số thông tin về kỹ năng và kinh nghiệm, nhưng thiếu chi tiết về trình độ kỹ năng cụ thể và mục tiêu nghề nghiệp rõ ràng. Các câu trả lời \"Khong biet\" cho các câu hỏi trước đây cho thấy người dùng không sẵn sàng hoặc không có khả năng cung cấp thông tin chi tiết hơn về kinh nghiệm của mình. Thiếu thông tin về bối cảnh cá nhân và mục tiêu nghề nghiệp cũng làm giảm tính đầy đủ của hồ sơ.",
+    "completeness_score": 0.65,
+    "suggested_focus": [
+      "Technical Skills: Cần làm rõ mức độ kinh nghiệm với các công nghệ khác nhau (ví dụ: số năm kinh nghiệm, các dự án cụ thể đã sử dụng công nghệ đó).",
+      "Career Goals: Cần hỏi về mục tiêu nghề nghiệp ngắn hạn và dài hạn của ứng viên.",
+      "Personal Context: Cần tìm hiểu về động lực ứng tuyển vào vị trí này và những gì ứng viên mong muốn đạt được trong công việc."
+    ],
+    "cv_summary": "CV của Nguyễn Đinh Minh Hưng trình bày kinh nghiệm của một kỹ sư phần mềm tập trung vào phát triển backend, đặc biệt là với ASP.NET MVC và web client. CV nêu bật các kỹ năng chuyên môn như OOP, lập trình .NET, C++, Java, quản lý SQL, HTML5, CSS3, cùng với các kỹ năng mềm như giao tiếp và làm việc nhóm. CV cũng liệt kê các dự án đã tham gia, chứng chỉ và giải thưởng, cùng với thông tin liên hệ."
+  },
+  "completeness_score": 0.65,
+  "missing_areas": [
+    "Technical Skills",
+    "Career Goals",
+    "Personal Context"
+  ],
+  "focus_areas": [
+    "Technical Skills: Cần làm rõ mức độ kinh nghiệm với các công nghệ khác nhau (ví dụ: số năm kinh nghiệm, các dự án cụ thể đã sử dụng công nghệ đó).",
+    "Career Goals: Cần hỏi về mục tiêu nghề nghiệp ngắn hạn và dài hạn của ứng viên.",
+    "Personal Context: Cần tìm hiểu về động lực ứng tuyển vào vị trí này và những gì ứng viên mong muốn đạt được trong công việc."
+  ],
+  "should_continue": false,
+  "workflow_complete": true,
+  "error_message": "429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. [violations {\n  quota_metric: \"generativelanguage.googleapis.com/generate_content_free_tier_requests\"\n  quota_id: \"GenerateRequestsPerMinutePerProjectPerModel-FreeTier\"\n  quota_dimensions {\n    key: \"model\"\n    value: \"gemini-2.0-flash\"\n  }\n  quota_dimensions {\n    key: \"location\"\n    value: \"global\"\n  }\n  quota_value: 15\n}\n, links {\n  description: \"Learn more about Gemini API quotas\"\n  url: \"https://ai.google.dev/gemini-api/docs/rate-limits\"\n}\n, retry_delay {\n  seconds: 4\n}\n]",
+  "generation_history": [
+    {
+      "iteration": 0,
+      "focus_areas": [
+        "Hỏi về kinh nghiệm làm việc thực tế (nếu có) ngoài các dự án học tập.",
+        "Hỏi về mục tiêu nghề nghiệp ngắn hạn và dài hạn.",
+        "Hỏi về trình độ và kinh nghiệm sử dụng các kỹ năng chuyên môn được liệt kê trong CV (ví dụ: .NET, HTML, CSS).",
+        "Hỏi về kinh nghiệm làm việc nhóm và khả năng giải quyết vấn đề trong các dự án thực tế."
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Bạn có thể chia sẻ một tình huống cụ thể trong dự án Jewelry Production System, khi bạn gặp khó khăn trong việc tích hợp API với các dịch vụ bên ngoài (ví dụ: dịch vụ thanh toán), và bạn đã giải quyết vấn đề đó như thế nào?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "api_integration_challenge",
+              "label": "Tình huống khó khăn khi tích hợp API",
+              "type": "text",
+              "placeholder": "Mô tả chi tiết vấn đề, cách bạn tiếp cận, và kết quả đạt được.",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.75
+    },
+    {
+      "iteration": 1,
+      "focus_areas": [
+        "Mô tả chi tiết hơn về kinh nghiệm làm việc trong các dự án, đặc biệt là các dự án liên quan đến phát triển web.",
+        "Làm rõ mức độ thành thạo của từng kỹ năng kỹ thuật (ví dụ: .NET, C++, Java, SQL, HTML5, CSS3).",
+        "Nêu rõ mục tiêu nghề nghiệp ngắn hạn và dài hạn.",
+        "Bổ sung thông tin về tính cách cá nhân, phong cách làm việc và sở thích liên quan đến công việc.",
+        "Cung cấp thêm thông tin về bối cảnh cá nhân, ví dụ như lý do chọn ngành kỹ thuật phần mềm, hoặc những thành tựu cá nhân khác."
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Trong CV của bạn có đề cập đến kinh nghiệm làm việc với cả ASP.NET MVC và React. Bạn có thể cho biết dự án web cụ thể nào bạn đã tham gia, và vai trò của bạn trong dự án đó là gì? Bạn có thể chia sẻ thêm về những thách thức bạn đã gặp phải và cách bạn vượt qua chúng trong dự án đó không?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "project_details",
+              "label": "Chi tiết dự án web (ASP.NET MVC hoặc React)",
+              "type": "text",
+              "placeholder": "Ví dụ: Tên dự án, vai trò, thách thức, giải pháp...",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.75
+    },
+    {
+      "iteration": 2,
+      "focus_areas": [
+        "Mô tả chi tiết hơn về các kỹ năng mềm và cách chúng được áp dụng trong công việc.",
+        "Nêu rõ mục tiêu nghề nghiệp ngắn hạn và dài hạn.",
+        "Chia sẻ thêm về động lực và đam mê với công việc phát triển web."
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Bạn có thể chia sẻ cụ thể hơn về những khó khăn lớn nhất bạn từng gặp phải trong quá trình phát triển backend cho các dự án web trước đây (ví dụ: Jewelry Production System hoặc MusicPlayerWPF) và cách bạn đã vượt qua chúng như thế nào? Điều gì đã giúp bạn học hỏi và phát triển từ những thử thách đó?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "difficulties_and_solutions",
+              "label": "Khó khăn và giải pháp",
+              "type": "text",
+              "placeholder": "Ví dụ: Khó khăn về hiệu suất, bảo mật, hoặc tích hợp với hệ thống cũ...",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.75
+    },
+    {
+      "iteration": 3,
+      "focus_areas": [
+        "Career Goals",
+        "Personal Context",
+        "Specific Web Development Experience Related to the Job Description"
+      ],
+      "questions_generated": [
+        {
+          "id": "q1",
+          "Question": "Trong mô tả công việc có đề cập đến việc sử dụng các framework và thư viện JavaScript hiện đại. Bạn có thể chia sẻ kinh nghiệm thực tế của bạn với một framework JavaScript cụ thể (ví dụ: Angular, Vue.js) và cách bạn áp dụng nó vào dự án web để giải quyết một vấn đề cụ thể không?",
+          "Question_type": "text_input",
+          "subtitle": null,
+          "Question_data": [
+            {
+              "id": "javascript_framework_experience",
+              "label": "Kinh nghiệm với JavaScript framework",
+              "type": "text",
+              "placeholder": "Ví dụ: Sử dụng React để xây dựng giao diện người dùng tương tác cho ứng dụng thương mại điện tử.",
+              "required": true
+            }
+          ],
+          "answer": null
+        }
+      ],
+      "completeness_before": 0.75
+    }
+  ],
+  "total_questions_generated": 4,
+  "session_id": "69cbe392-24d8-4c1a-b6c0-4d81885aee93",
+  "last_question_id": "q1"
+}

@@ -105,7 +105,7 @@ class QuestionGenerationWorkflow:
 			user_prompt = f"""
 			Trước tiên, hãy **tóm tắt CV** trong 2–3 câu để giúp quá trình phân tích chính xác hơn.
 
-			Sau đó, **phân tích mức độ đầy đủ** của hồ sơ người dùng dựa trên các thông tin sau:
+			Sau đó, **phân tích mức độ phù hợp** của người dùng dựa trên các thông tin sau:
 
 			--- CV ĐÃ LÀM SẠCH ---
 			{state.get('cv_text', '')}

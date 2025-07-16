@@ -15,6 +15,7 @@ from ..workflows.question_generation.config.workflow_config import QuestionGener
 from ..schemas.interview_request import UploadCVInterviewStartRequest, AnalyzeUserProfileRequest
 from ..schemas.interview_response import QuestionGenerationResponse, UserProfileAnalysisResponse
 from ..schemas.interview_schemas import UserProfile, Question, SubmitInterviewAnswerRequest
+from app.modules.question_interview.memory.session_store import load_session_state, save_session_state
 
 
 logger = logging.getLogger(__name__)
@@ -80,6 +81,7 @@ class InterviewComposerRepo:
 
 		# Run the workflow. `ainvoke` with a checkpointer handles state automatically.
 		result = await self.compiled_workflow.ainvoke(workflow_input, config=config)
+		save_session_state(session_id, result)
 
 		# Build response from the final state of the workflow
 		return QuestionGenerationResponse(
@@ -93,19 +95,14 @@ class InterviewComposerRepo:
 			total_questions_generated=result.get('total_questions_generated', 0),
 		)
 
-	async def generate_question_from_cv_text(
-		self,
-		cleaned_cv_text: str,
-		job_description: str,
-		previous_questions: list,
-		session_id: str,
-	) -> QuestionGenerationResponse:
-		# No session state is stored; all context is provided by BE
+	async def generate_question_from_cv_text(self, cleaned_cv_text: str, job_description: str, session_id: Optional[str] = None) -> QuestionGenerationResponse:
+		session_id = session_id or str(uuid.uuid4())
 		config = {"configurable": {"thread_id": session_id}}
+
 		initial_state = {
 			'user_profile': UserProfile(),
 			'generated_questions': [],
-			'all_previous_questions': previous_questions,
+			'all_previous_questions': [],
 			'current_iteration': 0,
 			'max_iterations': 5,
 			'analysis_decision': None,
@@ -121,7 +118,10 @@ class InterviewComposerRepo:
 			'cv_text': cleaned_cv_text,
 			'job_description': job_description,
 		}
+
 		result = await self.compiled_workflow.ainvoke(initial_state, config=config)
+		save_session_state(session_id, result)
+
 		return QuestionGenerationResponse(
 			session_id=session_id,
 			questions=result.get('generated_questions', []),
@@ -133,40 +133,47 @@ class InterviewComposerRepo:
 			total_questions_generated=result.get('total_questions_generated', 0),
 		)
 
-	async def evaluate_answer_and_continue(
-		self,
-		cleaned_cv_text: str,
-		job_description: str,
-		previous_questions: list,
-		answer_text: str,
-		session_id: str,
-	) -> Dict[str, Any]:
-		# Attach the answer to the last unanswered question in previous_questions
-		state = {
-			'user_profile': UserProfile(),
-			'generated_questions': [],
-			'all_previous_questions': previous_questions,
-			'current_iteration': len(previous_questions),
-			'max_iterations': 5,
-			'analysis_decision': None,
-			'completeness_score': 0.0,
-			'missing_areas': [],
-			'focus_areas': [],
-			'should_continue': True,
-			'workflow_complete': False,
-			'error_message': None,
-			'generation_history': [],
-			'total_questions_generated': len(previous_questions),
-			'session_id': session_id,
-			'cv_text': cleaned_cv_text,
-			'job_description': job_description,
-		}
-		# The answer should already be attached in previous_questions by BE
-		final_state = await self.compiled_workflow.ainvoke(state, config={"configurable": {"thread_id": session_id}})
+	async def evaluate_answer_and_continue(self, request: SubmitInterviewAnswerRequest) -> Dict[str, Any]:
+		config = {"configurable": {"thread_id": request.session_id}}
+		state = await self.memory.aget(config)
+		if not state:
+			state = load_session_state(request.session_id)
+			if not state:
+				raise NotFoundException(_("session_not_found"))
+
+		# Attach the answer to the last unanswered question
+		unanswered_idx = None
+		for i in reversed(range(len(state['all_previous_questions']))):
+			q = state['all_previous_questions'][i]
+			if isinstance(q, Question):
+				if not getattr(q, "answer", None):
+					unanswered_idx = i
+					q.answer = request.answer_text
+					state['all_previous_questions'][i] = q
+					break
+			elif isinstance(q, dict):
+				if not q.get("answer"):
+					unanswered_idx = i
+					q["answer"] = request.answer_text
+					state['all_previous_questions'][i] = q
+					break
+
+		if unanswered_idx is None:
+			raise ValidationException("No unanswered question found to attach answer to.")
+
+		state['current_iteration'] += 1
+		state['generated_questions'] = []
+
+		final_state = await self.compiled_workflow.ainvoke(state, config=config)
+		save_session_state(request.session_id, final_state)
+
+		# If done, return final feedback
+		# Determine if all questions have been answered
 		all_answered = all(
-			(q.answer if hasattr(q, "answer") else q.get("answer"))
+			(q.answer if isinstance(q, Question) else q.get("answer"))
 			for q in final_state.get("all_previous_questions", [])
 		)
+
 		if all_answered:
 			final_feedback = {
 				"score": final_state.get("completeness_score", 0.0),
@@ -174,8 +181,8 @@ class InterviewComposerRepo:
 				"summary": getattr(final_state.get('analysis_decision', None), 'reasoning', ''),
 				"all_answers": [
 					{
-						"question": q.Question if hasattr(q, "Question") else q.get("Question", ""),
-						"answer": getattr(q, "answer", "") if hasattr(q, "answer") else q.get("answer", "")
+						"question": q.Question if isinstance(q, Question) else q.get("Question", ""),
+						"answer": getattr(q, "answer", "") if isinstance(q, Question) else q.get("answer", "")
 					}
 					for q in final_state.get("all_previous_questions", [])
 				]
@@ -187,20 +194,25 @@ class InterviewComposerRepo:
 				"completeness_score": final_state.get("completeness_score", 0.0),
 				"should_continue": False,
 			}
+
 		# Otherwise, return next question
 		next_question = None
 		for q in reversed(final_state.get('all_previous_questions', [])):
-			if hasattr(q, "answer") and not getattr(q, "answer", None):
-				next_question = q
-				break
-			elif isinstance(q, dict) and not q.get('answer'):
-				next_question = q
-				break
+			if isinstance(q, Question):
+				if not getattr(q, 'answer', None):
+					next_question = q
+					break
+			elif isinstance(q, dict):
+				if not q.get('answer'):
+					next_question = q
+					break
+
 		feedback = {
 			'score': 0.9,
 			'feedback': 'Câu trả lời tốt. Bạn có thể cụ thể hóa thêm ví dụ.',
 			'suggestions': 'Hãy liên hệ trải nghiệm với vai trò AI Engineer.'
 		}
+
 		return {
 			"feedback": feedback,
 			"next_question": next_question,
