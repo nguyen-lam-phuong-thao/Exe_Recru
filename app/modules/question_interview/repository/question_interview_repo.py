@@ -165,6 +165,31 @@ class InterviewComposerRepo:
 		state['generated_questions'] = []
 
 		final_state = await self.compiled_workflow.ainvoke(state, config=config)
+
+		# Check for toxic or unserious responses in all answers
+		def is_offensive(text: str) -> bool:
+			if not isinstance(text, str):
+				return False  # If text is None or not a string, treat as not offensive
+			text = text.lower()
+			banned_words = ["địt", "lồn", "cặc", "fuck", "dm", "đm", "shit", "địt mẹ", "fuck you"]
+			return any(bad in text for bad in banned_words)
+
+		offensive_found = any(
+			is_offensive(q.get("answer", "")) if isinstance(q, dict) else is_offensive(getattr(q, "answer", ""))
+			for q in final_state.get("all_previous_questions", [])
+		)
+
+		if offensive_found:
+			final_state["completeness_score"] = 0.1
+			final_state["analysis_decision"] = {
+				"cv_summary": "Ứng viên có hồ sơ kỹ thuật nhưng thái độ trả lời không phù hợp.",
+				"decision": "need_more_info",
+				"completeness_score": 0.1,
+				"missing_areas": ["attitude", "communication"],
+				"reasoning": "Câu trả lời chứa nội dung không phù hợp, thiếu nghiêm túc và không thể đánh giá được năng lực thực tế.",
+				"suggested_focus": ["thái độ chuyên nghiệp", "kỹ năng giao tiếp"]
+			}
+
 		save_session_state(request.session_id, final_state)
 
 		# If done, return final feedback
@@ -175,10 +200,15 @@ class InterviewComposerRepo:
 		)
 
 		if all_answered:
+			analysis = final_state.get("analysis_decision", {})
+			summary = (
+				analysis.get("reasoning") if isinstance(analysis, dict)
+				else getattr(analysis, "reasoning", "")
+			)
 			final_feedback = {
 				"score": final_state.get("completeness_score", 0.0),
-				"feedback": "Bạn đã hoàn thành phỏng vấn. Dưới đây là nhận xét tổng quát về hồ sơ của bạn.",
-				"summary": getattr(final_state.get('analysis_decision', None), 'reasoning', ''),
+				"result": "Bạn đã hoàn thành phỏng vấn. Dưới đây là nhận xét tổng quát về hồ sơ của bạn.",
+				"summary": summary,
 				"all_answers": [
 					{
 						"question": q.Question if isinstance(q, Question) else q.get("Question", ""),
@@ -208,14 +238,7 @@ class InterviewComposerRepo:
 					next_question = q
 					break
 
-		feedback = {
-			'score': 0.9,
-			'feedback': 'Câu trả lời tốt. Bạn có thể cụ thể hóa thêm ví dụ.',
-			'suggestions': 'Hãy liên hệ trải nghiệm với vai trò AI Engineer.'
-		}
-
 		return {
-			"feedback": feedback,
 			"next_question": next_question,
 			"current_iteration": final_state.get('current_iteration', 0),
 			"completeness_score": final_state.get('completeness_score', 0.0),
